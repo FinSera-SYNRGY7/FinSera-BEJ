@@ -1,1 +1,3 @@
 # FinSera-BEJ
+
+init
