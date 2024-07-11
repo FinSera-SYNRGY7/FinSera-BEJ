@@ -13,7 +13,7 @@
 ````json
 {
   "username" : "string",
-  "mpin" : "string"
+  "password" : "string"
 }
 ````
 
