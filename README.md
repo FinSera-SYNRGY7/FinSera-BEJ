@@ -1,7 +1,5 @@
 # Auth API
 
----
-
 ## Login User
 
 ### Request :
@@ -19,7 +17,7 @@
 }
 ````
 
-## Response : <span style="color: green;">200 OK</span>
+### Response : <span style="color: green;">200 OK</span>
 ````json
 {
   "status" : "success",
@@ -34,7 +32,7 @@
 }
 ````
 
-## Error Response : <span style="color: red;">400 Bad Request</span>
+### Error Response : <span style="color: red;">400 Bad Request</span>
 ````json
 {
   "status" : "error",
@@ -59,7 +57,7 @@
 }
 ````
 
-## Response : <span style="color: green;">200 OK</span>
+### Response : <span style="color: green;">200 OK</span>
 ````json
 {
   "status" : "success",
@@ -73,7 +71,7 @@
 }
 ````
 
-## Error Response : <span style="color: red;">400 Bad Request</span>
+### Error Response : <span style="color: red;">400 Bad Request</span>
 ````json
 {
   "status" : "error",
