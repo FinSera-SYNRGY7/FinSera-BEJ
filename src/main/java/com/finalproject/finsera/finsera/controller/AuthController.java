@@ -40,6 +40,7 @@ public class AuthController {
     @Autowired
     CustomerRepository customerRepository;
 
+    //ignore register service
     @PostMapping("/register")
     public ResponseEntity<Customers> register(@RequestBody RegisterRequestDto registerRequestDto){
         Customers registerCustomer = customerService.register(registerRequestDto);
