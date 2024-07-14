@@ -2,7 +2,7 @@
 
 ## Transfer Sesama Bank API Spec
 
-Endpoint : POST /v1/amount
+Endpoint : POST /v1/create-transaction
 
 Authorization Type Bearer Token : "USER_TOKEN"
 
