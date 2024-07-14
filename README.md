@@ -23,7 +23,7 @@ Response Body (success) :
 {
     "data": {
         "transaction_num": 12138173913,
-        "transaction_Date": "08/07/2024 13:00",
+        "transaction_date": "08/07/2024 13:00",
         "name_sender" : "FinSera",
         "accountnum_sender" : "1234 567 897 890",
         "name_recipient" : "Binar",
