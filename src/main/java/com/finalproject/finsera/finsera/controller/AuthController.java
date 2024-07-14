@@ -9,21 +9,16 @@ import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.CustomerService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import com.finalproject.finsera.finsera.util.UserDetailsImpl;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("auth")
@@ -59,7 +54,7 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        Customers customers = customerRepository.findByName(userDetails.getUsername()).get();
+        Customers customers = customerRepository.findByUsername(userDetails.getUsername()).get();
         if (customers != null){
             customers.setStatusUser(StatusUser.ACTIVE);
             customerRepository.save(customers);
