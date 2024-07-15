@@ -7,4 +7,5 @@ import com.finalproject.finsera.finsera.model.entity.Customers;
 public interface CustomerService {
     CustomerResponse findById(Long id);
     Customers register(RegisterRequestDto registerRequestDto);
+    String getUserPin(String username);
 }

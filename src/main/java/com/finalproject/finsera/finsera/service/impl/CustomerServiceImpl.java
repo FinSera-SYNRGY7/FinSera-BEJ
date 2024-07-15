@@ -54,4 +54,10 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.save(customers);
         return customers;
     }
+
+    @Override
+    public String getUserPin(String username) {
+        Customers customers = customerRepository.findByUsername(username).get();
+        return customers.getMpin();
+    }
 }

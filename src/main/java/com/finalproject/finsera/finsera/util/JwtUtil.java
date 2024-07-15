@@ -11,9 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.net.http.HttpHeaders;
 import java.security.Key;
 import java.util.Date;
-import java.util.Map;
 import java.util.function.Function;
 
 @Slf4j
@@ -85,5 +85,15 @@ public class JwtUtil {
                 .parseClaimsJws(jwt)
                 .getBody()
                 .getSubject();
+    }
+
+    public String getMpinByToken(String token){
+        String jwt = token.replace("Bearer", "");
+        log.info("JWT : " + jwt);
+        String mpin = Jwts.parserBuilder()
+                .setSigningKey(getSignInKey()).build()
+                .parseClaimsJws(jwt)
+                .getBody().getSubject();
+        return mpin;
     }
 }

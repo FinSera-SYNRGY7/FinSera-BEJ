@@ -33,7 +33,8 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->
-                        auth.anyRequest().permitAll()
+                        auth.requestMatchers("/getUsername").authenticated()
+                                .anyRequest().permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);
