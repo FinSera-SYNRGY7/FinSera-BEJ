@@ -20,24 +20,20 @@
 ### Response : <span style="color: green;">200 OK</span>
 ````json
 {
-  "status" : "success",
-  "message" : "Login success",
   "data" : {
     "token" : "string, JWT",
-    "userDetails" : {
-      "username" : "string",
-      "status" : "enum"
-    }
-  }
+    "username" : "string",
+    "status" : "enum"
+  },
+  "message" : "Login success"
 }
 ````
 
 ### Error Response : <span style="color: red;">400 Bad Request</span>
 ````json
 {
-  "status" : "error",
-  "message" : "Username or Password is invalid",
-  "data" : null
+  "data" : null,
+  "message" : "Username or Password is invalid"
 }
 ````
 ---
@@ -50,7 +46,7 @@
     * Content-type : application/json
     * Accept : application/json
 
-### Body :
+### Param :
 ````json
 {
   "mpin" : "string"
@@ -60,23 +56,19 @@
 ### Response : <span style="color: green;">200 OK</span>
 ````json
 {
-  "status" : "success",
-  "message" : "Login success",
   "data" : {
-    "userDetails" : {
-      "username" : "string",
-      "status" : "enum"
-    }
-  }
+    "username" : "string",
+    "status" : "enum"
+  },
+  "message" : "Login success"
 }
 ````
 
 ### Error Response : <span style="color: red;">400 Bad Request</span>
 ````json
 {
-  "status" : "error",
-  "message" : "Pin is invalid",
-  "data" : null
+  "data" : null,
+  "message" : "Pin is invalid"
 }
 ````
 
