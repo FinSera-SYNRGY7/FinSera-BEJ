@@ -10,7 +10,7 @@ public class RegisterRequestDto {
     private String name;
     private String nik;
     private String address;
-    private Gender gender;
+    private String gender;
     private String fatherName;
     private String motherName;
     private String phoneNumber;

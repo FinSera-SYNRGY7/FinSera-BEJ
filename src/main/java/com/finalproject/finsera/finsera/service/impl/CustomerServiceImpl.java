@@ -40,7 +40,15 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setName(registerRequestDto.getName());
         customers.setNik(registerRequestDto.getNik());
         customers.setAddress(registerRequestDto.getAddress());
-        customers.setGender(Gender.LAKI_LAKI);
+
+        if (registerRequestDto.getGender().equalsIgnoreCase("laki laki")
+            || registerRequestDto.getGender().equalsIgnoreCase("laki-laki")
+        ){
+            customers.setGender(Gender.LAKI_LAKI);
+        } else if (registerRequestDto.getGender().equalsIgnoreCase("perempuan")) {
+            customers.setGender(Gender.PEREMPUAN);
+        }
+
         customers.setFatherName(registerRequestDto.getFatherName());
         customers.setMotherName(registerRequestDto.getMotherName());
         customers.setPhoneNumber(registerRequestDto.getPhoneNumber());
