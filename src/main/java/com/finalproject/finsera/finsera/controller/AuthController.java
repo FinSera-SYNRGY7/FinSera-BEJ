@@ -4,6 +4,7 @@ import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
 import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
 import com.finalproject.finsera.finsera.dto.login.ReloginResponseDto;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
+import com.finalproject.finsera.finsera.exception.ErrorResponse;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +44,9 @@ public class AuthController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    ErrorResponse errorResponse;
 
     //ignore register service
     @PostMapping("/register")
@@ -88,16 +93,10 @@ public class AuthController {
                 response.put("data", loginResponseDto);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("message", "Username or Password is invalid");
-                response.put("data", null);
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                return errorResponse.message("Username or Password is invalid");
             }
-        } catch (Exception e){
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Username or Password is invalid");
-            response.put("data", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } catch (AuthenticationException e){
+            return errorResponse.message("Username or Password is invalid");
         }
 
     }

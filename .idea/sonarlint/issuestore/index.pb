@@ -51,3 +51,5 @@ Psrc/main/java/com/finalproject/finsera/finsera/dto/login/ReloginResponseDto.jav
 Vsrc/main/java/com/finalproject/finsera/finsera/dto/login/ForgotPasswordRequestDto.java,5\f\5fbd6edfea59b9962aba68f00e743a9db027c480
 t
 Dsrc/main/java/com/finalproject/finsera/finsera/model/entity/Otp.java,6\9\69e8ed01b56b98514ef72d5be48f0fe67da40010
+{
+Ksrc/main/java/com/finalproject/finsera/finsera/exception/ErrorResponse.java,d\a\daf34f2c44849a352e7b988866c36599b388ab77
