@@ -55,9 +55,6 @@ public class InfoSaldoServiceImpl implements InfoSaldoService {
         } else {
             log.error("Error: Status Code: {}", response.getStatusCodeValue());
         }
-
-
-
         return null;
     }
 }
