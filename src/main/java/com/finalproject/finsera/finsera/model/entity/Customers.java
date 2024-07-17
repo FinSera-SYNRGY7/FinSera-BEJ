@@ -11,7 +11,6 @@ import java.sql.Timestamp;
 
 @Entity
 @Data
-@Table(name = "user", schema = "public")
 public class Customers {
 
     @Id

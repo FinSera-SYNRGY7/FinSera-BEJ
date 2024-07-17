@@ -93,9 +93,11 @@ public class AuthController {
                 response.put("data", loginResponseDto);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
+                System.out.println(errorResponse);
                 return errorResponse.message("Username or Password is invalid");
             }
         } catch (AuthenticationException e){
+            System.out.println(e);
             return errorResponse.message("Username or Password is invalid");
         }
 
