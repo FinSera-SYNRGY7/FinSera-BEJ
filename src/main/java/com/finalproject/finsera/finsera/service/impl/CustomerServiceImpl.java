@@ -1,6 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
+import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
 import com.finalproject.finsera.finsera.dto.customer.CustomerResponse;
 import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
 import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;

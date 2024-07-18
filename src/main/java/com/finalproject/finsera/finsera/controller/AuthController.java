@@ -2,6 +2,7 @@ package com.finalproject.finsera.finsera.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
 import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
 import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
 import com.finalproject.finsera.finsera.dto.login.ReloginRequestDto;

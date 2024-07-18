@@ -3,9 +3,18 @@ package com.finalproject.finsera.finsera.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Data
@@ -17,13 +26,10 @@ public class BankAccounts {
     @Column(name = "id_bank_accounts")
     private long idBankAccounts;
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customers customer;
 
-    @Column(name = "accout_number")
 
     @Column(name = "account_number")
     private String accountNumber;

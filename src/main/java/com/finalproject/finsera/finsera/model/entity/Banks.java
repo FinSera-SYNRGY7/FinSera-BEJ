@@ -9,7 +9,12 @@ import org.springframework.data.annotation.LastModifiedDate;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Data
