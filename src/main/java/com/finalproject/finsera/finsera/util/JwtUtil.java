@@ -12,8 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.net.http.HttpHeaders;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Slf4j
@@ -65,18 +68,33 @@ public class JwtUtil {
             throw new IllegalArgumentException("Unsupported principal type");
         }
 
+        Map<String, Object> map = new HashMap<>();
+        map.put("alg", "HS256");
+        map.put("typ", "JWT");
         Date now = new Date();
+//        return Jwts.builder()
+//                .setHeaderParam("alg", "HS256")
+//                .setHeaderParam("typ", "JWT")
+////                .setClaims(extractClaim())
+////                .setSubject(username)
+//                .setIssuedAt(now)
+//                .setExpiration(new Date(now.getTime()+jwtExpiration))
+//                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+//                .compact();
         return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
                 .setSubject(username)
                 .setIssuedAt(now)
+//                .setClaims()
                 .setExpiration(new Date(now.getTime()+jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
+//        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
+//        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String getUsername(String jwt) {
