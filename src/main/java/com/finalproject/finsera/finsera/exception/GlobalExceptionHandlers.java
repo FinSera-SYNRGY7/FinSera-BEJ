@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.exception;
 
+import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;

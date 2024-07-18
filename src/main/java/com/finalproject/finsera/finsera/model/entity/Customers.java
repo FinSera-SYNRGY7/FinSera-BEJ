@@ -8,13 +8,12 @@ import lombok.Data;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.sql.Timestamp;
-import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Data
 @Table(name = "user", schema = "public")
 public class Customers {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
@@ -57,5 +56,6 @@ public class Customers {
     @CurrentTimestamp
     private Timestamp createdAt;
 
-
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    private List<BankAccounts> bankAccounts;
 }
