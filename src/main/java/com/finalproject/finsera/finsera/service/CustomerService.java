@@ -16,5 +16,5 @@ public interface CustomerService {
     Customers register(RegisterRequestDto registerRequestDto);
     String getUserPin(String username);
     LoginResponseDto login(LoginRequestDto loginRequestDto);
-    ReloginResponseDto relogin(Principal principal);
+    String relogin(String username, ReloginRequestDto reloginRequestDto);
 }

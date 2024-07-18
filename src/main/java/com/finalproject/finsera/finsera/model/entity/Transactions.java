@@ -6,6 +6,8 @@ import lombok.Data;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -53,6 +55,7 @@ public class Transactions {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "deleted_date")
     private Date deletedDate;
+
 
 
 

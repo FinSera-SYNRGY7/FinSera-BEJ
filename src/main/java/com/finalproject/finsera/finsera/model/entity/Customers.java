@@ -13,8 +13,8 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "user", schema = "public")
 public class Customers {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
@@ -59,5 +59,4 @@ public class Customers {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<BankAccounts> bankAccounts;
-
 }

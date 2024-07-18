@@ -1,5 +1,7 @@
 package com.finalproject.finsera.finsera.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
 import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
 import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
@@ -10,11 +12,16 @@ import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.CustomerService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -39,6 +46,10 @@ public class AuthController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Value("${security.jwt.secret-key}")
+    private String secretKey;
+
+
     //ignore register service
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequestDto registerRequestDto){
@@ -62,30 +73,14 @@ public class AuthController {
     }
 
     @PostMapping("/relogin")
-    public ResponseEntity<Map<String, Object>> relogin(Principal principal, @RequestParam String mpin){
-//        ReloginResponseDto relogin = customerService.relogin(principal);
-//        Map<String, Object> response = new HashMap<>();
-//        response.put("message", "Login success");
-//        response.put("data", relogin);
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-        String username = principal.getName();
-        String userPin = customerService.getUserPin(username);
-        Customers customers = customerRepository.findByUsername(username).get();
-        if (mpin.equals(userPin)){
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Login success");
+    public ResponseEntity<Map<String, Object>> relogin(@RequestHeader("Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
+        String jwt = token.substring("Bearer ".length());
+        String username = jwtUtil.getUsername(jwt);
+        String relogin = customerService.relogin(username, reloginRequestDto);
 
-            ReloginResponseDto reloginResponseDto = new ReloginResponseDto(
-                    customers.getUsername(), customers.getStatusUser()
-            );
-            response.put("data", reloginResponseDto);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Invalid Pin");
-            response.put("data", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Relogin Success");
+        response.put("data", relogin);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 }

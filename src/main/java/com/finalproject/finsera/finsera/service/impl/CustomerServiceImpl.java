@@ -49,19 +49,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     JwtUtil jwtUtil;
 
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    JwtUtil jwtUtil;
-
-//    @Override
-//    public CustomerDetailResponse getUserDetailById(Long id) {
-//        Optional<Customers> optionalCustomers = customerRepository.getUserDetailById(id);
-//        CustomerDetailResponse customerResponse = modelMapper.map(optionalCustomers, CustomerDetailResponse.class);
-//        return customerResponse;
-//    }
-
 
     //ignore register service
     @Override
@@ -106,6 +93,7 @@ public class CustomerServiceImpl implements CustomerService {
             if (optionalCustomers.isEmpty()){
                 throw new UsernameNotFoundException("User not found");
             }
+        System.out.println("abcabc");
 
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -120,17 +108,18 @@ public class CustomerServiceImpl implements CustomerService {
             LoginResponseDto loginResponseDto = new LoginResponseDto(
                     jwt, userDetails.getUsername(), customers.getStatusUser()
             );
+        System.out.println(loginResponseDto.getUsername());
             return loginResponseDto;
     }
 
     @Override
-    public ReloginResponseDto relogin(Principal principal) {
-        String username = principal.getName();
-        String userPin = getUserPin(username);
+    public String relogin(String username, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findByUsername(username).get();
-        ReloginResponseDto reloginResponseDto = new ReloginResponseDto(
-                customers.getUsername(), customers.getStatusUser()
-        );
-        return reloginResponseDto;
+        System.out.println(customers.getMpin());
+        if (customers.getMpin().equals(reloginRequestDto.getMpin())){
+            return "Pin Valid";
+        } else {
+            return "Pin Invalid";
+        }
     }
 }

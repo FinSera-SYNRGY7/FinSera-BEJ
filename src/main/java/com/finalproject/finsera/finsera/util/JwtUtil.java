@@ -1,11 +1,14 @@
 package com.finalproject.finsera.finsera.util;
 
+import com.finalproject.finsera.finsera.model.entity.Customers;
+import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +25,9 @@ import java.util.function.Function;
 @Slf4j
 @Service
 public class JwtUtil {
+    @Autowired
+    CustomerRepository customerRepository;
+
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
@@ -61,31 +67,27 @@ public class JwtUtil {
 
     public String generateToken(Authentication authentication) {
         String username;
+        Long userId;
+        Customers customers = new Customers();
         if (authentication.getPrincipal() instanceof UserDetailsImpl userPrincipal){
             username = userPrincipal.getUsername();
-            log.info("Generating token for user : {}", username);
+            customers.setUsername(userPrincipal.getUsername());
+            customers.setIdCustomers(userPrincipal.getIdCustomers());
+
+            userId = userPrincipal.getIdCustomers();
+            log.info("Generating token for user : {}", userId);
         } else {
             throw new IllegalArgumentException("Unsupported principal type");
         }
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("alg", "HS256");
-        map.put("typ", "JWT");
         Date now = new Date();
-//        return Jwts.builder()
-//                .setHeaderParam("alg", "HS256")
-//                .setHeaderParam("typ", "JWT")
-////                .setClaims(extractClaim())
-////                .setSubject(username)
-//                .setIssuedAt(now)
-//                .setExpiration(new Date(now.getTime()+jwtExpiration))
-//                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-//                .compact();
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
+//                .setId(String.valueOf(userId))
+//                .setSubject(username)
+//                .claim("sub", customers)
                 .setSubject(username)
                 .setIssuedAt(now)
-//                .setClaims()
                 .setExpiration(new Date(now.getTime()+jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
@@ -114,4 +116,5 @@ public class JwtUtil {
                 .getBody().getSubject();
         return mpin;
     }
+
 }

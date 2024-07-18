@@ -10,12 +10,10 @@ import java.util.UUID;
 @Data
 @Table(name = "otp", schema = "public")
 public class Otp {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "otp_id")
     private long idOtp;
-
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")

@@ -5,11 +5,11 @@ import lombok.Data;
 
 @Data
 public class ReloginResponseDto {
-    private String username;
-    private StatusUser status;
+    private String token;
+    private String mpin;
 
-    public ReloginResponseDto(String username, StatusUser status) {
-        this.username = username;
-        this.status = status;
+    public ReloginResponseDto(String token, String mpin) {
+        this.token = token;
+        this.mpin = mpin;
     }
 }

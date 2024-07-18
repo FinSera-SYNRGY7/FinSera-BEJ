@@ -3,8 +3,12 @@ package com.finalproject.finsera.finsera.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -47,5 +51,6 @@ public class Banks {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "banks")
     private List<Transactions> transactions;
+
 
 }
