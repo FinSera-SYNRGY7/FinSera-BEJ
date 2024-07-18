@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class ErrorResponse extends RuntimeException{
     public ResponseEntity<Map<String, Object>> message(String message){
         Map<String, Object> response = new HashMap<>();

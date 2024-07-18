@@ -22,9 +22,6 @@ public class CustomerController {
     @Autowired
     CustomerRepository customerRepository;
 
-    @Autowired
-    ErrorResponse errorResponse;
-
     @GetMapping("/profile/{userId}")
     public ResponseEntity<Map<String, Object>> userDetail(@PathVariable("userId") Long userId) {
         Map<String, Object> response = new HashMap<>();
