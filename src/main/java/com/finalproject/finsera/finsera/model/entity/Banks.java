@@ -3,14 +3,21 @@ package com.finalproject.finsera.finsera.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "banks", schema = "public")
-public class Banks {
+public class Banks extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,8 +33,8 @@ public class Banks {
     @Column(name = "bank_image")
     private String bankImage;
 
-    @Column(name = "delete_at")
-    private Timestamp deletedAt;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "banks")
+    private List<Transactions> transactions;
 
 }

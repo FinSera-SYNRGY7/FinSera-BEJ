@@ -5,15 +5,19 @@ import com.finalproject.finsera.finsera.model.enums.Gender;
 import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.sql.Timestamp;
 import java.util.UUID;
+import java.util.List;
 
 @Entity
 @Data
 @Table(name = "user", schema = "public")
-public class Customers {
+@EqualsAndHashCode(callSuper = true)
+public class Customers extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,12 +54,11 @@ public class Customers {
     @Column(name = "status_user")
     private StatusUser statusUser;
 
-    @Column(name = "delete_at")
-    private Timestamp deletedAt;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    private List<BankAccounts> bankAccounts;
 
-    @Column(name = "created_at")
-    @CurrentTimestamp
-    private Timestamp createdAt;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customers")
+    private List<Notifications> notifications;
 
 
 }

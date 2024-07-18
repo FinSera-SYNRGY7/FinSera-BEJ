@@ -3,33 +3,35 @@ package com.finalproject.finsera.finsera.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import java.sql.Timestamp;
-import java.util.UUID;
+import java.util.List;
 
-@Entity
 @Data
+@Entity
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "bank_accounts", schema = "public")
-public class BankAccounts {
+public class BankAccounts extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
     private long idBankAccounts;
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customers customer;
 
 
-    @Column(name = "accout_number")
+    @Column(name = "account_number")
     private String accountNumber;
 
     @Column(name = "amount")
     private Double amount;
 
-    @Column(name = "delete_at")
-    private Timestamp deletedAt;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "bankAccounts")
+    private List<Transactions> transactions;
+
+
+
 }

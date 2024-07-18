@@ -2,8 +2,12 @@ package com.finalproject.finsera.finsera;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+
+import com.finalproject.finsera.finsera.controller.TransactionController;
 
 @SpringBootApplication
+@EnableJpaAuditing
 public class FinseraApplication {
 
 	public static void main(String[] args) {
