@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.controller;
 
+import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
 import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
 import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
 import com.finalproject.finsera.finsera.dto.login.ReloginResponseDto;
@@ -47,6 +48,8 @@ public class AuthController {
 
     @Autowired
     ErrorResponse errorResponse;
+
+
 
     //ignore register service
     @PostMapping("/register")

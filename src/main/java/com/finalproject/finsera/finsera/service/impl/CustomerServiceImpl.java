@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
 import com.finalproject.finsera.finsera.dto.customer.CustomerResponse;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
@@ -25,13 +26,13 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @Override
-    public CustomerResponse findById(Long id) {
-        Optional<Customers> optionalCustomers = customerRepository.findById(id);
-        CustomerResponse customerResponse = modelMapper.map(optionalCustomers, CustomerResponse.class);
+//    @Override
+//    public CustomerDetailResponse getUserDetailById(Long id) {
+//        Optional<Customers> optionalCustomers = customerRepository.getUserDetailById(id);
+//        CustomerDetailResponse customerResponse = modelMapper.map(optionalCustomers, CustomerDetailResponse.class);
+//        return customerResponse;
+//    }
 
-        return customerResponse;
-    }
 
     //ignore register service
     @Override
