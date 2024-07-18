@@ -71,32 +71,15 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-//    @PostMapping("/relogin")
-//    public ResponseEntity<ReloginResponseDto> relogin(@RequestHeader(value = "Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
-//        String jwt = token.substring("Bearer ".length());
-//        System.out.println(jwt);
-//        String userId = jwtUtil.getUsername(jwt);
-////        System.out.println(userId + "abab");
-////        System.out.println(userId);
-////        ObjectMapper objectMapper = new ObjectMapper();
-////        String mpinJson = "";
-////        try {
-////            JsonNode jsonNode = objectMapper.readTree(reloginRequestDto.getMpin());
-////            mpinJson = jsonNode.get("mpin").asText();
-////        } catch (Exception e){
-////            e.printStackTrace();
-////        }
-//        customerService.relogin(Long.valueOf(userId), reloginRequestDto);
-//        ReloginResponseDto reloginResponseDto = new ReloginResponseDto(
-//                jwt, reloginRequestDto.getMpin()
-//        );
-//        return ResponseEntity.ok(reloginResponseDto);
-//    }
-
     @PostMapping("/relogin")
-    public ResponseEntity<String> relogin(@RequestHeader(value = "Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
-        System.out.println(token);
-        System.out.println(reloginRequestDto.getMpin());
-        return ResponseEntity.ok("test");
+    public ResponseEntity<Map<String, Object>> relogin(@RequestHeader("Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
+        String jwt = token.substring("Bearer ".length());
+        String username = jwtUtil.getUsername(jwt);
+        String relogin = customerService.relogin(username, reloginRequestDto);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Relogin Success");
+        response.put("data", relogin);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

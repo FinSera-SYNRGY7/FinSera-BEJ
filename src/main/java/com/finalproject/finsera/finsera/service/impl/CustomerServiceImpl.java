@@ -113,8 +113,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public String relogin(Long id, ReloginRequestDto reloginRequestDto) {
-        Customers customers = customerRepository.findById(id).get();
+    public String relogin(String username, ReloginRequestDto reloginRequestDto) {
+        Customers customers = customerRepository.findByUsername(username).get();
         System.out.println(customers.getMpin());
         if (customers.getMpin().equals(reloginRequestDto.getMpin())){
             return "Pin Valid";

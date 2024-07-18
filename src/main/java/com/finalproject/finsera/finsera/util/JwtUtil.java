@@ -80,16 +80,13 @@ public class JwtUtil {
             throw new IllegalArgumentException("Unsupported principal type");
         }
 
-        Map<String, Object> map = new HashMap<>();
-        map.put("alg", "HS256");
-        map.put("typ", "JWT");
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
 //                .setId(String.valueOf(userId))
 //                .setSubject(username)
-                .claim("sub", customers)
-//                .setSubject(String.valueOf(userId))
+//                .claim("sub", customers)
+                .setSubject(username)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime()+jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
