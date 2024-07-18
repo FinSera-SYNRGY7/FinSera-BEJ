@@ -1,14 +1,12 @@
 package com.finalproject.finsera.finsera.controller;
 
 
+import com.finalproject.finsera.finsera.dto.InfoSaldoRequest;
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.service.InfoSaldoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -20,9 +18,11 @@ public class InfoSaldoController {
     private final InfoSaldoService infoSaldoService;
 
     @GetMapping("/")
-    public ResponseEntity<?> getInfoSaldo() {
+    public ResponseEntity<?> getInfoSaldo(
+            @RequestBody InfoSaldoRequest infoSaldoRequest
+    ) {
 
-        return ResponseEntity.ok(BaseResponse.success(infoSaldoService, "Success Create Order"));
+        return ResponseEntity.ok(BaseResponse.success(infoSaldoService.getInfoSaldo(infoSaldoRequest), "Nomor Rekening ditemukan"));
     }
 
 

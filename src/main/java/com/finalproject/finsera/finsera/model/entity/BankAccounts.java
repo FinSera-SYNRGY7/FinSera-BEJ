@@ -17,12 +17,9 @@ public class BankAccounts {
     @Column(name = "id_user")
     private long idBankAccounts;
 
-
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customers customer;
-
 
     @Column(name = "accout_number")
     private String accountNumber;
