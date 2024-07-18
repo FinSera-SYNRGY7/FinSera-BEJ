@@ -1,11 +1,8 @@
 package com.finalproject.finsera.finsera.mapper;
 
-import com.finalproject.finsera.finsera.dto.Amount;
-import com.finalproject.finsera.finsera.dto.InfoSaldoResponse;
+import com.finalproject.finsera.finsera.dto.infosaldo.Amount;
+import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoResponse;
 import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.repository.InfoSaldoRepository;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component

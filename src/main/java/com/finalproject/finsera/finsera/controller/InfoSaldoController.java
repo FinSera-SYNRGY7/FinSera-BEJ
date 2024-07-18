@@ -1,14 +1,12 @@
 package com.finalproject.finsera.finsera.controller;
 
 
-import com.finalproject.finsera.finsera.dto.InfoSaldoRequest;
+import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoRequest;
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.service.InfoSaldoService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @AllArgsConstructor
