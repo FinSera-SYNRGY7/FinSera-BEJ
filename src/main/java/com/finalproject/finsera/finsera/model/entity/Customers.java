@@ -8,6 +8,7 @@ import lombok.Data;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 import java.util.List;
 
 @Entity

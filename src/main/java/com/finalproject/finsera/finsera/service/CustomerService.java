@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.service;
 
+import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
 import com.finalproject.finsera.finsera.dto.customer.CustomerResponse;
 import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
 import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
