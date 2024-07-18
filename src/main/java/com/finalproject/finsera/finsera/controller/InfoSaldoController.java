@@ -4,6 +4,7 @@ package com.finalproject.finsera.finsera.controller;
 import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoRequest;
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.service.InfoSaldoService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ public class InfoSaldoController {
 
     @GetMapping("/")
     public ResponseEntity<?> getInfoSaldo(
+            @Valid
             @RequestBody InfoSaldoRequest infoSaldoRequest
     ) {
 
