@@ -18,12 +18,18 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.debug("Entering in loadUserByUsername Method...");
-        Customers customers = customerRepository.findByUsername(username)
+    public UserDetails loadUserByUsername(String id) throws UsernameNotFoundException {
+//        logger.debug("Entering in loadUserByUsername Method...");
+//        Customers customers = customerRepository.findById(Long.valueOf(id))
+//                .orElseThrow(() -> new UsernameNotFoundException(
+//                    "Username not found "
+//                ));
+        Customers getId = customerRepository.findByUsername(id).get();
+        Customers customers = customerRepository.findById(getId.getIdCustomers())
                 .orElseThrow(() -> new UsernameNotFoundException(
-                    "Username not found " + username
+                        "Username not found " + id
                 ));
         return UserDetailsImpl.build(customers);
     }
+
 }

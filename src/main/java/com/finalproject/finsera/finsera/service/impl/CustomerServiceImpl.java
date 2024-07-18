@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.finalproject.finsera.finsera.dto.customer.CustomerResponse;
 import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
 import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
@@ -48,13 +49,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     JwtUtil jwtUtil;
 
-    @Override
-    public CustomerResponse findById(Long id) {
-        Optional<Customers> optionalCustomers = customerRepository.findById(id);
-        CustomerResponse customerResponse = modelMapper.map(optionalCustomers, CustomerResponse.class);
-
-        return customerResponse;
-    }
 
     //ignore register service
     @Override
@@ -99,6 +93,7 @@ public class CustomerServiceImpl implements CustomerService {
             if (optionalCustomers.isEmpty()){
                 throw new UsernameNotFoundException("User not found");
             }
+        System.out.println("abcabc");
 
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -113,17 +108,18 @@ public class CustomerServiceImpl implements CustomerService {
             LoginResponseDto loginResponseDto = new LoginResponseDto(
                     jwt, userDetails.getUsername(), customers.getStatusUser()
             );
+        System.out.println(loginResponseDto.getUsername());
             return loginResponseDto;
     }
 
     @Override
-    public ReloginResponseDto relogin(Principal principal) {
-        String username = principal.getName();
-        String userPin = getUserPin(username);
-        Customers customers = customerRepository.findByUsername(username).get();
-        ReloginResponseDto reloginResponseDto = new ReloginResponseDto(
-                customers.getUsername(), customers.getStatusUser()
-        );
-        return reloginResponseDto;
+    public String relogin(Long id, ReloginRequestDto reloginRequestDto) {
+        Customers customers = customerRepository.findById(id).get();
+        System.out.println(customers.getMpin());
+        if (customers.getMpin().equals(reloginRequestDto.getMpin())){
+            return "Pin Valid";
+        } else {
+            return "Pin Invalid";
+        }
     }
 }

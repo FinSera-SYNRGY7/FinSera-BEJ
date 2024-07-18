@@ -12,17 +12,19 @@ import java.util.List;
 @Setter
 @Getter
 public class UserDetailsImpl implements UserDetails {
+    private Long idCustomers;
     private String username;
     private String password;
 
-    public UserDetailsImpl(String username, String password) {
+    public UserDetailsImpl(String username, String password, Long idCustomers) {
+        this.idCustomers = idCustomers;
         this.username = username;
         this.password = password;
     }
 
     public static UserDetails build(Customers customers){
         return new UserDetailsImpl(
-                customers.getUsername(), customers.getPassword()
+                customers.getUsername(), customers.getPassword(), customers.getIdCustomers()
         );
     }
 

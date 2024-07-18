@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.security.Principal;
 
 public interface CustomerService {
-    CustomerResponse findById(Long id);
     Customers register(RegisterRequestDto registerRequestDto);
     String getUserPin(String username);
     LoginResponseDto login(LoginRequestDto loginRequestDto);
-    ReloginResponseDto relogin(Principal principal);
+    String relogin(Long id, ReloginRequestDto reloginRequestDto);
 }
