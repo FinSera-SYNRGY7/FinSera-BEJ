@@ -22,7 +22,7 @@ import java.util.Map;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${security.jwt.secret.key}")
+    @Value("${security.jwt.secret-key}")
     private String jwtLoginKey;
 
     @Override

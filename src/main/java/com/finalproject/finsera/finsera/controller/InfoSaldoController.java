@@ -4,8 +4,10 @@ package com.finalproject.finsera.finsera.controller;
 import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoRequest;
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.service.InfoSaldoService;
+import com.finalproject.finsera.finsera.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,13 +18,17 @@ public class InfoSaldoController {
 
     private final InfoSaldoService infoSaldoService;
 
+    private final JwtUtil jwtUtil;
+
     @GetMapping("/")
     public ResponseEntity<?> getInfoSaldo(
             @Valid
-            @RequestBody InfoSaldoRequest infoSaldoRequest
+            @RequestHeader(name = "Authorization") String token
     ) {
 
-        return ResponseEntity.ok(BaseResponse.success(infoSaldoService.getInfoSaldo(infoSaldoRequest), "Nomor Rekening ditemukan"));
+        String jwt = token.substring("Bearer ".length());
+        String username = jwtUtil.getUsername(jwt);
+        return ResponseEntity.ok(BaseResponse.success(infoSaldoService.getInfoSaldo(username), "Nomor Rekening ditemukan"));
     }
 
 

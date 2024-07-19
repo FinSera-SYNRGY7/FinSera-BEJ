@@ -14,6 +14,7 @@ import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.CustomerService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import com.finalproject.finsera.finsera.util.UserDetailsImpl;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,12 +34,11 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
     @Autowired
     CustomerRepository customerRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -93,7 +93,6 @@ public class CustomerServiceImpl implements CustomerService {
             if (optionalCustomers.isEmpty()){
                 throw new UsernameNotFoundException("User not found");
             }
-        System.out.println("abcabc");
 
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -108,7 +107,7 @@ public class CustomerServiceImpl implements CustomerService {
             LoginResponseDto loginResponseDto = new LoginResponseDto(
                     jwt, userDetails.getUsername(), customers.getStatusUser()
             );
-        System.out.println(loginResponseDto.getUsername());
+            System.out.println(loginResponseDto.getUsername());
             return loginResponseDto;
     }
 

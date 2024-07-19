@@ -5,7 +5,7 @@ import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoResponse;
 import com.finalproject.finsera.finsera.mapper.InfoSaldoMapper;
 import com.finalproject.finsera.finsera.model.entity.BankAccounts;
 import com.finalproject.finsera.finsera.model.entity.Customers;
-import com.finalproject.finsera.finsera.repository.CustomersRepository;
+import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.repository.InfoSaldoRepository;
 import com.finalproject.finsera.finsera.service.InfoSaldoService;
 import com.finalproject.finsera.finsera.service.ValidationService;
@@ -25,15 +25,16 @@ public class InfoSaldoServiceImpl implements InfoSaldoService {
 
 
     private final InfoSaldoRepository infoSaldoRepository;
-    private final CustomersRepository customersRepository;
+    private final CustomerRepository customersRepository;
     private final ValidationService validationService;
     private final InfoSaldoMapper infoSaldoMapper;
 
 
     @Override
-    public InfoSaldoResponse getInfoSaldo(InfoSaldoRequest infoSaldoRequest) {
-        validationService.validate(infoSaldoRequest);
-        Customers customers = customersRepository.findById(infoSaldoRequest.getCustomerId())
+    public InfoSaldoResponse getInfoSaldo(String username) {
+        validationService.validate(username);
+
+        Customers customers = customersRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer Tidak Ditemukan"));
 
         Optional<BankAccounts> bankAccounts = Optional.ofNullable(infoSaldoRepository.findByCustomer(customers)

@@ -4,5 +4,5 @@ import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoRequest;
 import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoResponse;
 
 public interface InfoSaldoService {
-    InfoSaldoResponse getInfoSaldo(InfoSaldoRequest infoSaldoRequest);
+    InfoSaldoResponse getInfoSaldo(String username);
 }
