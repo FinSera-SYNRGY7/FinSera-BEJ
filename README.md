@@ -1,7 +1,7 @@
 
 ## Informasi Saldo API Spec
 
-Endpoint : GET /v1/amount
+Endpoint : GET api/v1/amount
 
 Authorization Type Bearer Token : "USER_TOKEN"
 
@@ -9,25 +9,24 @@ Response Body (succes) :
 
 ```json
 {
+    "code": 200,
+    "message": "Nomor Rekening ditemukan",
+    "status": true,
     "data": {
-        "idUser": 1,
-        "name": "Ramadhan",
-        "amount" : "10.000.000",
-        "appName" : "FinSera",
-        "accountNumber" : "1234 567 897 890",
-        "income" : "5.000.000",
-        "expenses" : "500.000",
-        "topUpEwallet" : "600.000" 
-    },
-    "message": "Berhasil mendapatkan data",
-    "status": 200
+        "customerId": 1,
+        "username": "John Doe",
+        "accountNumber": "1234567890",
+        "amount": {
+            "amount": 10000.0,
+            "currency": "IDR"
+        }
+    }
 }
-```
 Response Body (failed) :
 
 ```json
 {
-    "message": "Gagal mendapatkan data",
+    "message": "Nomor rekening tidak ditemukan",
     "status": 400
 }
 ```
