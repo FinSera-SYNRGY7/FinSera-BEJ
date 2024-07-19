@@ -88,28 +88,23 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-            Optional<Customers> optionalCustomers = customerRepository.findByUsername(loginRequestDto.getUsername());
-            Customers customers = optionalCustomers.get();
-            if (optionalCustomers.isEmpty()){
-                throw new UsernameNotFoundException("User not found");
-            }
-        System.out.println("abcabc");
-
-            Authentication authentication = authenticationManager.authenticate(
+        Optional<Customers> optionalCustomers = customerRepository.findByUsername(loginRequestDto.getUsername());
+        Customers customers = optionalCustomers.get();
+        Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequestDto.getUsername(),
                             loginRequestDto.getPassword()
                     ));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtil.generateToken(authentication);
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            customers.setStatusUser(StatusUser.ACTIVE);
-            customerRepository.save(customers);
-            LoginResponseDto loginResponseDto = new LoginResponseDto(
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtil.generateToken(authentication);
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        customers.setStatusUser(StatusUser.ACTIVE);
+        customerRepository.save(customers);
+        LoginResponseDto loginResponseDto = new LoginResponseDto(
                     jwt, userDetails.getUsername(), customers.getStatusUser()
             );
-        System.out.println(loginResponseDto.getUsername());
-            return loginResponseDto;
+
+        return loginResponseDto;
     }
 
     @Override

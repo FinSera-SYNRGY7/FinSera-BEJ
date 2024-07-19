@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("auth")
@@ -65,11 +66,20 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDto loginRequestDto){
-        LoginResponseDto login = customerService.login(loginRequestDto);
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Login success");
-        response.put("data", login);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        Optional<Customers> customers = customerRepository.findByUsername(loginRequestDto.getUsername());
+        if (customers.isPresent()){
+            LoginResponseDto login = customerService.login(loginRequestDto);
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Login success");
+            response.put("data", login);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Username or Password is invalid");
+            response.put("data", null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
     }
 
     @PostMapping("/relogin")
@@ -77,10 +87,18 @@ public class AuthController {
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
         String relogin = customerService.relogin(username, reloginRequestDto);
+        Customers customers = customerRepository.findByUsername(username).get();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Relogin Success");
-        response.put("data", relogin);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        if (customers.getMpin().equals(reloginRequestDto.getMpin())){
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Relogin Success");
+            response.put("data", relogin);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Pin is invalid");
+            response.put("data", null);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 }
