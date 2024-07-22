@@ -1,160 +1,44 @@
-# Auth API
+# FinSera-BEJ
 
-## Login User
+## Get User Profile
 
-### Request :
-* Method : `POST`
-* Endpoint : /v1/auth/login
-* Headers :
-    * Content-type : application/json
-    * Accept : application/json
+Endpoint : GET /v1/profile
 
-### Body :
-````json
-{
-  "username" : "string",
-  "password" : "string"
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Request Body:
+```json
+{  
+    "idUser": 1  
 }
-````
+```
 
-### Response : <span style="color: green;">200 OK</span>
-````json
-{
-  "data" : {
-    "token" : "string, JWT",
-    "username" : "string",
-    "status" : "enum"
-  },
-  "message" : "Login success"
+Response Body (success) :
+
+```json
+{  
+    "customer": {  
+        "id": 1,  
+        "name": "John Doe",  
+        "nik": "123456789",  
+        "address": "123 Main Street",  
+        "gender": "Male",  
+        "father_name": "Doe Sr.",  
+        "mother_name": "Doe Sr.",  
+        "phone_number": "123-456-7890",  
+        "income": 50000,  
+        "username": "johndoe",  
+        "mpin": "1234",  
+        "status_user": "Active"  
+    }  
 }
-````
+```
+Response Body (failed) :
+1. User ID Not Found 
 
-### Error Response : <span style="color: red;">400 Bad Request</span>
-````json
+```json
 {
-  "data" : null,
-  "message" : "Username or Password is invalid"
+    "message": "User Not Found",  
+    "status": 402  
 }
-````
----
-
-## Re-Login User
-### Request :
-* Method : `POST`
-* Endpoint : /v1/auth/relogin
-* Headers :
-    * Content-type : application/json
-    * Accept : application/json
-
-### Param :
-````json
-{
-  "mpin" : "string"
-}
-````
-
-### Response : <span style="color: green;">200 OK</span>
-````json
-{
-  "data" : {
-    "username" : "string",
-    "status" : "enum"
-  },
-  "message" : "Login success"
-}
-````
-
-### Error Response : <span style="color: red;">400 Bad Request</span>
-````json
-{
-  "data" : null,
-  "message" : "Pin is invalid"
-}
-````
-
----
-
-## Forgot Password
-
-### Request :
-* Method : POST
-* Endpoint : /v1/auth/forgot-password
-* Headers :
-    * Content-type : application/json
-    * Accept : application/json
-
-### Body :
-````json
-{
-  "idCustomers" : "long",
-  "accountNumber" : "string",
-  "mpin" : "string"
-}
-````
-
-### Response : <span style="color: green;">200 OK</span>
-````json
-{
-  "status" : "success",
-  "message" : "Password reset instructions sent to your email"
-}
-````
-
-### Error Response : <span style="color: red;">400 Bad Request</span>
-````json
-{
-  "status" : "error",
-  "message" : "Invalid username"
-}
-````
----
-
-## Setup New Password
-### Request :
-* Method : POST
-* Endpoint : /v1/auth/setup-new-password
-* Headers :
-    * Content-type : application/json
-    * Accept : application/json
-
-### Body :
-````json
-{
-  "username" : "string",
-  "newPassword" : "string",
-  "otpCode" : "string"
-}
-````
-
-### Response : <span style="color: green;">200 OK</span>
-````json
-{
-  "status" : "success",
-  "message" : "Password successfully updated"
-}
-````
-
-### Error Response : <span style="color: red;">400 Bad Request</span>
-````json
-{
-  "status" : "error",
-  "message" : "Invalid username"
-}
-````
-
-### Error Response : <span style="color: red;">400 Bad Request</span>
-````json
-{
-  "status" : "error",
-  "message" : "Password does not meet criteria"
-}
-````
-
-### Error Response : <span style="color: red;">400 Bad Request</span>
-````json
-{
-  "status" : "error",
-  "message" : "Invalid OTP"
-}
-````
-
+```
