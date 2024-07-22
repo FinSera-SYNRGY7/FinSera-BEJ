@@ -11,10 +11,12 @@ import com.finalproject.finsera.finsera.model.entity.Customers;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
+import java.util.Map;
 
 public interface CustomerService {
     Customers register(RegisterRequestDto registerRequestDto);
     String getUserPin(String username);
     LoginResponseDto login(LoginRequestDto loginRequestDto);
     String relogin(String username, ReloginRequestDto reloginRequestDto);
+    String reloginGetId(Long id, ReloginRequestDto reloginRequestDto);
 }

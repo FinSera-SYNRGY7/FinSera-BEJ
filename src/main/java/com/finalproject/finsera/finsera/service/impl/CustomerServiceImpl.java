@@ -73,7 +73,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setUsername(registerRequestDto.getUsername());
         customers.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         customers.setEmail(registerRequestDto.getEmail());
-        customers.setMpin(registerRequestDto.getMpin());
+        customers.setMpin(passwordEncoder.encode(registerRequestDto.getMpin()));
         customers.setStatusUser(StatusUser.INACTIVE);
 
         customerRepository.save(customers);
@@ -88,35 +88,41 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-            Optional<Customers> optionalCustomers = customerRepository.findByUsername(loginRequestDto.getUsername());
-            Customers customers = optionalCustomers.get();
-            if (optionalCustomers.isEmpty()){
-                throw new UsernameNotFoundException("User not found");
-            }
-        System.out.println("abcabc");
-
-            Authentication authentication = authenticationManager.authenticate(
+        Optional<Customers> optionalCustomers = customerRepository.findByUsername(loginRequestDto.getUsername());
+        Customers customers = optionalCustomers.get();
+        Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequestDto.getUsername(),
                             loginRequestDto.getPassword()
                     ));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtil.generateToken(authentication);
-            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-            customers.setStatusUser(StatusUser.ACTIVE);
-            customerRepository.save(customers);
-            LoginResponseDto loginResponseDto = new LoginResponseDto(
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String jwt = jwtUtil.generateToken(authentication);
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        customers.setStatusUser(StatusUser.ACTIVE);
+        customerRepository.save(customers);
+        LoginResponseDto loginResponseDto = new LoginResponseDto(
                     jwt, userDetails.getUsername(), customers.getStatusUser()
             );
-        System.out.println(loginResponseDto.getUsername());
-            return loginResponseDto;
+
+        return loginResponseDto;
     }
 
     @Override
     public String relogin(String username, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findByUsername(username).get();
         System.out.println(customers.getMpin());
-        if (customers.getMpin().equals(reloginRequestDto.getMpin())){
+        System.out.println(reloginRequestDto.getMpin());
+        if (passwordEncoder.matches(customers.getMpin(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
+            return "Pin Valid";
+        } else {
+            return "Pin Invalid";
+        }
+    }
+
+    @Override
+    public String reloginGetId(Long id, ReloginRequestDto reloginRequestDto) {
+        Customers customers = customerRepository.findById(id).get();
+        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpin())){
             return "Pin Valid";
         } else {
             return "Pin Invalid";
