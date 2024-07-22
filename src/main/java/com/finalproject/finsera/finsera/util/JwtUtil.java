@@ -5,7 +5,6 @@ import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.net.http.HttpHeaders;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 @Slf4j
@@ -80,6 +75,7 @@ public class JwtUtil {
             throw new IllegalArgumentException("Unsupported principal type");
         }
 
+
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
@@ -87,6 +83,7 @@ public class JwtUtil {
 //                .setSubject(username)
 //                .claim("sub", customers)
                 .setSubject(username)
+                .claim("userId", userPrincipal.getIdCustomers())
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime()+jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -105,6 +102,14 @@ public class JwtUtil {
                 .parseClaimsJws(jwt)
                 .getBody()
                 .getSubject();
+    }
+
+    public Long getId(String jwt) {
+        return Long.valueOf(Jwts.parserBuilder()
+                .setSigningKey(getSignInKey()).build()
+                .parseClaimsJws(jwt)
+                .getBody()
+                .get("userId", Long.class));
     }
 
     public String getMpinByToken(String token){
