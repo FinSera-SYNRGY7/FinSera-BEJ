@@ -26,6 +26,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig implements WebMvcConfigurer {
+
     @Autowired
     UserDetailsService userDetailsService;
 
@@ -35,12 +36,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->{
-
                             auth.requestMatchers("auth/**").permitAll();
                             auth.anyRequest().authenticated();
-
                         }
-
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
