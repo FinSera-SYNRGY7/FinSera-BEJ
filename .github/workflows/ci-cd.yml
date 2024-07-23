@@ -39,12 +39,8 @@ jobs:
       - name: Build Docker image
         run: docker build -t fahrizalvianaz/finsera-api-staging:v1 .
 
-      - name: Log into registry ${{ env.REGISTRY }}
-        uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.USER_GITHUB_TOKEN }}
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_HUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
       - name: Push Docker image to DockerHub
         run: docker push fahrizalvianaz/finsera-api-staging:v1
