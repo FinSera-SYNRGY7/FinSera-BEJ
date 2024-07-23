@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
     @Autowired
     CustomerService customerService;
@@ -52,7 +52,7 @@ public class AuthController {
 
 
     //ignore register service
-    @PostMapping("/auth/register")
+    @PostMapping("user/register")
     public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequestDto registerRequestDto){
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
@@ -64,7 +64,7 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("/user/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDto loginRequestDto){
         Optional<Customers> customers = customerRepository.findByUsername(loginRequestDto.getUsername());
         if (customers.isPresent()){

@@ -69,7 +69,7 @@ public class AuthenticationTest {
         loginRequestDto.setPassword("securepassword");
 
         ResultActions resultActions = mockMvc.perform(
-                post("/auth/login")
+                post("/api/v1/auth/user/login")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequestDto))
