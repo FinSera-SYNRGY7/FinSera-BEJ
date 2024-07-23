@@ -46,12 +46,12 @@ jobs:
         run: docker push fahrizalvianaz/finsera-api-staging:v1
 
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: koyeb-runner
     needs: build
 
     steps:
       - name: Deploy to server
         run: |
-          ssh user@your-server 'docker pull fahrizalvianaz/finsera-api-staging:v1'
-          ssh user@your-server 'docker stop finsera-api-staging || true'
-          ssh user@your-server 'docker run -d -p 8080:8080 --name finsera-api-staging fahrizalvianaz/finsera-api-staging:v1'
+          'docker pull fahrizalvianaz/finsera-api-staging:v1'
+          'docker stop finsera-api-staging || true'
+          'docker run -d -p 8080:8080 --name finsera-api-staging fahrizalvianaz/finsera-api-staging:v1'
