@@ -30,7 +30,6 @@ public class BankAccounts {
     @JoinColumn(name = "customer_id")
     private Customers customer;
 
-
     @Column(name = "account_number")
     private String accountNumber;
 
@@ -38,17 +37,17 @@ public class BankAccounts {
     private Double amount;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_date", nullable = true, updatable = false)
+    @Column(name = "created_at", nullable = true, updatable = false)
     @CreatedDate
     private Date createdDate;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_date", nullable = true)
+    @Column(name = "updated_at", nullable = true)
     @LastModifiedDate
     private Date updatedDate;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "deleted_date")
+    @Column(name = "deleted_at")
     private Date deletedDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bankAccounts")
