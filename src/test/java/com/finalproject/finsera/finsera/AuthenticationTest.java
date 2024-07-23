@@ -4,10 +4,14 @@ package com.finalproject.finsera.finsera;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.finsera.finsera.controller.CustomerController;
 import com.finalproject.finsera.finsera.dto.AuthRequest;
+import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
+import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
+import com.finalproject.finsera.finsera.dto.login.ReloginRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.CustomerService;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,33 +33,33 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Slf4j
 public class AuthenticationTest {
 
     @Autowired
     MockMvc mockMvc;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+
+    @MockBean
+    private CustomerService customerService;
 
     @Autowired
     private ObjectMapper objectMapper;
 
 
+    private BaseResponse authResponse;
+
     @BeforeEach
     public void init() {
-        Customers customer = customerRepository.findByUsername("customerusername").get();
-        if(customer.equals(null)){
-            customer = new Customers();
-            customer.setUsername("customerusername");
-            customer.setPassword("securepassword");
-            customerRepository.save(customer);
-        }
+        authResponse = new BaseResponse();
+
     }
 
     @Test
@@ -64,17 +68,42 @@ public class AuthenticationTest {
         loginRequestDto.setUsername("customerusername");
         loginRequestDto.setPassword("securepassword");
 
-        mockMvc.perform(
+        ResultActions resultActions = mockMvc.perform(
                 post("/auth/login")
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequestDto))
-        ).andExpectAll(
-                status().isOk()
-        ).andDo(result -> {
-            ResponseEntity<?> responseEntity = objectMapper.readValue(result.getResponse().getContentAsString(), ResponseEntity.class);
-            assertEquals(responseEntity.getStatusCodeValue(), 200);
-        });
+        );
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(result -> {
+                    String responseBody = result.getResponse().getContentAsString();
+                    authResponse = objectMapper.readValue(responseBody, BaseResponse.class);
+                    assertEquals("Login success", authResponse.getMessage());
+                });
 
     }
+
+//    @Test
+//    public void testRelogin() throws Exception{
+//
+//        ReloginRequestDto reloginRequestDto = new ReloginRequestDto();
+//        reloginRequestDto.setMpin("123456");
+//
+//        ResultActions resultActions = mockMvc.perform(
+//                post("/auth/reogin")
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .header("Authorization", "Bearer " + "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJjdXN0b21lcnVzZXJuYW1lIiwidXNlcklkIjo3LCJpYXQiOjE3MjE3Mzk4NzgsImV4cCI6NjAxNzIxNzM5ODc4fQ.iot8aFV3bL9sgoYSf7ujhuGNGLKIYXUS6gHcF2FleJw")
+//                        .content(objectMapper.writeValueAsString(reloginRequestDto))
+//        );
+//        resultActions
+//                .andExpect(status().isOk())
+//                .andDo(result -> {
+//                    String responseBody = result.getResponse().getContentAsString();
+//                    authResponse = objectMapper.readValue(responseBody, BaseResponse.class);
+//                    assertEquals("Login success", authResponse);
+//                });
+//
+//    }
 }
