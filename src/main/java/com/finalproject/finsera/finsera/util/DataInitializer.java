@@ -5,6 +5,7 @@ import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.model.enums.Gender;
 import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
+import com.finalproject.finsera.finsera.repository.InfoSaldoRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,7 @@ import java.time.Instant;
 public class DataInitializer {
 
     @Bean
-    public CommandLineRunner loadData(CustomerRepository customersRepository) {
+    public CommandLineRunner loadData(CustomerRepository customersRepository, InfoSaldoRepository bankAccountsRepository) {
         return args -> {
 
             if (customersRepository.count() == 0) {
@@ -31,7 +32,7 @@ public class DataInitializer {
                 customer1.setPhoneNumber("081234567890");
                 customer1.setIncome(5000.0);
                 customer1.setUsername("johndoe");
-                customer1.setPassword("password123");
+                customer1.setPassword("$2y$10$zJbIkde9wMiVHasdl80FP.Ho9a4lPHuEHrS0EMD467VpBIBDnI5ka"); // password123
                 customer1.setEmail("john.doe@example.com");
                 customer1.setMpin("1234");
                 customer1.setStatusUser(StatusUser.ACTIVE);
@@ -47,7 +48,7 @@ public class DataInitializer {
                 customer2.setPhoneNumber("082345678901");
                 customer2.setIncome(6000.0);
                 customer2.setUsername("janesmith");
-                customer2.setPassword("password456");
+                customer2.setPassword("$2y$10$VkN6Nr.jOV3mJjPUvIqDv.QAbTQfzbmIEvStIJxtUVS1suttssuYq"); // password456
                 customer2.setEmail("jane.smith@example.com");
                 customer2.setMpin("5678");
                 customer2.setStatusUser(StatusUser.ACTIVE);
@@ -57,6 +58,23 @@ public class DataInitializer {
                 customersRepository.save(customer1);
                 customersRepository.save(customer2);
 
+
+
+                BankAccounts bankAccount1 = new BankAccounts();
+                bankAccount1.setCustomer(customer1);
+                bankAccount1.setAccountNumber("1234567890");
+                bankAccount1.setAmount(10000.0);
+                bankAccount1.setDeletedDate(null);
+
+                BankAccounts bankAccount2 = new BankAccounts();
+                bankAccount2.setCustomer(customer2);
+                bankAccount2.setAccountNumber("0987654321");
+                bankAccount2.setAmount(15000.0);
+                bankAccount2.setDeletedDate(null);
+
+
+                bankAccountsRepository.save(bankAccount1);
+                bankAccountsRepository.save(bankAccount2);
             }
         };
     }

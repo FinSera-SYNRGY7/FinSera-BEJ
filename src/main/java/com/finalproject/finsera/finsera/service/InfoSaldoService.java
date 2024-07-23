@@ -1,7 +1,8 @@
 package com.finalproject.finsera.finsera.service;
 
-import java.util.Map;
+import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoRequest;
+import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoResponse;
 
 public interface InfoSaldoService {
-    Map getInfoSaldo();
+    InfoSaldoResponse getInfoSaldo(String username);
 }

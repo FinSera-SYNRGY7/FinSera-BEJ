@@ -20,7 +20,6 @@ public class GlobalExceptionHandlers {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<String>> handleGeneralException(Exception exception) {
-        System.out.println(exception);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(BaseResponse.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage()));
     }
