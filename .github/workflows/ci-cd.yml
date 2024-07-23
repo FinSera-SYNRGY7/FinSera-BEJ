@@ -45,13 +45,3 @@ jobs:
       - name: Push Docker image to DockerHub
         run: docker push fahrizalvianaz/finsera-api-staging:v1
 
-  deploy:
-    runs-on: koyeb-runner
-    needs: build
-
-    steps:
-      - name: Deploy to server
-        run: |
-          'docker pull fahrizalvianaz/finsera-api-staging:v1'
-          'docker stop finsera-api-staging || true'
-          'docker run -d -p 8080:8080 --name finsera-api-staging fahrizalvianaz/finsera-api-staging:v1'
