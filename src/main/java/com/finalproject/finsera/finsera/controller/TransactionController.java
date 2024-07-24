@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.controller;
 
+import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,9 +39,17 @@ public class TransactionController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            response.put("status", 402);
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(402).body(response);
+            if (e instanceof ConnectException){
+                response.put("status", 503);
+                response.put("message", "Connection lost with the server. Please try again later.");
+                return ResponseEntity.status(503).body(response);
+            }
+            else{
+                response.put("status", 402);
+                response.put("message", e.getMessage());
+                return ResponseEntity.status(402).body(response);
+            }
+
         }
     }
 

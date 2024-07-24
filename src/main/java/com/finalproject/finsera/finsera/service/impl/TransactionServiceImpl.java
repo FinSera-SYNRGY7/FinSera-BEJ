@@ -2,6 +2,8 @@ package com.finalproject.finsera.finsera.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.finalproject.finsera.finsera.dto.TransactionCheckAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.TransactionCheckAccountResponseDto;
@@ -28,7 +30,9 @@ public class TransactionServiceImpl implements TransactionService{
     @Autowired TransactionRepository transactionRepository;
     @Autowired BankAccountsRepository bankAccountsRepository;
     @Autowired BankRepository bankRepository;
+    @Autowired PasswordEncoder passwordEncoder;
 
+    @Transactional
     @Override
     public TransactionResponseDto create(TransactionRequestDto transactionRequestDto){
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(transactionRequestDto.getId_user());
@@ -43,9 +47,12 @@ public class TransactionServiceImpl implements TransactionService{
         Banks banks = optionalBanks.get();
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
         BankAccounts bankAccountsReceiver = optionalBankAccountsReceiver.get();
-        if (!(bankAccountsSender.getCustomer().getMpin().equals(transactionRequestDto.getPin()))){
+        // if (!(bankAccountsSender.getCustomer().getMpin().equals(transactionRequestDto.getPin()))){
+        //     
+        // }
+        if (!(passwordEncoder.matches(bankAccountsSender.getCustomer().getMpin(), passwordEncoder.encode(transactionRequestDto.getPin())))){
             throw new IllegalArgumentException("Pin Anda Salah");
-        }
+        } 
         if (bankAccountsSender.getAmount()-transactionRequestDto.getNominal() <0) {
             throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
         }
@@ -85,6 +92,11 @@ public class TransactionServiceImpl implements TransactionService{
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
         return currencyFormatter.format(amount);
     }
+
+
+
+    
+    @Transactional
     @Override
     public TransactionCheckAccountResponseDto check(TransactionCheckAccountRequestDto transactionCheckAccountRequestDto){
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionCheckAccountRequestDto.getAccountnum_recipient());
