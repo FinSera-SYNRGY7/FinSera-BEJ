@@ -20,8 +20,9 @@ import java.util.function.Function;
 @Slf4j
 @Service
 public class JwtUtil {
+
     @Autowired
-    CustomerRepository customerRepository;
+    private CustomerRepository customerRepository;
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -64,7 +65,9 @@ public class JwtUtil {
         String username;
         Long userId;
         Customers customers = new Customers();
-        if (authentication.getPrincipal() instanceof UserDetailsImpl userPrincipal){
+
+        if (authentication.getPrincipal() instanceof UserDetailsImpl) {
+            UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
             username = userPrincipal.getUsername();
             customers.setUsername(userPrincipal.getUsername());
             customers.setIdCustomers(userPrincipal.getIdCustomers());
@@ -75,25 +78,19 @@ public class JwtUtil {
             throw new IllegalArgumentException("Unsupported principal type");
         }
 
-
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
-//                .setId(String.valueOf(userId))
-//                .setSubject(username)
-//                .claim("sub", customers)
                 .setSubject(username)
-                .claim("userId", userPrincipal.getIdCustomers())
+                .claim("userId", customers.getIdCustomers())
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime()+jwtExpiration))
+                .setExpiration(new Date(now.getTime() + jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     private Key getSignInKey() {
-//        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(secretKey.getBytes());
-//        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String getUsername(String jwt) {
@@ -105,21 +102,20 @@ public class JwtUtil {
     }
 
     public Long getId(String jwt) {
-        return Long.valueOf(Jwts.parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey()).build()
                 .parseClaimsJws(jwt)
                 .getBody()
-                .get("userId", Long.class));
+                .get("userId", Long.class);
     }
 
-    public String getMpinByToken(String token){
-        String jwt = token.replace("Bearer", "");
+    public String getMpinByToken(String token) {
+        String jwt = token.replace("Bearer", "").trim();
         log.info("JWT : " + jwt);
-        String mpin = Jwts.parserBuilder()
+        return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey()).build()
                 .parseClaimsJws(jwt)
-                .getBody().getSubject();
-        return mpin;
+                .getBody()
+                .getSubject();
     }
-
 }

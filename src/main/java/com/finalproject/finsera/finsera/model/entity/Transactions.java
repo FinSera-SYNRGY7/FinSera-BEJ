@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.model.entity;
 
+import com.finalproject.finsera.finsera.model.enums.TransactionsByBankType;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -24,7 +25,7 @@ public class Transactions {
     private long idTransaction;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user")
+    @JoinColumn(name = "bank_account_id")
     private BankAccounts bankAccounts;
 
     @Column(name = "to_account_number")
@@ -42,6 +43,9 @@ public class Transactions {
     @Column(name = "transaction_type")
     private TransactionsType type;
 
+    @Column(name = "transaction_by_bank_type")
+    private TransactionsByBankType byBankType;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date", nullable = true, updatable = false)
     @CreatedDate
@@ -51,12 +55,5 @@ public class Transactions {
     @Column(name = "updated_date", nullable = true)
     @LastModifiedDate
     private Date updatedDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "deleted_date")
-    private Date deletedDate;
-
-
-
 
 }

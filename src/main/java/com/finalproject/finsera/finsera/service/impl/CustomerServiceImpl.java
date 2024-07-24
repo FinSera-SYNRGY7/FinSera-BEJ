@@ -37,8 +37,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     CustomerRepository customerRepository;
 
-    @Autowired
-    ModelMapper modelMapper;
 
     @Autowired
     PasswordEncoder passwordEncoder;
