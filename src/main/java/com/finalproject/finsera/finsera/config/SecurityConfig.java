@@ -36,7 +36,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth ->{
-                            auth.requestMatchers("api/v1/auth/user/**").permitAll();
+                            auth.requestMatchers("api/v1/auth/user/**", "/v3/**","/swagger-ui/**", "/v3/api-docs/**").permitAll();
                             auth.anyRequest().authenticated();
                         }
                 )
