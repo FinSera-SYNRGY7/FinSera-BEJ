@@ -27,7 +27,7 @@ public class CustomerController {
     @Autowired
     JwtUtil jwtUtil;
 
-    @GetMapping("/")
+    @GetMapping(value = {"/", ""})
     public ResponseEntity<Map<String, Object>> userDetail(@RequestHeader(name = "Authorization") String token) {
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);

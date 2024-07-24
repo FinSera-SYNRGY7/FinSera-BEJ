@@ -30,7 +30,7 @@ public class InfoSaldoController {
 
     private final JwtUtil jwtUtil;
 
-    @GetMapping("/")
+    @GetMapping(value = {"/", ""})
     public ResponseEntity<?> getInfoSaldo(
             @Valid
             @RequestHeader(name = "Authorization") String token

@@ -52,7 +52,7 @@ public class AuthController {
 
 
     //ignore register service
-    @PostMapping("user/register")
+    @PostMapping(value = {"user/register", "user/register/"})
     public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequestDto registerRequestDto){
         Map<String, Object> response = new HashMap<>();
         response.put("status", "success");
@@ -64,7 +64,7 @@ public class AuthController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping("/user/login")
+    @PostMapping(value = {"/user/login", "/user/login/"})
     public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDto loginRequestDto){
         Optional<Customers> customers = customerRepository.findByUsername(loginRequestDto.getUsername());
         if (customers.isPresent()){
@@ -82,7 +82,7 @@ public class AuthController {
 
     }
 
-    @PostMapping("/relogin")
+    @PostMapping(value = {"/relogin", "/relogin/"})
     public ResponseEntity<Map<String, Object>> relogin(@RequestHeader("Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
@@ -102,7 +102,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/relogin-get-id")
+    @PostMapping(value = {"/relogin-get-id", "/relogin-get-id/"})
     public ResponseEntity<Map<String, Object>> reloginGetId(@RequestHeader("Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
