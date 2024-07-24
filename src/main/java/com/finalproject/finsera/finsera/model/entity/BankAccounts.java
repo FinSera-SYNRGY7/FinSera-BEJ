@@ -15,11 +15,13 @@ import java.util.UUID;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import lombok.EqualsAndHashCode;
 
-@Entity
 @Data
+@Entity
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "bank_accounts", schema = "public")
-public class BankAccounts {
+public class BankAccounts extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,20 +37,6 @@ public class BankAccounts {
 
     @Column(name = "amount")
     private Double amount;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = true, updatable = false)
-    @CreatedDate
-    private Date createdDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at", nullable = true)
-    @LastModifiedDate
-    private Date updatedDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "deleted_at")
-    private Date deletedDate;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bankAccounts")
     private List<Transactions> transactions;
