@@ -11,6 +11,7 @@ import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.repository.TransactionRepository;
 import com.finalproject.finsera.finsera.service.MutasiService;
 import com.finalproject.finsera.finsera.service.ValidationService;
+import com.finalproject.finsera.finsera.util.DateFormatService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,9 +50,11 @@ public class MutasiServiceImpl implements MutasiService {
     @Autowired
     MutasiMapper mutasiMapper;
 
+    @Autowired
+    DateFormatService dateFormatService;
+
     @Transactional
     @Override
-
     public List<MutasiResponseDto> getMutasi(String username, MutasiRequestDto mutasiRequestDto, boolean isSevenDays, boolean isOneMonth, boolean isToday, Timestamp startDate, Timestamp endDate, int page, int size) {
 
         validationService.validate(mutasiRequestDto);
@@ -65,12 +70,43 @@ public class MutasiServiceImpl implements MutasiService {
         Instant now = Instant.now();
         Timestamp today = Timestamp.from(now.truncatedTo(ChronoUnit.DAYS));
         if (bankAccounts.getCustomer() == customers.get()) {
-            if (isSevenDays) {
-                Timestamp sevenDays = Timestamp.from(now.plus(7, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS));
-                filteredTransactions = transactionRepository.findAllByCreatedDateAndBankAccounts(today, sevenDays, bankAccounts.getIdBankAccounts(), pageable)
+            if(isToday) {
+                log.info("today: {}", today);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(today);
+                calendar.set(Calendar.HOUR_OF_DAY, 0);
+                calendar.set(Calendar.MINUTE, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MILLISECOND, 0);
+                Timestamp todayStart = new Timestamp(calendar.getTimeInMillis());
+                calendar.set(Calendar.HOUR_OF_DAY, 23);
+                calendar.set(Calendar.MINUTE, 59);
+                calendar.set(Calendar.SECOND, 59);
+                calendar.set(Calendar.MILLISECOND, 999);
+                Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
+                Timestamp todayEnd = Timestamp.valueOf(timestamp.toLocalDateTime());
+                filteredTransactions = transactionRepository.findAllByCreatedDateAndBankAccounts(todayStart, todayEnd, bankAccounts.getIdBankAccounts(), pageable)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+            } else if (isSevenDays) {
+                log.info("sevenday: {}");
+                Timestamp sevenDays = Timestamp.from(now.minus(7, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS));
+                filteredTransactions = transactionRepository.findAllByCreatedDateAndBankAccounts(sevenDays,today, bankAccounts.getIdBankAccounts(), pageable)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
 
+            } else if(isOneMonth) {
+                filteredTransactions = transactionRepository.findAllByCreatedDateMonth(bankAccounts.getIdBankAccounts(), pageable)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+//
+            } else if(startDate != null && endDate != null) {
+                log.info("start and end date: {}");
+                filteredTransactions = transactionRepository.findAllByCreatedDateAndBankAccounts(startDate, endDate, bankAccounts.getIdBankAccounts(), pageable)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+            } else {
+                log.info("else: {}");
+                filteredTransactions = transactionRepository.findAllByBankAccounts(bankAccounts, pageable)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
             }
+
         } else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Number not found");
         }

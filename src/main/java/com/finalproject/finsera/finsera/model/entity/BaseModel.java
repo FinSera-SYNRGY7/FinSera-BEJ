@@ -16,6 +16,8 @@ import java.util.Date;
 @Data
 @EntityListeners(AuditingEntityListener.class)
 public class BaseModel implements Serializable {
+
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date", nullable = true, updatable = false)
     @CreatedDate

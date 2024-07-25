@@ -30,6 +30,7 @@ public class MutasiMapper {
                 .transactionId(transaction.getIdTransaction())
                 .noTransaction(transaction.getNoTransaction())
                 .transactionDate(transaction.getCreatedDate())
+                .accountNumber(transaction.getFromAccountNumber())
                 .amountTransfer(amount)
                 .transactionInformation(transaction.getTransactionInformation())
                 .build();

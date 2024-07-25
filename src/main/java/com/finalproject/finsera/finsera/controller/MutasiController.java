@@ -36,18 +36,18 @@ public class MutasiController {
     @Autowired
     MutasiService mutasiService;
 
-    @GetMapping(value = {"/", ""})
+    @PostMapping(value = {"/", ""})
     @Operation(summary = "Info Saldo user", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = InfoSaldoExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<?> getInfoMutasi(
             @Valid
             @RequestHeader(name = "Authorization") String token,
             @RequestBody MutasiRequestDto accountNumber,
-            @RequestParam(value = "hariIni", required = false) boolean isToday,
-            @RequestParam(value = "7Hari", required = false) boolean isSevenDays,
-            @RequestParam(value = "1Bulan", required = false) boolean isOneMonth,
-            @RequestParam(value = "tanggalMulai", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
-            @RequestParam(value = "tanggalAkhir", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam(value = "today", required = false) boolean isToday,
+            @RequestParam(value = "sevenDay", required = false) boolean isSevenDays,
+            @RequestParam(value = "oneMonth", required = false) boolean isOneMonth,
+            @RequestParam(value = "startDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(value = "endDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size
     ) {
@@ -61,8 +61,6 @@ public class MutasiController {
             Timestamp startDateTimeStamp = Timestamp.valueOf(startDateLocalDateTime);
             LocalDateTime endDateLocalDateTime = endDate.atTime(23, 59, 59);
             Timestamp endDateTimeStamp = Timestamp.valueOf(endDateLocalDateTime);
-
-
             listTransction = mutasiService.getMutasi(
                     username, accountNumber, isSevenDays, isOneMonth, isToday, startDateTimeStamp, endDateTimeStamp, page, size
             );
