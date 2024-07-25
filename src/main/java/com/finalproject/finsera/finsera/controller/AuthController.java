@@ -107,7 +107,7 @@ public class AuthController {
         String relogin = customerService.relogin(username, reloginRequestDto);
         Customers customers = customerRepository.findByUsername(username).get();
 
-        if (customers.getMpin().equals(reloginRequestDto.getMpin())){
+        if (customers.getMpinAuth().equals(reloginRequestDto.getMpin())){
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Relogin Success");
             response.put("data", relogin);
@@ -131,7 +131,7 @@ public class AuthController {
         String relogin = customerService.reloginGetId(userId, reloginRequestDto);
         Customers customers = customerRepository.findById(userId).get();
 
-        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpin())){
+        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpinAuth())){
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Relogin Success");
             response.put("data", relogin);

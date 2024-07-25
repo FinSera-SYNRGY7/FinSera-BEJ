@@ -25,7 +25,7 @@ public class Notifications {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    private Customers customers;
+    private Customers customer;
 
     private String type;
 }
