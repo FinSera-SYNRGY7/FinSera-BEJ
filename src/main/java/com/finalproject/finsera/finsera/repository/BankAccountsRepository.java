@@ -1,6 +1,5 @@
 package com.finalproject.finsera.finsera.repository;
 
-import java.util.UUID;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,4 +23,7 @@ public interface BankAccountsRepository extends JpaRepository<BankAccounts, Long
     
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<BankAccounts> findByAccountNumber(String account_number);
+
+    @Query(value = "select * from bank_accounts ba where customer_id = :customerId", nativeQuery = true)
+    BankAccounts findByCustomerId(Long customerId);
 }

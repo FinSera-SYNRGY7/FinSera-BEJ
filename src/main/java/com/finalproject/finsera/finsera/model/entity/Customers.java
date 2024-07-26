@@ -49,7 +49,7 @@ public class Customers extends BaseModel{
 
     private String email;
 
-    private String mpin;
+    private String mpinAuth;
 
     @Column(name = "status_user")
     private StatusUser statusUser;

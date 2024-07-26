@@ -245,7 +245,7 @@ Request Body:
     "accountnum_recipient": "213818317",
     "nominal" : 100000,
     "note" : "Cicilan Motor",
-    "pin" : "2213131",
+    "pin" : "2213131"
 }
 ```
 
@@ -290,6 +290,63 @@ Response Body (failed) :
 {
     "message": "Pin Anda Salah",
     "status": 402
+}
+```
+---
+## Transfer Virtual Account Spec
+* Endpoint : POST /v1/transaction/virtual-account
+* Authorization Type Bearer Token : "USER_TOKEN"
+
+### Request Body :
+```json
+{
+  "id_user" : "long",
+  "recipinet_accountNum" : "string",
+  "recipient_accountType" : "enum",
+  "nominal" : "double",
+  "note" : "string",
+  "pin_account" : "string"
+}
+```
+
+### Response Body (success) : <span style="color: green;">200 OK</span>
+```json
+{
+  "data" : {
+    "transaction_num" : "long",
+    "transaction_type" : "enum",
+    "transaction_date" : "current_timestamp",
+    "sender_name" : "string",
+    "sender_accountNum" : "string",
+    "recipient_name" : "string",
+    "recipinet_accountNum" : "string",
+    "nominal" : "string",
+    "note" : "string"
+  },
+  "status" : "success",
+  "message" : "your transaction is success"
+}
+```
+### Response Body (failed) : <span style="color: red;">401 Unauthorized</span>
+```json
+{
+  "data" : "null",
+  "message" : "recipient account not found"
+}
+```
+### Response Body (failed) : <span style="color: red;">400 Bad Request</span>
+```json
+{
+  "data" : "null",
+  "message" : "your balance is insufficient"
+}
+```
+
+### Response Body (failed) : <span style="color: red;">401 Unauthorized</span>
+```json
+{
+  "data" : "null",
+  "message" : "your pin is invalid"
 }
 ```
 

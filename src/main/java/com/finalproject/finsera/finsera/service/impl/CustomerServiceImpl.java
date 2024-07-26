@@ -71,7 +71,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setUsername(registerRequestDto.getUsername());
         customers.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         customers.setEmail(registerRequestDto.getEmail());
-        customers.setMpin(passwordEncoder.encode(registerRequestDto.getMpin()));
+        customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpinAuth()));
         customers.setStatusUser(StatusUser.INACTIVE);
 
         customerRepository.save(customers);
@@ -81,7 +81,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String getUserPin(String username) {
         Customers customers = customerRepository.findByUsername(username).get();
-        return customers.getMpin();
+        return customers.getMpinAuth();
     }
 
     @Override
@@ -108,9 +108,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String relogin(String username, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findByUsername(username).get();
-        System.out.println(customers.getMpin());
+        System.out.println(customers.getMpinAuth());
         System.out.println(reloginRequestDto.getMpin());
-        if (passwordEncoder.matches(customers.getMpin(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
+        if (passwordEncoder.matches(customers.getMpinAuth(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
             return "Pin Valid";
         } else {
             return "Pin Invalid";
@@ -120,7 +120,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String reloginGetId(Long id, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findById(id).get();
-        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpin())){
+        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpinAuth())){
             return "Pin Valid";
         } else {
             return "Pin Invalid";

@@ -1,7 +1,6 @@
 package com.finalproject.finsera.finsera.model.enums;
 
-public enum TransactionsType {
-    ANTAR_BANK,
-    SESAMA_BANK,
+public enum AccountType {
+    E_WALLET,
     VIRTUAL_ACCOUNT
 }

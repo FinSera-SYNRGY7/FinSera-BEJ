@@ -1,5 +1,14 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.finalproject.finsera.finsera.dto.accountDummy.CheckAccountDummyRequestDto;
+import com.finalproject.finsera.finsera.dto.accountDummy.CheckAccountDummyResponseDto;
+import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountRequestDto;
+import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountResponseDto;
+import com.finalproject.finsera.finsera.model.entity.AccountDummyData;
+import com.finalproject.finsera.finsera.model.enums.AccountType;
+import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
+import com.finalproject.finsera.finsera.repository.AccountDummyRepository;
+import com.finalproject.finsera.finsera.service.AccountDummyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +28,8 @@ import com.finalproject.finsera.finsera.repository.TransactionRepository;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.Locale;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 @Service
@@ -31,6 +38,10 @@ public class TransactionServiceImpl implements TransactionService{
     @Autowired BankAccountsRepository bankAccountsRepository;
     @Autowired BankRepository bankRepository;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired
+    AccountDummyService accountDummyService;
+    @Autowired
+    AccountDummyRepository accountDummyRepository;
 
     @Transactional
     @Override
@@ -52,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService{
         //     
         // }
 
-        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getCustomer().getMpin())))
+        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getCustomer().getMpinAuth())))
         {
             throw new IllegalArgumentException("Pin Anda Salah");
         } 
@@ -123,5 +134,53 @@ public class TransactionServiceImpl implements TransactionService{
 
         return transactionCheckAccountResponseDisplay;
     }
-    
+
+    @Override
+    public TransferVirtualAccountResponseDto transferVA(Long id, TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
+        BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
+        AccountDummyData recipientVirtualAccount = accountDummyService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
+
+        //sender transaction
+//        Transactions senderTransaction = new Transactions();
+//        senderTransaction.setTransactionInformation(TransactionInformation.UANG_KELUAR);
+//        senderTransaction.setBankAccounts(senderBankAccount);
+//        senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
+//        senderTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+//        senderTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
+//        senderTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
+//        transactionRepository.save(senderTransaction);
+
+        //sender update amount
+        senderBankAccount.setAmount(senderBankAccount.getAmount() - transferVirtualAccountRequestDto.getNominal());
+        bankAccountsRepository.save(senderBankAccount);
+
+        //recipient transaction
+//        Transactions recipientTransaction = new Transactions();
+//        recipientTransaction.setTransactionInformation(TransactionInformation.UANG_MASUK);
+//        recipientTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
+//        recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
+//        recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+//        recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
+//        recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
+//        transactionRepository.save(recipientTransaction);
+
+        //recipient update amount
+        recipientVirtualAccount.setAmount(
+                recipientVirtualAccount.getAmount() + transferVirtualAccountRequestDto.getNominal()
+        );
+        accountDummyRepository.save(recipientVirtualAccount);
+
+        TransferVirtualAccountResponseDto response = new TransferVirtualAccountResponseDto();
+        response.setTransactionNum(1L);
+        response.setType(TransactionsType.VIRTUAL_ACCOUNT);
+        response.setTransactionDate(Date.from(Instant.now()).toString());
+        response.setSenderName(senderBankAccount.getCustomer().getName());
+        response.setSenderAccountNum(senderBankAccount.getAccountNumber());
+        response.setRecipientName(recipientVirtualAccount.getAccountName());
+        response.setRecipientAccountNum(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        response.setNominal(transferVirtualAccountRequestDto.getNominal().toString());
+        response.setNote(transferVirtualAccountRequestDto.getNote());
+        return response;
+    }
+
 }

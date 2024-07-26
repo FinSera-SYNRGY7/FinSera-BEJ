@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.model.entity;
 
+import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.model.enums.TransactionsByBankType;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import jakarta.persistence.*;
@@ -17,7 +18,6 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "transactions", schema = "public")
 public class Transactions extends BaseModel{
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
@@ -26,6 +26,12 @@ public class Transactions extends BaseModel{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_bank_accounts")
     private BankAccounts bankAccounts;
+
+    @Column(name = "no_transaction", unique = true)
+    private String noTransaction;
+
+    @Column(name = "from_account_number")
+    private String fromAccountNumber;
 
     @Column(name = "to_account_number")
     private String toAccountNumber;
@@ -36,9 +42,12 @@ public class Transactions extends BaseModel{
 
     @Column(name = "amount_transfer")
     private Double amountTransfer;
-    
+
     private String notes;
 
     @Column(name = "transaction_type")
     private TransactionsType type;
+
+    @Column(name = "transaction_information")
+    private TransactionInformation transactionInformation;
 }
