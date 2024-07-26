@@ -88,15 +88,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Customers updateMpin(Principal principal, String newMpin){
-        Optional<Customers> optionalCustomers = customerRepository.findByUsername(principal.getName());
+    public Customers updateMpin(String username, String newMpin){
+        Optional<Customers> optionalCustomers = customerRepository.findByUsername(username);
 
-        if (optionalCustomers.isPresent()) {
+        if (!optionalCustomers.isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
         }
         Customers customer = optionalCustomers.get();
-        customer.setMpinAuth(newMpin);
+        customer.setMpinAuth(passwordEncoder.encode(newMpin));
 
+        customerRepository.save(customer);
         return customer;
     }
 

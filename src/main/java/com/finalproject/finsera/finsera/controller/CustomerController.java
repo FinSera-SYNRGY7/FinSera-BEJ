@@ -2,6 +2,7 @@ package com.finalproject.finsera.finsera.controller;
 
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
+import com.finalproject.finsera.finsera.dto.customer.UpdateMpinRequest;
 import com.finalproject.finsera.finsera.dto.responseMsg.ResponseConstant;
 import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.ProfileExampleSwagger;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -63,10 +65,15 @@ public class CustomerController {
         }
     }
 
-
-    @PutMapping("/update-mpin")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<BaseResponse<Customers>> updateMpin(@AuthenticationPrincipal Principal principal, @RequestBody String mpinUpdateRequest) {
-        return ResponseEntity.ok(BaseResponse.success(customerService.updateMpin(principal, mpinUpdateRequest), ResponseConstant.updateSuccess));
+    @PatchMapping("/update-mpin")
+    public ResponseEntity<BaseResponse> updateMpin(@RequestHeader(name = "Authorization") String token, @RequestBody UpdateMpinRequest mpin) {
+        String jwt = token.substring("Bearer ".length());
+        String username = jwtUtil.getUsername(jwt);
+        try{
+            Customers updatedCustomer =  customerService.updateMpin(username, mpin.getMpinAuth());
+            return ResponseEntity.ok(BaseResponse.success(null, ResponseConstant.updateSuccess));
+        }catch(ResponseStatusException e){
+            return ResponseEntity.ok(BaseResponse.failure(400, ResponseConstant.updateFail));
+        }
     }
 }

@@ -19,6 +19,6 @@ public interface CustomerService {
     LoginResponseDto login(LoginRequestDto loginRequestDto);
     String relogin(String username, ReloginRequestDto reloginRequestDto);
     String reloginGetId(Long id, ReloginRequestDto reloginRequestDto);
-    Customers updateMpin(Principal principal, String newMpin);
+    Customers updateMpin(String username, String newMpin);
 
 }
