@@ -1,6 +1,8 @@
 package com.finalproject.finsera.finsera.controller;
 
+import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
+import com.finalproject.finsera.finsera.dto.responseMsg.ResponseConstant;
 import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.ProfileExampleSwagger;
 import com.finalproject.finsera.finsera.exception.ErrorResponse;
@@ -17,8 +19,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -57,5 +61,12 @@ public class CustomerController {
             response.put("message", "User not found");
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
+    }
+
+
+    @PutMapping("/update-mpin")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<BaseResponse<Customers>> updateMpin(@AuthenticationPrincipal Principal principal, @RequestBody String mpinUpdateRequest) {
+        return ResponseEntity.ok(BaseResponse.success(customerService.updateMpin(principal, mpinUpdateRequest), ResponseConstant.updateSuccess));
     }
 }
