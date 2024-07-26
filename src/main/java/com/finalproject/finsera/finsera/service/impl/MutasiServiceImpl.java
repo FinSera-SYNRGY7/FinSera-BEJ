@@ -65,7 +65,10 @@ public class MutasiServiceImpl implements MutasiService {
         Instant now = Instant.now();
         Timestamp today = Timestamp.from(now.truncatedTo(ChronoUnit.DAYS));
         if (bankAccounts.getCustomer() == customers.get()) {
-            if(isToday) {
+
+            if ((isToday ? 1 : 0) + (isOneMonth ? 1 : 0) + (isSevenDays ? 1 : 0) + ((startDate != null && endDate != null) ? 1 : 0) > 1) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose only one filter");
+            } else if(isToday) {
                 log.info("today: {}", today);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(today);
