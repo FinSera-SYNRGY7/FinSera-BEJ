@@ -28,7 +28,7 @@ public class MutasiMapper {
 
         return MutasiResponseDto.builder()
                 .transactionId(transaction.getIdTransaction())
-                .noTransaction(transaction.getNoTransaction())
+                .noTransaction(transaction.getTransactionsNumber().getTransactionNumber())
                 .transactionDate(transaction.getCreatedDate())
                 .accountNumber(transaction.getBankAccounts().getAccountNumber())
                 .amountTransfer(amount)

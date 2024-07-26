@@ -5,4 +5,5 @@ public enum TransactionInformation {
     UANG_KELUAR,
 
     UANG_MASUK
+    
 }
