@@ -95,9 +95,6 @@ public class TransactionServiceImpl implements TransactionService{
         NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
         return currencyFormatter.format(amount);
     }
-
-
-
     
     @Transactional
     @Override
