@@ -15,17 +15,17 @@ import java.util.Optional;
 @Repository
 public interface TransactionRepository extends JpaRepository<Transactions, Long>{
 
-    Optional<Page<Transactions>> findAllByBankAccounts(BankAccounts bankAccounts, Pageable pageable);
+    Optional<Page<Transactions>> findAllByBankAccounts(BankAccounts fromBankAccounts, Pageable pageable);
 
-    @Query("SELECT t FROM Transactions t WHERE DATE_TRUNC('month', t.createdDate) = DATE_TRUNC('month', CURRENT_DATE)")
-    Optional<Page<Transactions>> findAllByCreatedDateMonth(
+    @Query("SELECT t FROM Transactions t WHERE (t.bankAccounts.idBankAccounts=:bankAccounts) AND (DATE_TRUNC('month', t.createdDate)=DATE_TRUNC('month', CURRENT_DATE))")
+    Optional<Page<Transactions>> findAllByBankAccountsAndCreatedDateMonth(
             @Param("bankAccounts") long bankAccounts,
             Pageable pageable
     );
 
-    @Query("SELECT t FROM Transactions t WHERE  t.bankAccounts.idBankAccounts=:bankAccounts AND" +
+    @Query("SELECT t FROM Transactions t WHERE  (t.bankAccounts.idBankAccounts=:bankAccounts) AND" +
             "(t.createdDate BETWEEN :startDate AND :endDate) ")
-    Optional<Page<Transactions>> findAllByCreatedDateAndBankAccounts(
+    Optional<Page<Transactions>> findAllByBankAccountsAndCreatedDate(
             @Param("startDate") Timestamp startDate,
             @Param("endDate") Timestamp endDate,
             @Param("bankAccounts") long bankAccounts,
