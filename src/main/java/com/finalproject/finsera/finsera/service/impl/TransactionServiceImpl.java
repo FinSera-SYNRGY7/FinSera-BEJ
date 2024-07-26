@@ -80,7 +80,7 @@ public class TransactionServiceImpl implements TransactionService{
         // Convert Date to String
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm 'WIB'");
         String dateString = dateFormat.format(transactionsaved.getCreatedDate());
-        transactionResponseDto.setTransaction_num(randomLong);
+        transactionResponseDto.setTransaction_num(Math.abs(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());
         transactionResponseDto.setAccountnum_sender(bankAccountsSender.getAccountNumber());
