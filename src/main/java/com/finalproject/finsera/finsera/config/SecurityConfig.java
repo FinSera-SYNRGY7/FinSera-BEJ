@@ -46,6 +46,7 @@ public class SecurityConfig implements WebMvcConfigurer {
         return http.build();
     }
 
+
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer

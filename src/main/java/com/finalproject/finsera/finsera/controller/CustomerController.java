@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
@@ -66,14 +67,16 @@ public class CustomerController {
     }
 
     @PatchMapping("/update-mpin")
-    public ResponseEntity<BaseResponse> updateMpin(@RequestHeader(name = "Authorization") String token, @RequestBody UpdateMpinRequest mpin) {
+    public ResponseEntity<BaseResponse<Void>> updateMpin(@RequestHeader(name = "Authorization") String token, @RequestBody UpdateMpinRequest mpin) {
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
         try{
             Customers updatedCustomer =  customerService.updateMpin(username, mpin.getMpinAuth());
-            return ResponseEntity.ok(BaseResponse.success(null, ResponseConstant.updateSuccess));
+            return ResponseEntity.ok(BaseResponse.success(null, ResponseConstant.UPDATE_SUCCESS));
         }catch(ResponseStatusException e){
-            return ResponseEntity.ok(BaseResponse.failure(400, ResponseConstant.updateFail));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, ResponseConstant.UPDATE_FAIL));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.failure(500, ResponseConstant.UPDATE_FAIL));
         }
     }
 }
