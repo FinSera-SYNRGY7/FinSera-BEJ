@@ -109,8 +109,8 @@ public class CustomerServiceImpl implements CustomerService {
     public String relogin(String username, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findByUsername(username).get();
         System.out.println(customers.getMpinAuth());
-        System.out.println(reloginRequestDto.getMpin());
-        if (passwordEncoder.matches(customers.getMpinAuth(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
+        System.out.println(reloginRequestDto.getMpinAuth());
+        if (passwordEncoder.matches(customers.getMpinAuth(), passwordEncoder.encode(reloginRequestDto.getMpinAuth()))){
             return "Pin Valid";
         } else {
             return "Pin Invalid";
@@ -120,7 +120,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String reloginGetId(Long id, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findById(id).get();
-        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpinAuth())){
+        if (passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())){
             return "Pin Valid";
         } else {
             return "Pin Invalid";
