@@ -11,6 +11,7 @@ import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.CustomerService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
+import com.finalproject.finsera.finsera.util.JwtUtilRefreshToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -42,6 +43,9 @@ public class AuthController {
 
     @Autowired
     JwtUtil jwtUtil;
+
+    @Autowired
+    JwtUtilRefreshToken jwtUtilRefreshToken;
 
     @Autowired
     CustomerRepository customerRepository;
@@ -139,8 +143,16 @@ public class AuthController {
     }
 
     @PostMapping(value = {"/user/refresh-token", "/user/refresh-token/"})
-    public String relogin(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto){
-        RefreshTokenResponseDto refreshTokenResponseDto = customerService.refreshToken(refreshTokenRequestDto);
-        return refreshTokenResponseDto.getAccessToken();
+    public ResponseEntity<Object> relogin(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto){
+        String username = jwtUtilRefreshToken.getUsername(refreshTokenRequestDto.getRefreshToken());
+        Customers customers = customerRepository.findByUsername(username).get();
+        if (!customerRepository.existsById(customers.getIdCustomers())){
+            return ResponseEntity.ok(BaseResponse.failure(400, "user not found"));
+        } else if (customers.getStatusUser().equals(StatusUser.INACTIVE)) {
+            return ResponseEntity.ok(BaseResponse.failure(400, "your account is inactive"));
+        } else {
+            RefreshTokenResponseDto refreshTokenResponseDto = customerService.refreshToken(refreshTokenRequestDto);
+            return ResponseEntity.ok(BaseResponse.success(refreshTokenResponseDto, "accessToken"));
+        }
     }
 }

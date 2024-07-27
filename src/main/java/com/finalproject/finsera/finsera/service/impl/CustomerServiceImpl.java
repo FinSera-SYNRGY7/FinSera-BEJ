@@ -101,13 +101,6 @@ public class CustomerServiceImpl implements CustomerService {
         //TODO validate present or not
         //TODO validate active or inactive
         String username = jwtUtilRefreshToken.getUsername(refreshTokenRequestDto.getRefreshToken());
-        System.out.println(username);
-        Customers customers = customerRepository.findByUsername(username).get();
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(
-//                        customers.getUsername(), "user123"
-//                ));
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtUtil.generateTokenFromUsername(username);
         RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
         refreshTokenResponseDto.setAccessToken(token);
