@@ -129,7 +129,7 @@ public class AuthController {
         String relogin = customerService.relogin(userId, reloginRequestDto);
         Customers customers = customerRepository.findById(userId).get();
 
-        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpin())){
+        if (passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())){
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Relogin Success");
             response.put("data", relogin);

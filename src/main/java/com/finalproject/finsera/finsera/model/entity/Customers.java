@@ -7,10 +7,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.hibernate.annotations.CurrentTimestamp;
-
-import java.sql.Timestamp;
-import java.util.UUID;
 import java.util.List;
 
 @Entity
@@ -49,7 +45,7 @@ public class Customers extends BaseModel{
 
     private String email;
 
-    private String mpin;
+    private String mpinAuth;
 
     @Column(name = "status_user")
     private StatusUser statusUser;

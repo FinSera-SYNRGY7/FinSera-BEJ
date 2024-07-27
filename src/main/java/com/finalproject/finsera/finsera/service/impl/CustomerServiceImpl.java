@@ -61,7 +61,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setUsername(registerRequestDto.getUsername());
         customers.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         customers.setEmail(registerRequestDto.getEmail());
-        customers.setMpin(passwordEncoder.encode(registerRequestDto.getMpin()));
+        customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpin()));
         customers.setStatusUser(StatusUser.INACTIVE);
 
         customerRepository.save(customers);
@@ -71,7 +71,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String getUserPin(String username) {
         Customers customers = customerRepository.findByUsername(username).get();
-        return customers.getMpin();
+        return customers.getMpinAuth();
     }
 
     @Override
@@ -90,7 +90,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setStatusUser(StatusUser.ACTIVE);
         customerRepository.save(customers);
         LoginResponseDto loginResponseDto = new LoginResponseDto(
-                    token, refreshToken, userDetails.getIdCustomers(), customers.getMpin(), customers.getStatusUser()
+                    token, refreshToken, userDetails.getIdCustomers(), customers.getMpinAuth(), customers.getStatusUser()
             );
 
         return loginResponseDto;
@@ -122,7 +122,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String relogin(Long id, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findById(id).get();
-        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpin())){
+        if (passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())){
             return "Pin Valid";
         } else {
             return "Pin Invalid";
