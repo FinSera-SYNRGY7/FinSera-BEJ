@@ -40,6 +40,10 @@ public class BankAccounts extends BaseModel{
 
     private String mpinAccount;
 
+    @ManyToOne
+    @JoinColumn(name = "bank_id")
+    private Banks banks;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bankAccounts")
     private List<Transactions> transactions;
 

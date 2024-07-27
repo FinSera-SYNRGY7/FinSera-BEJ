@@ -9,6 +9,7 @@ import com.finalproject.finsera.finsera.model.enums.AccountType;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.repository.AccountDummyRepository;
 import com.finalproject.finsera.finsera.service.AccountDummyService;
+import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -144,7 +145,10 @@ public class TransactionServiceImpl implements TransactionService{
         Transactions senderTransaction = new Transactions();
         senderTransaction.setTransactionInformation(TransactionInformation.UANG_KELUAR);
         senderTransaction.setBankAccounts(senderBankAccount);
+        senderTransaction.setBanks(senderBankAccount.getBanks());
         senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
+        senderTransaction.setNoTransaction(TransactionNumberGenerator.generateTransactionNumber());
+        senderTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
         senderTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
         senderTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
         senderTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
@@ -158,6 +162,11 @@ public class TransactionServiceImpl implements TransactionService{
         Transactions recipientTransaction = new Transactions();
         recipientTransaction.setTransactionInformation(TransactionInformation.UANG_MASUK);
         recipientTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
+
+        //TBD should be same with noTransaction of sender or not
+        recipientTransaction.setNoTransaction(TransactionNumberGenerator.generateTransactionNumber());
+        recipientTransaction.setBankAccounts(senderBankAccount);
+        recipientTransaction.setBanks(senderBankAccount.getBanks());
         recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
         recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
         recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
