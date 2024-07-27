@@ -141,28 +141,28 @@ public class TransactionServiceImpl implements TransactionService{
         AccountDummyData recipientVirtualAccount = accountDummyService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
 
         //sender transaction
-//        Transactions senderTransaction = new Transactions();
-//        senderTransaction.setTransactionInformation(TransactionInformation.UANG_KELUAR);
-//        senderTransaction.setBankAccounts(senderBankAccount);
-//        senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
-//        senderTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
-//        senderTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
-//        senderTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
-//        transactionRepository.save(senderTransaction);
+        Transactions senderTransaction = new Transactions();
+        senderTransaction.setTransactionInformation(TransactionInformation.UANG_KELUAR);
+        senderTransaction.setBankAccounts(senderBankAccount);
+        senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
+        senderTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        senderTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
+        senderTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
+        transactionRepository.save(senderTransaction);
 
         //sender update amount
         senderBankAccount.setAmount(senderBankAccount.getAmount() - transferVirtualAccountRequestDto.getNominal());
         bankAccountsRepository.save(senderBankAccount);
 
         //recipient transaction
-//        Transactions recipientTransaction = new Transactions();
-//        recipientTransaction.setTransactionInformation(TransactionInformation.UANG_MASUK);
-//        recipientTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
-//        recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
-//        recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
-//        recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
-//        recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
-//        transactionRepository.save(recipientTransaction);
+        Transactions recipientTransaction = new Transactions();
+        recipientTransaction.setTransactionInformation(TransactionInformation.UANG_MASUK);
+        recipientTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
+        recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
+        recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
+        recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
+        transactionRepository.save(recipientTransaction);
 
         //recipient update amount
         recipientVirtualAccount.setAmount(
