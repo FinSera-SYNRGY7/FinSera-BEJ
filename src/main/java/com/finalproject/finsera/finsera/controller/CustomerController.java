@@ -1,6 +1,7 @@
 package com.finalproject.finsera.finsera.controller;
 
 import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
+import com.finalproject.finsera.finsera.dto.customer.DetailCustomerResponse;
 import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.ProfileExampleSwagger;
 import com.finalproject.finsera.finsera.exception.ErrorResponse;
@@ -47,9 +48,16 @@ public class CustomerController {
 
         Map<String, Object> data = new HashMap<>();
         Optional<Customers> customer = customerRepository.findByUsername(username);
+        DetailCustomerResponse detailCustomerResponse = new DetailCustomerResponse();
+        detailCustomerResponse.setAddress(customer.get().getAddress());
+        detailCustomerResponse.setIdCustomer(customer.get().getIdCustomers());
+        detailCustomerResponse.setName(customer.get().getName());
+        detailCustomerResponse.setEmail(customer.get().getEmail());
+        detailCustomerResponse.setPhone(customer.get().getPhoneNumber());
+        detailCustomerResponse.setUsername(customer.get().getUsername());
 
         if (customer != null) {
-            data.put("userDetails", customer);
+            data.put("userDetails", detailCustomerResponse);
             response.put("data", data);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
