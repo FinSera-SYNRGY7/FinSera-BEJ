@@ -41,7 +41,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth ->{
                             auth.requestMatchers(
-                                    "api/v1/auth/user/**",
+                                    "/api/v1/auth/user/**",
                                     "/api/v1/test/",
                                     "/api/v1/test",
                                     "/v3/**",
