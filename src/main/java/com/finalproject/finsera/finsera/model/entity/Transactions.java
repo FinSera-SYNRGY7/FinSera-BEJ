@@ -27,8 +27,9 @@ public class Transactions extends BaseModel{
     @JoinColumn(name = "id_bank_accounts")
     private BankAccounts bankAccounts;
 
-    @Column(name = "no_transaction", unique = true)
-    private String noTransaction;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transaction_number_id")
+    private TransactionsNumber transactionsNumber;
 
     @Column(name = "from_account_number")
     private String fromAccountNumber;

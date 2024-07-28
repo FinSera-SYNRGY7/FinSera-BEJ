@@ -154,3 +154,5 @@ Ssrc/main/java/com/finalproject/finsera/finsera/util/TransactionNumberGenerator.
 Msrc/main/java/com/finalproject/finsera/finsera/repository/BankRepository.java,e\7\e7a348583c4197b4a274756113a97f2cec6cc176
 „
 Tsrc/main/java/com/finalproject/finsera/finsera/repository/TransactionRepository.java,c\a\cad8808d04e2f2b732c5754cd0cc406fe7f751a6
+ƒ
+Ssrc/main/java/com/finalproject/finsera/finsera/model/entity/TransactionsNumber.java,d\7\d7f8fd700628fce703b7ae0e07e46b9d40dff4a1
