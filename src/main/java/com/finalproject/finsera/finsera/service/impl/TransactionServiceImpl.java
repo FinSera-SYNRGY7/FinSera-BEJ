@@ -4,10 +4,10 @@ import com.finalproject.finsera.finsera.dto.accountDummy.CheckAccountDummyReques
 import com.finalproject.finsera.finsera.dto.accountDummy.CheckAccountDummyResponseDto;
 import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountResponseDto;
-import com.finalproject.finsera.finsera.model.entity.AccountDummyData;
+import com.finalproject.finsera.finsera.model.entity.*;
 import com.finalproject.finsera.finsera.model.enums.AccountType;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
-import com.finalproject.finsera.finsera.repository.AccountDummyRepository;
+import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.AccountDummyService;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +19,7 @@ import com.finalproject.finsera.finsera.dto.TransactionCheckAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.TransactionCheckAccountResponseDto;
 import com.finalproject.finsera.finsera.dto.TransactionRequestDto;
 import com.finalproject.finsera.finsera.dto.TransactionResponseDto;
-import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.model.entity.Banks;
-import com.finalproject.finsera.finsera.model.entity.Transactions;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
-import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
-import com.finalproject.finsera.finsera.repository.BankRepository;
-import com.finalproject.finsera.finsera.repository.TransactionRepository;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 
@@ -38,6 +32,8 @@ public class TransactionServiceImpl implements TransactionService{
     @Autowired TransactionRepository transactionRepository;
     @Autowired BankAccountsRepository bankAccountsRepository;
     @Autowired BankRepository bankRepository;
+    @Autowired
+    TransactionNumberRepository transactionNumberRepository;
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired
     AccountDummyService accountDummyService;
@@ -136,10 +132,14 @@ public class TransactionServiceImpl implements TransactionService{
         return transactionCheckAccountResponseDisplay;
     }
 
+    @Transactional
     @Override
     public TransferVirtualAccountResponseDto transferVA(Long id, TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
         BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
         AccountDummyData recipientVirtualAccount = accountDummyService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        TransactionsNumber transactionsNumber = new TransactionsNumber();
+        transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
+        transactionNumberRepository.save(transactionsNumber);
 
         //sender transaction
         Transactions senderTransaction = new Transactions();
@@ -147,7 +147,7 @@ public class TransactionServiceImpl implements TransactionService{
         senderTransaction.setBankAccounts(senderBankAccount);
         senderTransaction.setBanks(senderBankAccount.getBanks());
         senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
-        senderTransaction.setTransactionsNumber(senderTransaction.getTransactionsNumber());
+        senderTransaction.setTransactionsNumber(transactionsNumber);
         senderTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
         senderTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
         senderTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
@@ -164,7 +164,7 @@ public class TransactionServiceImpl implements TransactionService{
         recipientTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
 
         //TBD should be same with noTransaction of sender or not
-        recipientTransaction.setTransactionsNumber(recipientTransaction.getTransactionsNumber());
+        recipientTransaction.setTransactionsNumber(transactionsNumber);
         recipientTransaction.setBankAccounts(senderBankAccount);
         recipientTransaction.setBanks(senderBankAccount.getBanks());
         recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());

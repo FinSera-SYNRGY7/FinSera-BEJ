@@ -32,7 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Component
 @RestController
-@RequestMapping("/v1/transaction")
+@RequestMapping("api/v1/transaction")
 public class TransactionController {
     @Autowired TransactionServiceImpl transactionServiceImpl;
     @Autowired BankAccountsRepository bankAccountsRepository;

@@ -156,3 +156,5 @@ Msrc/main/java/com/finalproject/finsera/finsera/repository/BankRepository.java,
 Tsrc/main/java/com/finalproject/finsera/finsera/repository/TransactionRepository.java,c\a\cad8808d04e2f2b732c5754cd0cc406fe7f751a6
 ƒ
 Ssrc/main/java/com/finalproject/finsera/finsera/model/entity/TransactionsNumber.java,d\7\d7f8fd700628fce703b7ae0e07e46b9d40dff4a1
+Š
+Zsrc/main/java/com/finalproject/finsera/finsera/repository/TransactionNumberRepository.java,c\4\c4e4310220d9d8ea90d8e2bf4c84d532fbad9ef5
