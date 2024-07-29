@@ -52,7 +52,7 @@ public class TransactionServiceImpl implements TransactionService{
         //     
         // }
 
-        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getCustomer().getMpin())))
+        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getMpinAccount())))
         {
             throw new IllegalArgumentException("Pin Anda Salah");
         } 

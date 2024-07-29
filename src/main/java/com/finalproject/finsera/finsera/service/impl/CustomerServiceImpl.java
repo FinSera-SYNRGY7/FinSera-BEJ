@@ -7,6 +7,7 @@ import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
 import com.finalproject.finsera.finsera.dto.login.ReloginRequestDto;
 import com.finalproject.finsera.finsera.dto.login.ReloginResponseDto;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
+import com.finalproject.finsera.finsera.dto.responseMsg.ResponseConstant;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.model.enums.Gender;
 import com.finalproject.finsera.finsera.model.enums.StatusUser;
@@ -26,10 +27,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -71,7 +74,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setUsername(registerRequestDto.getUsername());
         customers.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         customers.setEmail(registerRequestDto.getEmail());
-        customers.setMpin(passwordEncoder.encode(registerRequestDto.getMpin()));
+        customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpin()));
         customers.setStatusUser(StatusUser.INACTIVE);
 
         customerRepository.save(customers);
@@ -81,8 +84,23 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String getUserPin(String username) {
         Customers customers = customerRepository.findByUsername(username).get();
-        return customers.getMpin();
+        return customers.getMpinAuth();
     }
+
+    @Override
+    public Customers updateMpin(String username, String newMpin){
+        Optional<Customers> optionalCustomers = customerRepository.findByUsername(username);
+
+        if (!optionalCustomers.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+        }
+        Customers customer = optionalCustomers.get();
+        customer.setMpinAuth(passwordEncoder.encode(newMpin));
+
+        customerRepository.save(customer);
+        return customer;
+    }
+
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
@@ -108,9 +126,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String relogin(String username, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findByUsername(username).get();
-        System.out.println(customers.getMpin());
+        System.out.println(customers.getMpinAuth());
         System.out.println(reloginRequestDto.getMpin());
-        if (passwordEncoder.matches(customers.getMpin(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
+        if (passwordEncoder.matches(customers.getMpinAuth(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
             return "Pin Valid";
         } else {
             return "Pin Invalid";
@@ -120,7 +138,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String reloginGetId(Long id, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findById(id).get();
-        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpin())){
+        if (passwordEncoder.matches(reloginRequestDto.getMpin(), customers.getMpinAuth())){
             return "Pin Valid";
         } else {
             return "Pin Invalid";

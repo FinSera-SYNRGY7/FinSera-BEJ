@@ -49,7 +49,8 @@ public class Customers extends BaseModel{
 
     private String email;
 
-    private String mpin;
+    @Column(name = "mpin_auth")
+    private String mpinAuth;
 
     @Column(name = "status_user")
     private StatusUser statusUser;
@@ -57,7 +58,7 @@ public class Customers extends BaseModel{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<BankAccounts> bankAccounts;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customers")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<Notifications> notifications;
 
 }
