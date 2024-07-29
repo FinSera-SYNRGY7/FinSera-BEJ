@@ -21,8 +21,9 @@ public class TransactionsNumber extends BaseModel {
     @Column(name = "transaction_number", unique = true)
     private String transactionNumber;
 
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "transactionsNumber")
     private List<Transactions> transactions;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "transactionsNumber")
+    private List<TransactionOtherBanks> transactionOtherBanks;
 }

@@ -1,4 +1,4 @@
-package com.finalproject.finsera.finsera.dto;
+package com.finalproject.finsera.finsera.dto.transaction;
 
 import lombok.Data;
 
