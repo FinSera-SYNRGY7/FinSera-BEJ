@@ -5,13 +5,17 @@ import lombok.Data;
 
 @Data
 public class LoginResponseDto {
-    private String token;
-    private String username;
+    private String accessToken;
+    private String refreshToken;
+    private Long userId;
+    private String mpinAuth;
     private StatusUser status;
 
-    public LoginResponseDto(String token, String username, StatusUser status) {
-        this.token = token;
-        this.username = username;
+    public LoginResponseDto(String accessToken, String refreshToken, Long userId, String mpinAuth, StatusUser status) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
+        this.userId = userId;
+        this.mpinAuth = mpinAuth;
         this.status = status;
     }
 }
