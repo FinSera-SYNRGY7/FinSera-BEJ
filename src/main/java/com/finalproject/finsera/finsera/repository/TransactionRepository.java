@@ -17,11 +17,11 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
 
     Optional<Page<Transactions>> findAllByBankAccounts(BankAccounts fromBankAccounts, Pageable pageable);
 
-    @Query("SELECT t FROM Transactions t WHERE (t.bankAccounts.idBankAccounts=:bankAccounts) AND (DATE_TRUNC('month', t.createdDate)=DATE_TRUNC('month', CURRENT_DATE))")
-    Optional<Page<Transactions>> findAllByBankAccountsAndCreatedDateMonth(
-            @Param("bankAccounts") long bankAccounts,
-            Pageable pageable
-    );
+//    @Query("SELECT t FROM Transactions t WHERE (t.bankAccounts.idBankAccounts=:bankAccounts) AND (DATE_TRUNC('month', t.createdDate)=DATE_TRUNC('month', CURRENT_DATE))")
+//    Optional<Page<Transactions>> findAllByBankAccountsAndCreatedDateMonth(
+//            @Param("bankAccounts") long bankAccounts,
+//            Pageable pageable
+//    );
 
     @Query("SELECT t FROM Transactions t WHERE  (t.bankAccounts.idBankAccounts=:bankAccounts) AND" +
             "(t.createdDate BETWEEN :startDate AND :endDate) ")

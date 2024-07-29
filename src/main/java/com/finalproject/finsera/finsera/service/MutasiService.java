@@ -11,9 +11,6 @@ public interface MutasiService {
     List<MutasiResponseDto> getMutasi(
             String username,
             MutasiRequestDto mutasiRequestDto,
-            boolean isSevenDays,
-            boolean isOneMonth,
-            boolean isToday,
             Timestamp startDate,
             Timestamp endDate,
             int page,

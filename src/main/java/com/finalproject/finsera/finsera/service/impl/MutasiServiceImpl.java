@@ -50,52 +50,26 @@ public class MutasiServiceImpl implements MutasiService {
 
     @Transactional
     @Override
-    public List<MutasiResponseDto> getMutasi(String username, MutasiRequestDto mutasiRequestDto, boolean isSevenDays, boolean isOneMonth, boolean isToday, Timestamp startDate, Timestamp endDate, int page, int size) {
+    public List<MutasiResponseDto> getMutasi(
+            String username,
+            MutasiRequestDto mutasiRequestDto,
+            Timestamp startDate,
+            Timestamp endDate,
+            int page,
+            int size) {
 
         validationService.validate(mutasiRequestDto);
 
         Pageable pageable = PageRequest.of(((page > 0) ? page - 1 : page), size, Sort.by(Sort.Direction.DESC, "createdDate"));
-        Page<Transactions> filteredTransactions = null;
+        Page<Transactions> filteredTransactions;
 
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found")));
 
         BankAccounts bankAccounts = bankAccountsRepository.findByAccountNumber(mutasiRequestDto.getAccountNumber())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "The account number does not match the token"));
-        Instant now = Instant.now();
-        Timestamp today = Timestamp.from(now.truncatedTo(ChronoUnit.DAYS));
         if (bankAccounts.getCustomer() == customers.get()) {
-
-            if ((isToday ? 1 : 0) + (isOneMonth ? 1 : 0) + (isSevenDays ? 1 : 0) + ((startDate != null && endDate != null) ? 1 : 0) > 1) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please choose only one filter");
-            } else if(isToday) {
-                log.info("today: {}", today);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTime(today);
-                calendar.set(Calendar.HOUR_OF_DAY, 0);
-                calendar.set(Calendar.MINUTE, 0);
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MILLISECOND, 0);
-                Timestamp todayStart = new Timestamp(calendar.getTimeInMillis());
-                calendar.set(Calendar.HOUR_OF_DAY, 23);
-                calendar.set(Calendar.MINUTE, 59);
-                calendar.set(Calendar.SECOND, 59);
-                calendar.set(Calendar.MILLISECOND, 999);
-                Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
-                Timestamp todayEnd = Timestamp.valueOf(timestamp.toLocalDateTime());
-                filteredTransactions = transactionRepository.findAllByBankAccountsAndCreatedDate(todayStart, todayEnd, bankAccounts.getIdBankAccounts(), pageable)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
-            } else if (isSevenDays) {
-                log.info("sevenday: {}");
-                Timestamp sevenDays = Timestamp.from(now.minus(7, ChronoUnit.DAYS).truncatedTo(ChronoUnit.DAYS));
-                filteredTransactions = transactionRepository.findAllByBankAccountsAndCreatedDate(sevenDays,today, bankAccounts.getIdBankAccounts(), pageable)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
-
-            } else if(isOneMonth) {
-                filteredTransactions = transactionRepository.findAllByBankAccountsAndCreatedDateMonth(bankAccounts.getIdBankAccounts(), pageable)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
-//
-            } else if(startDate != null && endDate != null) {
+            if(startDate != null && endDate != null) {
                 log.info("start and end date: {}");
                 filteredTransactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts(), pageable)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
@@ -113,4 +87,6 @@ public class MutasiServiceImpl implements MutasiService {
         assert filteredTransactions != null;
         return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList());
     }
+
+
 }

@@ -39,15 +39,12 @@ public class MutasiController {
     MutasiService mutasiService;
 
     @PostMapping(value = {"/", ""})
-    @Operation(summary = "Info Saldo user", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Mutasi", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = InfoSaldoExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<?> getInfoMutasi(
             @Valid
             @RequestHeader(name = "Authorization") String token,
             @RequestBody MutasiRequestDto accountNumber,
-            @RequestParam(value = "today", required = false, defaultValue = "false") boolean isToday,
-            @RequestParam(value = "sevenDay", required = false, defaultValue = "false") boolean isSevenDays,
-            @RequestParam(value = "oneMonth", required = false, defaultValue = "false") boolean isOneMonth,
             @RequestParam(value = "startDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(value = "endDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -64,7 +61,7 @@ public class MutasiController {
             LocalDateTime endDateLocalDateTime = endDate.atTime(23, 59, 59);
             Timestamp endDateTimeStamp = Timestamp.valueOf(endDateLocalDateTime);
             listTransction = mutasiService.getMutasi(
-                    username, accountNumber, isSevenDays, isOneMonth, isToday, startDateTimeStamp, endDateTimeStamp, page, size
+                    username, accountNumber, startDateTimeStamp, endDateTimeStamp, page, size
             );
         } else if((startDate != null) && (endDate == null)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End Date is required, if you want to use Start Date");
@@ -72,7 +69,7 @@ public class MutasiController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start Date is required, if you want to use End Date");
         } else {
             listTransction = mutasiService.getMutasi(
-                    username, accountNumber, isSevenDays, isOneMonth, isToday, null, null, page, size
+                    username, accountNumber,  null, null, page, size
             );
         }
         return ResponseEntity.ok(BaseResponse.success(listTransction, "Nomor Rekening ditemukan"));
