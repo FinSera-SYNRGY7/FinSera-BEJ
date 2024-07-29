@@ -45,6 +45,7 @@ public class Customers extends BaseModel{
 
     private String email;
 
+    @Column(name = "mpin_auth")
     private String mpinAuth;
 
     @Column(name = "status_user")

@@ -11,12 +11,14 @@ import com.finalproject.finsera.finsera.util.JwtUtil;
 import com.finalproject.finsera.finsera.util.JwtUtilRefreshToken;
 import com.finalproject.finsera.finsera.util.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -72,6 +74,20 @@ public class CustomerServiceImpl implements CustomerService {
     public String getUserPin(String username) {
         Customers customers = customerRepository.findByUsername(username).get();
         return customers.getMpinAuth();
+    }
+
+    @Override
+    public Customers updateMpin(String username, String newMpin){
+        Optional<Customers> optionalCustomers = customerRepository.findByUsername(username);
+
+        if (!optionalCustomers.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+        }
+        Customers customer = optionalCustomers.get();
+        customer.setMpinAuth(passwordEncoder.encode(newMpin));
+
+        customerRepository.save(customer);
+        return customer;
     }
 
     @Override
