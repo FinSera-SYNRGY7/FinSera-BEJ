@@ -54,7 +54,7 @@ public class Customers extends BaseModel{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<BankAccounts> bankAccounts;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customers")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<Notifications> notifications;
 
 }
