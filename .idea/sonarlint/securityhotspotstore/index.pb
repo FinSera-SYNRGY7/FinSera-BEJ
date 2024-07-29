@@ -59,3 +59,5 @@ Osrc/main/java/com/finalproject/finsera/finsera/dto/login/ReloginRequestDto.java
 Wsrc/main/java/com/finalproject/finsera/finsera/service/impl/TransactionServiceImpl.java,4\8\482245a95301b2bd2274e8f5867d1da8b08b0f9c
 ~
 Nsrc/main/java/com/finalproject/finsera/finsera/service/TransactionService.java,e\2\e292d52e9fe7270037158bab6b8f3ad58d6c65ca
+~
+Nsrc/main/java/com/finalproject/finsera/finsera/model/entity/Notifications.java,c\7\c775a23b105f7be5642b80c9ac10b2a31d5b1392
