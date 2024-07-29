@@ -23,7 +23,7 @@ import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
 public class TransactionController {
     @Autowired TransactionServiceImpl transactionServiceImpl;
     @Autowired BankAccountsRepository bankAccountsRepository;
-    @PostMapping("/transaction_intra/create")
+    @PostMapping("/transaction-intra/create")
     public ResponseEntity<Map<String, Object>> createTransaction(@RequestBody TransactionRequestDto transactionRequestDto) {
         Map<String, Object> response = new HashMap<>();
         try {
