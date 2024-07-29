@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.finalproject.finsera.finsera.dto.TransactionCheckAccountRequestDto;
-import com.finalproject.finsera.finsera.dto.TransactionCheckAccountResponseDto;
-import com.finalproject.finsera.finsera.dto.TransactionRequestDto;
-import com.finalproject.finsera.finsera.dto.TransactionResponseDto;
+import com.finalproject.finsera.finsera.dto.transaction.*;
 import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
@@ -26,11 +23,11 @@ import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
 public class TransactionController {
     @Autowired TransactionServiceImpl transactionServiceImpl;
     @Autowired BankAccountsRepository bankAccountsRepository;
-    @PostMapping("/create")
+    @PostMapping("/transaction-intra/create")
     public ResponseEntity<Map<String, Object>> createTransaction(@RequestBody TransactionRequestDto transactionRequestDto) {
         Map<String, Object> response = new HashMap<>();
         try {
-            TransactionResponseDto transactionResponseDto =  transactionServiceImpl.create(transactionRequestDto);
+            TransactionResponseDto transactionResponseDto =  transactionServiceImpl.placeTransactionsIntraBank(transactionRequestDto);
             // Map<String, Object> data = new HashMap<>();
             // data.put("data", transactionResponseDto);
             response.put("message", "Transaksi Berhasil");
@@ -53,11 +50,57 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/check")
+    @PostMapping("/transaction-intra/check")
     public ResponseEntity<Map<String, Object>> checkTransaction(@RequestBody TransactionCheckAccountRequestDto transactionCheckAccountRequestDto) {
+        System.out.println(transactionCheckAccountRequestDto.getAccountnum_recipient());
         Map<String, Object> response = new HashMap<>();
         try {
-            TransactionCheckAccountResponseDto transactionCheckAccountResponseDto =  transactionServiceImpl.check(transactionCheckAccountRequestDto);
+            TransactionCheckAccountResponseDto transactionCheckAccountResponseDto =  transactionServiceImpl.checkAccountIntraBank(transactionCheckAccountRequestDto);
+            // Map<String, Object> data = new HashMap<>();
+            // data.put("data", transactionResponseDto);
+            response.put("message", "Data Rekening tersedia");
+            response.put("status", 200);
+            response.put("data", transactionCheckAccountResponseDto);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", 402);
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(402).body(response);
+        }
+    }
+
+    @PostMapping(value ={"/transaction-inter/create"})
+    public ResponseEntity<Map<String, Object>> createTransactionInter(@RequestBody TransactionOtherBankRequest transactionOtherBankRequest) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            TransactionOtherBankResponse transactionResponseDto =  transactionServiceImpl.placeTransactionsInterBank(transactionOtherBankRequest);
+            // Map<String, Object> data = new HashMap<>();
+            // data.put("data", transactionResponseDto);
+            response.put("message", "Transaksi Berhasil");
+            response.put("status", 200);
+            response.put("data", transactionResponseDto);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            if (e instanceof ConnectException){
+                response.put("status", 503);
+                response.put("message", "Connection lost with the server. Please try again later.");
+                return ResponseEntity.status(503).body(response);
+            }
+            else{
+                response.put("status", 402);
+                response.put("message", e.getMessage());
+                return ResponseEntity.status(402).body(response);
+            }
+
+        }
+    }
+    @PostMapping(value ={"/transaction-inter/check"})
+    public ResponseEntity<Map<String, Object>> checkTransactionInter(@RequestBody TransactionCheckOtherBankAccountRequest transactionCheckOtherBankAccountRequest) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            TransactionCheckOtherBankResponse transactionCheckAccountResponseDto =  transactionServiceImpl.checkAccountOtherBank(transactionCheckOtherBankAccountRequest);
             // Map<String, Object> data = new HashMap<>();
             // data.put("data", transactionResponseDto);
             response.put("message", "Data Rekening tersedia");

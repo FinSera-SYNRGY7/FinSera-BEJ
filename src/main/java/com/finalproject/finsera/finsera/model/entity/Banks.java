@@ -35,6 +35,6 @@ public class Banks extends BaseModel{
     private String bankImage;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "banks")
-    private List<Transactions> transactions;
+    private List<BankAccountsOtherBanks> bankAccountsOtherBanks;
 
 }
