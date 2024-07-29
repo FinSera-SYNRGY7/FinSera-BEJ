@@ -1,11 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
-import com.finalproject.finsera.finsera.dto.customer.CustomerDetailResponse;
-import com.finalproject.finsera.finsera.dto.customer.CustomerResponse;
-import com.finalproject.finsera.finsera.dto.login.LoginRequestDto;
-import com.finalproject.finsera.finsera.dto.login.LoginResponseDto;
-import com.finalproject.finsera.finsera.dto.login.ReloginRequestDto;
-import com.finalproject.finsera.finsera.dto.login.ReloginResponseDto;
+import com.finalproject.finsera.finsera.dto.login.*;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.model.enums.Gender;
@@ -13,30 +8,24 @@ import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.CustomerService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
+import com.finalproject.finsera.finsera.util.JwtUtilRefreshToken;
 import com.finalproject.finsera.finsera.util.UserDetailsImpl;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
     @Autowired
     CustomerRepository customerRepository;
-
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -46,6 +35,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     JwtUtil jwtUtil;
+
+    @Autowired
+    JwtUtilRefreshToken jwtUtilRefreshToken;
 
 
     //ignore register service
@@ -71,7 +63,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setUsername(registerRequestDto.getUsername());
         customers.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         customers.setEmail(registerRequestDto.getEmail());
-        customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpinAuth()));
+        customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpin()));
         customers.setStatusUser(StatusUser.INACTIVE);
 
         customerRepository.save(customers);
@@ -85,6 +77,20 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public Customers updateMpin(String username, String newMpin){
+        Optional<Customers> optionalCustomers = customerRepository.findByUsername(username);
+
+        if (!optionalCustomers.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+        }
+        Customers customer = optionalCustomers.get();
+        customer.setMpinAuth(passwordEncoder.encode(newMpin));
+
+        customerRepository.save(customer);
+        return customer;
+    }
+
+    @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         Optional<Customers> optionalCustomers = customerRepository.findByUsername(loginRequestDto.getUsername());
         Customers customers = optionalCustomers.get();
@@ -94,31 +100,43 @@ public class CustomerServiceImpl implements CustomerService {
                             loginRequestDto.getPassword()
                     ));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtil.generateToken(authentication);
+        String token = jwtUtil.generateToken(authentication);
+        String refreshToken = jwtUtilRefreshToken.generateRefreshToken(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         customers.setStatusUser(StatusUser.ACTIVE);
         customerRepository.save(customers);
         LoginResponseDto loginResponseDto = new LoginResponseDto(
-                    jwt, userDetails.getUsername(), customers.getStatusUser()
+                    token, refreshToken, userDetails.getIdCustomers(), customers.getMpinAuth(), customers.getStatusUser()
             );
 
         return loginResponseDto;
     }
 
     @Override
-    public String relogin(String username, ReloginRequestDto reloginRequestDto) {
-        Customers customers = customerRepository.findByUsername(username).get();
-        System.out.println(customers.getMpinAuth());
-        System.out.println(reloginRequestDto.getMpinAuth());
-        if (passwordEncoder.matches(customers.getMpinAuth(), passwordEncoder.encode(reloginRequestDto.getMpinAuth()))){
-            return "Pin Valid";
-        } else {
-            return "Pin Invalid";
-        }
+    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto refreshTokenRequestDto) {
+        //TODO validate present or not
+        //TODO validate active or inactive
+        String username = jwtUtilRefreshToken.getUsername(refreshTokenRequestDto.getRefreshToken());
+        String token = jwtUtil.generateTokenFromUsername(username);
+        RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
+        refreshTokenResponseDto.setAccessToken(token);
+        return refreshTokenResponseDto;
     }
 
+//    @Override
+//    public String relogin(String username, ReloginRequestDto reloginRequestDto) {
+//        Customers customers = customerRepository.findByUsername(username).get();
+//        System.out.println(customers.getMpin());
+//        System.out.println(reloginRequestDto.getMpin());
+//        if (passwordEncoder.matches(customers.getMpin(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
+//            return "Pin Valid";
+//        } else {
+//            return "Pin Invalid";
+//        }
+//    }
+
     @Override
-    public String reloginGetId(Long id, ReloginRequestDto reloginRequestDto) {
+    public String relogin(Long id, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findById(id).get();
         if (passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())){
             return "Pin Valid";

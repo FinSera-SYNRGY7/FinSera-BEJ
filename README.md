@@ -196,7 +196,7 @@ Response Body (failed) :
 ## Transfer Sesama Bank API Spec
 
 ### Check Data Rekening API Spec
-Endpoint : POST /v1/transaction/check
+Endpoint : POST /v1/transaction/transaction-intra/check
 
 Authorization Type Bearer Token : "USER_TOKEN"
 
@@ -234,7 +234,7 @@ Response Body (failed) :
 ```
 ## Transfer Sesama Bank API Spec
 
-Endpoint : POST /v1/transaction/create
+Endpoint : POST /v1/transaction/transaction-intra/create
 
 Authorization Type Bearer Token : "USER_TOKEN"
 
@@ -347,6 +347,113 @@ Response Body (failed) :
 {
   "data" : "null",
   "message" : "your pin is invalid"
+}
+```
+
+## Transfer Antar Bank API Spec
+
+### Check Data Rekening Antar BankAPI Spec
+Endpoint : POST /v1/transaction/transaction-inter/check
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Request Body:
+```json
+{
+    "bank_id":1,
+    "accountnum_recipient": "213818317",
+    "nominal" : 1000,
+    "note" : "cicilan"
+}
+```
+
+Response Body (success) :
+
+```json
+{
+    "data": {
+        "bank_id": 1,
+        "bank_name": "Mandiri",
+        "accountnum_recipient": "12345",
+        "name_recipient": "Userku",
+        "nominal": 1000,
+        "admin_fee": "Rp2.500,00",
+        "note": "cicilan"
+    },
+    "message": "Data Rekening tersedia",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Account Number is unavailable
+
+```json
+{
+    "message": "Nomor Rekening Tidak Ditemukan",
+    "status": 402
+}
+```
+## Transfer Antar Bank API Spec
+
+Endpoint : POST /v1/transaction/transaction-inter/create
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Request Body:
+```json
+{
+    "id_user":1,
+    "bank_id":1,
+    "accountnum_recipient":"12345",
+    "nominal":10000,
+    "note":"Cicilan",
+    "pin":"123456"
+}
+```
+
+Response Body (success) :
+
+```json
+{
+    "data": {
+        "transaction_num": "6796237263890977736",
+        "transaction_date": "29 July 2024 19:06 WIB",
+        "name_sender": "badrun",
+        "accountnum_sender": "123456",
+        "bank_name": "Mandiri",
+        "name_recipient": "Userku",
+        "accountnum_recipient": "12345",
+        "nominal": "Rp10.000,00",
+        "admin_fee": "Rp2.500,00",
+        "note": "Cicilan"
+    },
+    "message": "Transaksi Berhasil",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Account Number is unavailable
+
+```json
+{
+    "message": "Nomor Rekening Tidak Ditemukan",
+    "status": 402
+}
+```
+2. The balance is insufficient
+
+```json
+{
+    "message": "Saldo Anda Tidak Cukup",
+    "status": 402
+}
+```
+3. Incorrect Pin
+
+```json
+{
+    "message": "Pin Anda Salah",
+    "status": 402
 }
 ```
 

@@ -38,11 +38,8 @@ public class BankAccounts extends BaseModel{
     @Column(name = "amount")
     private Double amount;
 
+    @Column(name = "mpin_account")
     private String mpinAccount;
-
-    @ManyToOne
-    @JoinColumn(name = "bank_id")
-    private Banks banks;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bankAccounts")
     private List<Transactions> transactions;

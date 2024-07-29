@@ -7,10 +7,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.hibernate.annotations.CurrentTimestamp;
-
-import java.sql.Timestamp;
-import java.util.UUID;
 import java.util.List;
 
 @Entity
@@ -49,6 +45,7 @@ public class Customers extends BaseModel{
 
     private String email;
 
+    @Column(name = "mpin_auth")
     private String mpinAuth;
 
     @Column(name = "status_user")
@@ -57,7 +54,7 @@ public class Customers extends BaseModel{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<BankAccounts> bankAccounts;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customers")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<Notifications> notifications;
 
 }

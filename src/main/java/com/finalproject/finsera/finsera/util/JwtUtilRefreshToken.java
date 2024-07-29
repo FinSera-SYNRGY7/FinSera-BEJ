@@ -19,7 +19,7 @@ import java.util.function.Function;
 
 @Slf4j
 @Service
-public class JwtUtil {
+public class JwtUtilRefreshToken {
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -61,7 +61,7 @@ public class JwtUtil {
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    public String generateToken(Authentication authentication) {
+    public String generateRefreshToken(Authentication authentication) {
         String username;
         Long userId;
         Customers customers = new Customers();
@@ -84,21 +84,7 @@ public class JwtUtil {
                 .setSubject(username)
                 .claim("userId", customers.getIdCustomers())
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + jwtExpiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public String generateTokenFromUsername(String username){
-        Customers customers = customerRepository.findByUsername(username).get();
-
-        Date now = new Date();
-        return Jwts.builder()
-                .setHeaderParam("typ", "JWT")
-                .claim("userId", customers.getIdCustomers())
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + jwtExpiration))
+//                .setExpiration(null)
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -132,4 +118,6 @@ public class JwtUtil {
                 .getBody()
                 .getSubject();
     }
+
+
 }
