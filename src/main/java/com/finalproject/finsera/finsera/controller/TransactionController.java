@@ -22,7 +22,7 @@ import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
 
 @Component
 @RestController
-@RequestMapping("/v1/transaction")
+@RequestMapping("/api/v1/transaction")
 public class TransactionController {
     @Autowired TransactionServiceImpl transactionServiceImpl;
     @Autowired BankAccountsRepository bankAccountsRepository;

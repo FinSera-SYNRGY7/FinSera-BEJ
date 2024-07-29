@@ -25,6 +25,4 @@ public class Otp {
     @Column(name = "expired_at")
     private Timestamp expiredAt;
 
-    @Column(name = "created_at")
-    private Timestamp createdAt;
 }
