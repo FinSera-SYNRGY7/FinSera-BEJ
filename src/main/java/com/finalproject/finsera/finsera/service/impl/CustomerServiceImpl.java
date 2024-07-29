@@ -63,7 +63,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setUsername(registerRequestDto.getUsername());
         customers.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         customers.setEmail(registerRequestDto.getEmail());
-        customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpin()));
+        customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpinAuth()));
         customers.setStatusUser(StatusUser.INACTIVE);
 
         customerRepository.save(customers);

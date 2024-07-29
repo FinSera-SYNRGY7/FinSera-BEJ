@@ -1,6 +1,7 @@
 package com.finalproject.finsera.finsera.dto.register;
 import com.finalproject.finsera.finsera.model.enums.Gender;
 import com.finalproject.finsera.finsera.model.enums.StatusUser;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.Set;
@@ -18,6 +19,6 @@ public class RegisterRequestDto {
     private String username;
     private String password;
     private String email;
-    private String mpin;
+    private String mpinAuth;
     private StatusUser statusUser;
 }

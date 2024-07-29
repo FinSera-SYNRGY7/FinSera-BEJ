@@ -1,51 +1,41 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.finalproject.finsera.finsera.dto.transaction.*;
+import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountRequestDto;
+import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountResponseDto;
+import com.finalproject.finsera.finsera.model.entity.*;
+import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
+import com.finalproject.finsera.finsera.repository.*;
+import com.finalproject.finsera.finsera.service.AccountDummyService;
+import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.finalproject.finsera.finsera.dto.transaction.TransactionCheckAccountRequestDto;
-import com.finalproject.finsera.finsera.dto.transaction.TransactionCheckAccountResponseDto;
-import com.finalproject.finsera.finsera.dto.transaction.TransactionCheckOtherBankAccountRequest;
-import com.finalproject.finsera.finsera.dto.transaction.TransactionCheckOtherBankResponse;
-import com.finalproject.finsera.finsera.dto.transaction.TransactionOtherBankRequest;
-import com.finalproject.finsera.finsera.dto.transaction.TransactionOtherBankResponse;
-import com.finalproject.finsera.finsera.dto.transaction.TransactionRequestDto;
-import com.finalproject.finsera.finsera.dto.transaction.TransactionResponseDto;
-import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.model.entity.BankAccountsOtherBanks;
-import com.finalproject.finsera.finsera.model.entity.Banks;
-import com.finalproject.finsera.finsera.model.entity.TransactionOtherBanks;
-import com.finalproject.finsera.finsera.model.entity.Transactions;
-import com.finalproject.finsera.finsera.model.entity.TransactionsNumber;
-import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
-import com.finalproject.finsera.finsera.repository.BankAccountsOtherBanksRepository;
-import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
-import com.finalproject.finsera.finsera.repository.BankRepository;
-import com.finalproject.finsera.finsera.repository.TransactionNumberRepository;
-import com.finalproject.finsera.finsera.repository.TransactionOtherBankRepository;
-import com.finalproject.finsera.finsera.repository.TransactionRepository;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.Locale;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-
 @Service
 public class TransactionServiceImpl implements TransactionService{
     @Autowired TransactionRepository transactionRepository;
-    @Autowired TransactionOtherBankRepository transactionOtherBankRepository;
+    @Autowired
+    TransactionOtherBankRepository transactionOtherBankRepository;
     @Autowired BankAccountsRepository bankAccountsRepository;
-    @Autowired BankAccountsOtherBanksRepository bankAccountsOtherBanksRepository;
+    @Autowired
+    BankAccountsOtherBanksRepository bankAccountsOtherBanksRepository;
     @Autowired TransactionNumberRepository transactionNumberRepository;
     @Autowired BankRepository bankRepository;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired
+    AccountDummyService accountDummyService;
+    @Autowired
+    AccountDummyRepository accountDummyRepository;
 
     @Transactional
     @Override
@@ -104,7 +94,7 @@ public class TransactionServiceImpl implements TransactionService{
         transaction_in.setAmountTransfer((double) transactionRequestDto.getNominal());
         transaction_out.setNotes(transactionRequestDto.getNote());
         transaction_in.setType(TransactionsType.SESAMA_BANK);
-        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);        
+        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
 
         bankAccountsSender.setAmount(bankAccountsSender.getAmount()-(double) transactionRequestDto.getNominal());
         bankAccountsReceiver.setAmount(bankAccountsReceiver.getAmount()+(double) transactionRequestDto.getNominal());
@@ -133,10 +123,13 @@ public class TransactionServiceImpl implements TransactionService{
         return currencyFormatter.format(amount);
     }
 
+
+
+    
     @Transactional
     @Override
     public TransactionCheckAccountResponseDto checkAccountIntraBank(TransactionCheckAccountRequestDto transactionCheckAccountRequestDto){
-        
+
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionCheckAccountRequestDto.getAccountnum_recipient());
         if (!optionalBankAccountsReceiver.isPresent()) {
             throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
@@ -176,13 +169,13 @@ public class TransactionServiceImpl implements TransactionService{
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
         BankAccountsOtherBanks bankAccountsReceiver = optionalBankAccountsReceiver.get(0);
         // if (!(bankAccountsSender.getCustomer().getMpin().equals(transactionRequestDto.getPin()))){
-        //     
+        //
         // }
 
         if (!(passwordEncoder.matches(transactionOtherBankRequest.getPin(), bankAccountsSender.getMpinAccount())))
         {
             throw new IllegalArgumentException("Pin Anda Salah");
-        } 
+        }
         int nominal = transactionOtherBankRequest.getNominal()+2500;
         if (bankAccountsSender.getAmount()-nominal <0) {
             throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
@@ -215,7 +208,7 @@ public class TransactionServiceImpl implements TransactionService{
         transaction_in.setToAccountNumber(bankAccountsSender.getAccountNumber());
         transaction_in.setAmountTransfer((double) nominal);
         transaction_out.setNotes(transactionOtherBankRequest.getNote());
-        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);        
+        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
 
         bankAccountsSender.setAmount(bankAccountsSender.getAmount()-(double) nominal);
         bankAccountsReceiver.setAmount(bankAccountsReceiver.getAmount()+(double) transactionOtherBankRequest.getNominal());
@@ -268,4 +261,63 @@ public class TransactionServiceImpl implements TransactionService{
 
         return transactionCheckAccountResponseDisplay;
     }
+
+    @Transactional
+    @Override
+    public TransferVirtualAccountResponseDto transferVA(Long id, TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
+        BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
+        AccountDummyData recipientVirtualAccount = accountDummyService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        TransactionsNumber transactionsNumber = new TransactionsNumber();
+        transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
+        transactionNumberRepository.save(transactionsNumber);
+
+        //sender transaction
+        Transactions senderTransaction = new Transactions();
+        senderTransaction.setTransactionInformation(TransactionInformation.UANG_KELUAR);
+        senderTransaction.setBankAccounts(senderBankAccount);
+        senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
+        senderTransaction.setTransactionsNumber(transactionsNumber);
+        senderTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
+        senderTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        senderTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
+        senderTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
+        transactionRepository.save(senderTransaction);
+
+        //sender update amount
+        senderBankAccount.setAmount(senderBankAccount.getAmount() - transferVirtualAccountRequestDto.getNominal());
+        bankAccountsRepository.save(senderBankAccount);
+
+        //recipient transaction
+        Transactions recipientTransaction = new Transactions();
+        recipientTransaction.setTransactionInformation(TransactionInformation.UANG_MASUK);
+        recipientTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
+
+        //TBD should be same with noTransaction of sender or not
+        recipientTransaction.setTransactionsNumber(transactionsNumber);
+        recipientTransaction.setBankAccounts(senderBankAccount);
+        recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
+        recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
+        recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
+        transactionRepository.save(recipientTransaction);
+
+        //recipient update amount
+        recipientVirtualAccount.setAmount(
+                recipientVirtualAccount.getAmount() + transferVirtualAccountRequestDto.getNominal()
+        );
+        accountDummyRepository.save(recipientVirtualAccount);
+
+        TransferVirtualAccountResponseDto response = new TransferVirtualAccountResponseDto();
+        response.setTransactionNum(1L);
+        response.setType(TransactionsType.VIRTUAL_ACCOUNT);
+        response.setTransactionDate(Date.from(Instant.now()).toString());
+        response.setSenderName(senderBankAccount.getCustomer().getName());
+        response.setSenderAccountNum(senderBankAccount.getAccountNumber());
+        response.setRecipientName(recipientVirtualAccount.getAccountName());
+        response.setRecipientAccountNum(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        response.setNominal(transferVirtualAccountRequestDto.getNominal().toString());
+        response.setNote(transferVirtualAccountRequestDto.getNote());
+        return response;
+    }
+
 }

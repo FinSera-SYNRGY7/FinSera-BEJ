@@ -1,6 +1,5 @@
 package com.finalproject.finsera.finsera.model.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
