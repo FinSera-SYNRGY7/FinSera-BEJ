@@ -275,7 +275,6 @@ public class TransactionServiceImpl implements TransactionService{
         Transactions senderTransaction = new Transactions();
         senderTransaction.setTransactionInformation(TransactionInformation.UANG_KELUAR);
         senderTransaction.setBankAccounts(senderBankAccount);
-        senderTransaction.setBanks(senderBankAccount.getBanks());
         senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
         senderTransaction.setTransactionsNumber(transactionsNumber);
         senderTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
@@ -296,7 +295,6 @@ public class TransactionServiceImpl implements TransactionService{
         //TBD should be same with noTransaction of sender or not
         recipientTransaction.setTransactionsNumber(transactionsNumber);
         recipientTransaction.setBankAccounts(senderBankAccount);
-        recipientTransaction.setBanks(senderBankAccount.getBanks());
         recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
         recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
         recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());

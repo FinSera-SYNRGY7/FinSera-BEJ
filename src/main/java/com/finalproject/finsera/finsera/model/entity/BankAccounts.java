@@ -43,8 +43,4 @@ public class BankAccounts extends BaseModel{
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bankAccounts")
     private List<Transactions> transactions;
-
-    @ManyToOne
-    @JoinColumn(name = "bank_id")
-    private Banks banks;
 }
