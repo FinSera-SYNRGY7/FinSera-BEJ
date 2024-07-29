@@ -69,7 +69,7 @@ public class TransactionServiceImpl implements TransactionService{
         System.out.println(transactionRequestDto.getPin());
         System.out.println(bankAccountsSender.getMpinAccount());
 
-        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getMpinAccount())))
+        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getCustomer().getMpinAuth())))
         {
             throw new IllegalArgumentException("Pin Anda Salah");
         } 

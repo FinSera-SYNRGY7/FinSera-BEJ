@@ -7,10 +7,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import org.hibernate.annotations.CurrentTimestamp;
-
-import java.sql.Timestamp;
-import java.util.UUID;
 import java.util.List;
 
 @Entity
@@ -58,7 +54,7 @@ public class Customers extends BaseModel{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<BankAccounts> bankAccounts;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customers")
     private List<Notifications> notifications;
 
 }
