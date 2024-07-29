@@ -1,9 +1,12 @@
 package com.finalproject.finsera.finsera.util;
 
+import org.springframework.stereotype.Component;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@Component
 public class TransactionNumberGenerator {
 
     private static final AtomicInteger counter = new AtomicInteger(0);

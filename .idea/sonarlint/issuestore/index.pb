@@ -64,6 +64,8 @@ Nsrc/main/java/com/finalproject/finsera/finsera/model/entity/Notifications.java
 „
 Tsrc/main/java/com/finalproject/finsera/finsera/controller/TransactionController.java,5\a\5aed262ec18bd9d58b7c4a0c9708b810a2c76c30
 }
-Msrc/main/java/com/finalproject/finsera/finsera/model/entity/Transactions.java,9\6\969bc8ade6789f8cc5337bc519bebfa12687393e
-}
 Msrc/main/java/com/finalproject/finsera/finsera/model/entity/BankAccounts.java,6\f\6ffc7503604d93e3003966bd0f25703804bd5c50
+}
+Msrc/main/java/com/finalproject/finsera/finsera/model/entity/Transactions.java,9\6\969bc8ade6789f8cc5337bc519bebfa12687393e
+‡
+Wsrc/main/java/com/finalproject/finsera/finsera/model/entity/BankAccountsOtherBanks.java,9\6\967b46f3bb855822f2c299020f6d2901accffb9a

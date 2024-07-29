@@ -10,6 +10,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BankRepository extends JpaRepository<Banks, Long>{
-    
     Optional<Banks> findByBankName(String bank_name);
 }

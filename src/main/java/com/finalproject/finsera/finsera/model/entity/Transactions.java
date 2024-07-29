@@ -18,7 +18,6 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "transaction", schema = "public")
 public class Transactions extends BaseModel{
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
@@ -38,13 +37,13 @@ public class Transactions extends BaseModel{
     @Column(name = "to_account_number")
     private String toAccountNumber;
 
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "bank_id")
-    // private Banks banks;
+//     @ManyToOne(fetch = FetchType.LAZY)
+//     @JoinColumn(name = "bank_id")
+//     private Banks banks;
 
     @Column(name = "amount_transfer")
     private Double amountTransfer;
-    
+
     private String notes;
 
     @Column(name = "transaction_type")
