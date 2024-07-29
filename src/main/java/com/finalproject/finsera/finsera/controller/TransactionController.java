@@ -3,19 +3,24 @@ package com.finalproject.finsera.finsera.controller;
 import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+import com.finalproject.finsera.finsera.dto.transaction.*;
+import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountRequestDto;
+import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountResponseDto;
+import com.finalproject.finsera.finsera.model.entity.AccountDummyData;
+import com.finalproject.finsera.finsera.model.entity.BankAccounts;
+import com.finalproject.finsera.finsera.repository.AccountDummyRepository;
+import com.finalproject.finsera.finsera.repository.CustomerRepository;
+import com.finalproject.finsera.finsera.service.AccountDummyService;
+import com.finalproject.finsera.finsera.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.finalproject.finsera.finsera.dto.TransactionCheckAccountRequestDto;
-import com.finalproject.finsera.finsera.dto.TransactionCheckAccountResponseDto;
-import com.finalproject.finsera.finsera.dto.TransactionRequestDto;
-import com.finalproject.finsera.finsera.dto.TransactionResponseDto;
 import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
@@ -26,7 +31,6 @@ import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
 public class TransactionController {
     @Autowired TransactionServiceImpl transactionServiceImpl;
     @Autowired BankAccountsRepository bankAccountsRepository;
-    @PostMapping("/transaction-intra/create")
     @Autowired
     JwtUtil jwtUtil;
 
@@ -42,7 +46,7 @@ public class TransactionController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @PostMapping("/create")
+    @PostMapping("/transaction-intra/create")
     public ResponseEntity<Map<String, Object>> createTransaction(@RequestBody TransactionRequestDto transactionRequestDto) {
         Map<String, Object> response = new HashMap<>();
         try {

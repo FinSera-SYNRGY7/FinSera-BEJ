@@ -1,39 +1,41 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.finalproject.finsera.finsera.dto.transaction.*;
+import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountRequestDto;
+import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountResponseDto;
+import com.finalproject.finsera.finsera.model.entity.*;
+import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
+import com.finalproject.finsera.finsera.repository.*;
+import com.finalproject.finsera.finsera.service.AccountDummyService;
+import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.finalproject.finsera.finsera.dto.TransactionCheckAccountRequestDto;
-import com.finalproject.finsera.finsera.dto.TransactionCheckAccountResponseDto;
-import com.finalproject.finsera.finsera.dto.TransactionRequestDto;
-import com.finalproject.finsera.finsera.dto.TransactionResponseDto;
-import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.model.entity.Banks;
-import com.finalproject.finsera.finsera.model.entity.Transactions;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
-import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
-import com.finalproject.finsera.finsera.repository.BankRepository;
-import com.finalproject.finsera.finsera.repository.TransactionRepository;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 
-import java.util.Optional;
-import java.util.Random;
-import java.util.Locale;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 @Service
 public class TransactionServiceImpl implements TransactionService{
     @Autowired TransactionRepository transactionRepository;
-    @Autowired TransactionOtherBankRepository transactionOtherBankRepository;
+    @Autowired
+    TransactionOtherBankRepository transactionOtherBankRepository;
     @Autowired BankAccountsRepository bankAccountsRepository;
-    @Autowired BankAccountsOtherBanksRepository bankAccountsOtherBanksRepository;
+    @Autowired
+    BankAccountsOtherBanksRepository bankAccountsOtherBanksRepository;
     @Autowired TransactionNumberRepository transactionNumberRepository;
     @Autowired BankRepository bankRepository;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired
+    AccountDummyService accountDummyService;
+    @Autowired
+    AccountDummyRepository accountDummyRepository;
 
     @Transactional
     @Override
