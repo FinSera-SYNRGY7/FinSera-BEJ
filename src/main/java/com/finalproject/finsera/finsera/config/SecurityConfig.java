@@ -64,9 +64,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.addAllowedOrigin("*");
-        configuration.addAllowedMethod(CorsConfiguration.ALL);
-        configuration.addAllowedHeader(CorsConfiguration.ALL);
+        configuration.addAllowedOriginPattern("*"); // Mengizinkan semua origin
+        configuration.addAllowedMethod(CorsConfiguration.ALL); // Mengizinkan semua method
+        configuration.addAllowedHeader(CorsConfiguration.ALL); // Mengizinkan semua headers
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
