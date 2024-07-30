@@ -61,16 +61,18 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Start ssh-agent and add the key
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-passphrase: ${{ secrets.SSH_PASSPHRASE }}
+
       - name: Deploy to Server
         run: |
-          sshpass -p "$SSH_PASSPHRASE" ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa root@103.235.74.240 << 'EOF'
+          ssh -o StrictHostKeyChecking=no root@103.235.74.240 << 'EOF'
             docker pull fahrizalvianaz/finsera-api-staging:v1
             docker stop finsera-api || true
             docker rm finsera-api || true
             docker run -d --name finsera-api -p 8080:8080 fahrizalvianaz/finsera-api-staging:v1
             sudo systemctl restart nginx
           EOF
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
-        shell: bash
