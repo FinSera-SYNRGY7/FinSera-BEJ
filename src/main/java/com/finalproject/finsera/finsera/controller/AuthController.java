@@ -87,9 +87,9 @@ public class AuthController {
         }
 
         if (!loginRequestDto.getUsername().equals(customer.get().getUsername())){
-            return ResponseEntity.ok(BaseResponse.failure(400, "username or password invalid"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, "username or password invalid"));
         } else if (!passwordEncoder.matches(loginRequestDto.getPassword(), customer.get().getPassword())) {
-            return ResponseEntity.ok(BaseResponse.failure(400, "username or password invalid"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, "username or password invalid"));
         } else {
             LoginResponseDto login = customerService.login(loginRequestDto);
             Map<String, Object> response = new HashMap<>();
