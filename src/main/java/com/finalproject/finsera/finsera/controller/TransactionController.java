@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.dto.transaction.*;
 import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountResponseDto;
@@ -14,6 +15,12 @@ import com.finalproject.finsera.finsera.repository.AccountDummyRepository;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.AccountDummyService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +35,7 @@ import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
 @Component
 @RestController
 @RequestMapping("/api/v1/transaction")
+@Tag(name = "Transactions Controller", description = "API untuk operasi transaksi")
 public class TransactionController {
     @Autowired TransactionServiceImpl transactionServiceImpl;
     @Autowired BankAccountsRepository bankAccountsRepository;
@@ -47,6 +55,8 @@ public class TransactionController {
     PasswordEncoder passwordEncoder;
 
     @PostMapping("/transaction-intra/create")
+    @Operation(summary = "Transaction intra-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> createTransaction(@RequestBody TransactionRequestDto transactionRequestDto) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -74,6 +84,8 @@ public class TransactionController {
     }
 
     @PostMapping("/transaction-intra/check")
+    @Operation(summary = "Transaction check intra-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> checkTransaction(@RequestBody TransactionCheckAccountRequestDto transactionCheckAccountRequestDto) {
         System.out.println(transactionCheckAccountRequestDto.getAccountnum_recipient());
         Map<String, Object> response = new HashMap<>();
@@ -94,6 +106,8 @@ public class TransactionController {
     }
 
     @PostMapping(value ={"/transaction-inter/create"})
+    @Operation(summary = "Transaction inter-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionOtherBankResponse.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> createTransactionInter(@RequestBody TransactionOtherBankRequest transactionOtherBankRequest) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -120,6 +134,8 @@ public class TransactionController {
         }
     }
     @PostMapping(value ={"/transaction-inter/check"})
+    @Operation(summary = "Transaction check inter-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckOtherBankResponse.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> checkTransactionInter(@RequestBody TransactionCheckOtherBankAccountRequest transactionCheckOtherBankAccountRequest) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -139,6 +155,8 @@ public class TransactionController {
     }
 
     @PostMapping("/virtual-account")
+    @Operation(summary = "Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransferVirtualAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> virtualAccount(@RequestHeader("Authorization") String token, @RequestBody TransferVirtualAccountRequestDto transferVirtualAccountRequestDto){
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
@@ -190,6 +208,7 @@ public class TransactionController {
 //    }
 
     @PostMapping("/get-va")
+    @Operation(summary = "Get Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
     public String getVA(@RequestParam String accountNum){
         AccountDummyData recipient = accountDummyService.checkAccount(accountNum);
         System.out.println(recipient.getAccountName());

@@ -39,7 +39,7 @@ public class MutasiController {
     MutasiService mutasiService;
 
     @PostMapping(value = {"/", ""})
-    @Operation(summary = "Mutasi", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Mutasi (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = InfoSaldoExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<?> getInfoMutasi(
             @Valid

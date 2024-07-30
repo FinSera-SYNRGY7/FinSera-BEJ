@@ -45,9 +45,9 @@ public class CustomerController {
     JwtUtil jwtUtil;
 
     @GetMapping(value = {"/", ""})
-    @Operation(summary = "Detail user", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Detail user (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = ProfileExampleSwagger.class), mediaType = "application/json") })
-    public ResponseEntity<Map<String, Object>> userDetail(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<?> userDetail(@RequestHeader(name = "Authorization") String token) {
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
         Map<String, Object> response = new HashMap<>();
@@ -66,7 +66,7 @@ public class CustomerController {
         if (customer != null) {
             data.put("userDetails", detailCustomerResponse);
             response.put("data", data);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return ResponseEntity.ok(BaseResponse.success(response, "success"));
         } else {
             response.put("status", "error");
             response.put("message", "User not found");
@@ -75,6 +75,8 @@ public class CustomerController {
     }
 
     @PatchMapping("/update-mpin")
+    @Operation(summary = "Update PIN AppLock (done) ", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = InfoSaldoExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<BaseResponse<Void>> updateMpin(@RequestHeader(name = "Authorization") String token, @RequestBody UpdateMpinRequest mpin) {
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
