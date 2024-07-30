@@ -5,10 +5,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-
+import lombok.EqualsAndHashCode;
 import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -18,8 +16,9 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "banks", schema = "public")
-public class Banks {
+public class Banks extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,22 +34,7 @@ public class Banks {
     @Column(name = "bank_image")
     private String bankImage;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at", nullable = true, updatable = false)
-    @CreatedDate
-    private Date createdDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_at", nullable = true)
-    @LastModifiedDate
-    private Date updatedDate;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "deleted_at")
-    private Date deletedDate;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "banks")
-    private List<Transactions> transactions;
-
+    private List<BankAccountsOtherBanks> bankAccountsOtherBanks;
 
 }

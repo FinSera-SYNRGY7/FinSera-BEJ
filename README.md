@@ -191,4 +191,269 @@ Response Body (failed) :
   "message" : "Invalid OTP"
 }
 ````
+# FinSera-BEJ
+
+## Transfer Sesama Bank API Spec
+
+### Check Data Rekening API Spec
+Endpoint : POST /v1/transaction/transaction-intra/check
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Request Body:
+```json
+{
+    "accountnum_recipient": "213818317",
+    "nominal" : 100000,
+    "note" : "Cicilan Motor"
+}
+```
+
+Response Body (success) :
+
+```json
+{
+    "data": {
+        "transaction_num": 12138173913,
+        "accountnum_recipient" : "213818317",
+        "nominal" : "Rp.100.000",
+        "note" : "Cicilan Motor" 
+    },
+    "message": "Data Rekening tersedia",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Account Number is unavailable
+
+```json
+{
+    "message": "Nomor Rekening Tidak Ditemukan",
+    "status": 402
+}
+```
+## Transfer Sesama Bank API Spec
+
+Endpoint : POST /v1/transaction/transaction-intra/create
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Request Body:
+```json
+{
+    "id_user": 1,
+    "accountnum_recipient": "213818317",
+    "nominal" : 100000,
+    "note" : "Cicilan Motor",
+    "pin" : "2213131"
+}
+```
+
+Response Body (success) :
+
+```json
+{
+    "data": {
+        "transaction_num": 12138173913,
+        "transaction_date": "08/07/2024 13:00",
+        "name_sender" : "FinSera",
+        "accountnum_sender" : "1234 567 897 890",
+        "name_recipient" : "Binar",
+        "accountnum_recipient" : "213818317",
+        "nominal" : "Rp.100.000",
+        "note" : "Cicilan Motor" 
+    },
+    "message": "Transaksi Berhasil",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Account Number is unavailable
+
+```json
+{
+    "message": "Nomor Rekening Tidak Ditemukan",
+    "status": 402
+}
+```
+2. The balance is insufficient
+
+```json
+{
+    "message": "Saldo Anda Tidak Cukup",
+    "status": 402
+}
+```
+3. Incorrect Pin
+
+```json
+{
+    "message": "Pin Anda Salah",
+    "status": 402
+}
+```
+---
+## Transfer Virtual Account Spec
+* Endpoint : POST /v1/transaction/virtual-account
+* Authorization Type Bearer Token : "USER_TOKEN"
+
+### Request Body :
+```json
+{
+  "id_user" : "long",
+  "recipinet_accountNum" : "string",
+  "recipient_accountType" : "enum",
+  "nominal" : "double",
+  "note" : "string",
+  "pin_account" : "string"
+}
+```
+
+### Response Body (success) : <span style="color: green;">200 OK</span>
+```json
+{
+  "data" : {
+    "transaction_num" : "long",
+    "transaction_type" : "enum",
+    "transaction_date" : "current_timestamp",
+    "sender_name" : "string",
+    "sender_accountNum" : "string",
+    "recipient_name" : "string",
+    "recipinet_accountNum" : "string",
+    "nominal" : "string",
+    "note" : "string"
+  },
+  "status" : "success",
+  "message" : "your transaction is success"
+}
+```
+### Response Body (failed) : <span style="color: red;">401 Unauthorized</span>
+```json
+{
+  "data" : "null",
+  "message" : "recipient account not found"
+}
+```
+### Response Body (failed) : <span style="color: red;">400 Bad Request</span>
+```json
+{
+  "data" : "null",
+  "message" : "your balance is insufficient"
+}
+```
+
+### Response Body (failed) : <span style="color: red;">401 Unauthorized</span>
+```json
+{
+  "data" : "null",
+  "message" : "your pin is invalid"
+}
+```
+
+## Transfer Antar Bank API Spec
+
+### Check Data Rekening Antar BankAPI Spec
+Endpoint : POST /v1/transaction/transaction-inter/check
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Request Body:
+```json
+{
+    "bank_id":1,
+    "accountnum_recipient": "213818317",
+    "nominal" : 1000,
+    "note" : "cicilan"
+}
+```
+
+Response Body (success) :
+
+```json
+{
+    "data": {
+        "bank_id": 1,
+        "bank_name": "Mandiri",
+        "accountnum_recipient": "12345",
+        "name_recipient": "Userku",
+        "nominal": 1000,
+        "admin_fee": "Rp2.500,00",
+        "note": "cicilan"
+    },
+    "message": "Data Rekening tersedia",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Account Number is unavailable
+
+```json
+{
+    "message": "Nomor Rekening Tidak Ditemukan",
+    "status": 402
+}
+```
+## Transfer Antar Bank API Spec
+
+Endpoint : POST /v1/transaction/transaction-inter/create
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Request Body:
+```json
+{
+    "id_user":1,
+    "bank_id":1,
+    "accountnum_recipient":"12345",
+    "nominal":10000,
+    "note":"Cicilan",
+    "pin":"123456"
+}
+```
+
+Response Body (success) :
+
+```json
+{
+    "data": {
+        "transaction_num": "6796237263890977736",
+        "transaction_date": "29 July 2024 19:06 WIB",
+        "name_sender": "badrun",
+        "accountnum_sender": "123456",
+        "bank_name": "Mandiri",
+        "name_recipient": "Userku",
+        "accountnum_recipient": "12345",
+        "nominal": "Rp10.000,00",
+        "admin_fee": "Rp2.500,00",
+        "note": "Cicilan"
+    },
+    "message": "Transaksi Berhasil",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Account Number is unavailable
+
+```json
+{
+    "message": "Nomor Rekening Tidak Ditemukan",
+    "status": 402
+}
+```
+2. The balance is insufficient
+
+```json
+{
+    "message": "Saldo Anda Tidak Cukup",
+    "status": 402
+}
+```
+3. Incorrect Pin
+
+```json
+{
+    "message": "Pin Anda Salah",
+    "status": 402
+}
+```
 

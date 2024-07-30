@@ -2,7 +2,8 @@ package com.finalproject.finsera.finsera.model.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
+import lombok.EqualsAndHashCode;
+import com.finalproject.finsera.finsera.model.enums.Notification;
 import java.sql.Timestamp;
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ public class Notifications {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
-    private Customers customers;
+    private Customers customer;
 
     private String type;
 }

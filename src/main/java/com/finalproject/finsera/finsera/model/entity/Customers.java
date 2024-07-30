@@ -5,16 +5,15 @@ import com.finalproject.finsera.finsera.model.enums.Gender;
 import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.CurrentTimestamp;
+import lombok.EqualsAndHashCode;
 
-import java.sql.Timestamp;
-import java.util.UUID;
 import java.util.List;
 
 @Entity
 @Data
 @Table(name = "customers", schema = "public")
-public class Customers {
+@EqualsAndHashCode(callSuper = true)
+public class Customers extends BaseModel{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,26 +22,20 @@ public class Customers {
 
     private String address;
 
-    @Column(name = "created_at")
-    @CurrentTimestamp
-    private Timestamp createdAt;
-
-    @Column(name = "delete_at")
-    private Timestamp deletedAt;
-
-    private String email;
+    private Gender gender;
 
     @Column(name = "father_user")
     private String fatherName;
 
-    private Gender gender;
-
     @Column(name = "mother_user")
     private String motherName;
 
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
     private Double income;
 
-    private String mpin;
+    private String username;
 
     private String name;
 
@@ -50,16 +43,18 @@ public class Customers {
 
     private String password;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    private String email;
+
+    @Column(name = "mpin_auth")
+    private String mpinAuth;
 
     @Column(name = "status_user")
     private StatusUser statusUser;
 
-    private String username;
-
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<BankAccounts> bankAccounts;
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+    private List<Notifications> notifications;
 
 }

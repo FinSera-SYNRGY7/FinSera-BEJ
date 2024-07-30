@@ -40,7 +40,7 @@ public class InfoSaldoController {
     private final JwtUtil jwtUtil;
 
     @GetMapping(value = {"/", ""})
-    @Operation(summary = "Info Saldo user", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Info Saldo user (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = InfoSaldoExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<?> getInfoSaldo(
             @Valid

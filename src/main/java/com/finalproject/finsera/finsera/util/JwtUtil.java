@@ -89,6 +89,20 @@ public class JwtUtil {
                 .compact();
     }
 
+    public String generateTokenFromUsername(String username){
+        Customers customers = customerRepository.findByUsername(username).get();
+
+        Date now = new Date();
+        return Jwts.builder()
+                .setHeaderParam("typ", "JWT")
+                .claim("userId", customers.getIdCustomers())
+                .setSubject(username)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + jwtExpiration))
+                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     private Key getSignInKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
