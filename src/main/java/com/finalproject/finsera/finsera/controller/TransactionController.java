@@ -155,7 +155,7 @@ public class TransactionController {
     }
 
     @PostMapping("/virtual-account")
-    @Operation(summary = "Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Virtual Accounts", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransferVirtualAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> virtualAccount(@RequestHeader("Authorization") String token, @RequestBody TransferVirtualAccountRequestDto transferVirtualAccountRequestDto){
         String jwt = token.substring("Bearer ".length());
@@ -207,12 +207,11 @@ public class TransactionController {
 //        return "from : " + bankAccounts.getCustomer().getUsername() + "\n" + "to : " + recipientVirtualAccount.getAccountName();
 //    }
 
-    @PostMapping("/get-va")
-    @Operation(summary = "Get Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    public String getVA(@RequestParam String accountNum){
-        AccountDummyData recipient = accountDummyService.checkAccount(accountNum);
-        System.out.println(recipient.getAccountName());
-
-        return "account name " + recipient.getAccountName();
-    }
+//    @PostMapping("/get-va")
+//    public String getVA(@RequestParam String accountNum){
+//        AccountDummyData recipient = accountDummyService.checkAccount(accountNum);
+//        System.out.println(recipient.getAccountName());
+//
+//        return "account name " + recipient.getAccountName();
+//    }
 }
