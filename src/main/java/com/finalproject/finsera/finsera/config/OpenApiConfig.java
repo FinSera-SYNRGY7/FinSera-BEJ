@@ -34,7 +34,7 @@ public class OpenApiConfig {
                                 .bearerFormat("JWT")))
                 .servers(List.of(
                         new Server().url("http://localhost:8080").description("HTTP Server"),
-                        new Server().url("https://individual-gerry-finsera-dd701fe5.koyeb.app").description("HTTPS Server")
+                        new Server().url("https://finsera-api.site").description("HTTPS Server")
                 ));
 
 
