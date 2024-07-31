@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountDummyServiceImpl implements AccountDummyService {
@@ -53,12 +54,20 @@ public class AccountDummyServiceImpl implements AccountDummyService {
     @Override
     public List<Transactions> getAll() {
         List<Transactions> transactionsList = transactionRepository.findAll();
-        transactionsList.forEach(transactions -> transactions.getType().equals(TransactionsType.VIRTUAL_ACCOUNT));
         return transactionsList;
     }
 
     @Override
     public List<AccountLastTransactionResponseDto> getAccount() {
-        return transactionRepository.findByCreatedDate();
+        List<Transactions> transactionsList = transactionRepository.getLastAccountTransaction();
+//        String recipientAccountName = accountDummyRepository.findByAccountNumber(
+//                String.valueOf(transactionsList.stream().map(transactions -> transactions.getToAccountNumber()))
+//        ).getAccountName();
+//        System.out.println(recipientAccountName);
+        return transactionsList.stream()
+                .map(transactions -> new AccountLastTransactionResponseDto(
+                        accountDummyRepository.findByAccountNumber(transactions.getToAccountNumber()).getAccountName(),
+                        transactions.getToAccountNumber()
+                )).toList();
     }
 }

@@ -36,8 +36,8 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
             Pageable pageable
     );
 
-    @Query(value = "select add2.account_name, t.to_account_number from transactions t\n" +
-            "join account_dummy_data add2 on add2.account_number = t.to_account_number \n" +
-            "where t.created_date >= now() - interval '3 days' and t.transaction_type = 2", nativeQuery = true)
-    List<AccountLastTransactionResponseDto> findByCreatedDate();
+    @Query(value = "select distinct * from \"transaction\" t where transaction_information = 0 \n" +
+            "order by created_date desc limit 3;"
+            , nativeQuery = true)
+    List<Transactions> getLastAccountTransaction();
 }
