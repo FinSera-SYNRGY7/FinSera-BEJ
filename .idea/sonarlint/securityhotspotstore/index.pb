@@ -69,3 +69,7 @@ Msrc/main/java/com/finalproject/finsera/finsera/model/entity/BankAccounts.java,
 Msrc/main/java/com/finalproject/finsera/finsera/model/entity/Transactions.java,9\6\969bc8ade6789f8cc5337bc519bebfa12687393e
 ‡
 Wsrc/main/java/com/finalproject/finsera/finsera/model/entity/BankAccountsOtherBanks.java,9\6\967b46f3bb855822f2c299020f6d2901accffb9a
+„
+Tsrc/main/java/com/finalproject/finsera/finsera/repository/TransactionRepository.java,c\a\cad8808d04e2f2b732c5754cd0cc406fe7f751a6
+
+Osrc/main/java/com/finalproject/finsera/finsera/service/AccountDummyService.java,5\1\511cff074768850e6d817e8993d968ed38a5260e
