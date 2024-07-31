@@ -1,12 +1,12 @@
 package com.finalproject.finsera.finsera.service.impl;
 
 import com.finalproject.finsera.finsera.dto.transaction.*;
-import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountRequestDto;
-import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountResponseDto;
+import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
+import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
 import com.finalproject.finsera.finsera.model.entity.*;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.repository.*;
-import com.finalproject.finsera.finsera.service.AccountDummyService;
+import com.finalproject.finsera.finsera.service.VirtualAccountService;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,9 +33,9 @@ public class TransactionServiceImpl implements TransactionService{
     @Autowired BankRepository bankRepository;
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired
-    AccountDummyService accountDummyService;
+    VirtualAccountService virtualAccountService;
     @Autowired
-    AccountDummyRepository accountDummyRepository;
+    VirtualAccountRepository virtualAccountRepository;
 
     @Transactional
     @Override
@@ -266,10 +266,11 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public TransferVirtualAccountResponseDto transferVA(Long id, TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
         BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
-        AccountDummyData recipientVirtualAccount = accountDummyService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        VirtualAccounts recipientVirtualAccount = virtualAccountService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
         TransactionsNumber transactionsNumber = new TransactionsNumber();
         transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
         transactionNumberRepository.save(transactionsNumber);
+        Double adminFee = 2500.0;
 
         //sender transaction
         Transactions senderTransaction = new Transactions();
@@ -284,7 +285,7 @@ public class TransactionServiceImpl implements TransactionService{
         transactionRepository.save(senderTransaction);
 
         //sender update amount
-        senderBankAccount.setAmount(senderBankAccount.getAmount() - transferVirtualAccountRequestDto.getNominal());
+        senderBankAccount.setAmount(senderBankAccount.getAmount() - transferVirtualAccountRequestDto.getNominal() - adminFee);
         bankAccountsRepository.save(senderBankAccount);
 
         //recipient transaction
@@ -298,17 +299,19 @@ public class TransactionServiceImpl implements TransactionService{
         recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
         recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
         recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
+
         recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
         transactionRepository.save(recipientTransaction);
 
-        //recipient update amount
+        //recipient update amount and save
         recipientVirtualAccount.setAmount(
                 recipientVirtualAccount.getAmount() + transferVirtualAccountRequestDto.getNominal()
         );
-        accountDummyRepository.save(recipientVirtualAccount);
+        recipientVirtualAccount.setSavedAccount(transferVirtualAccountRequestDto.getSaveAccount());
+        virtualAccountRepository.save(recipientVirtualAccount);
 
         TransferVirtualAccountResponseDto response = new TransferVirtualAccountResponseDto();
-        response.setTransactionNum(1L);
+        response.setTransactionNum(transactionsNumber.getTransactionNumber());
         response.setType(TransactionsType.VIRTUAL_ACCOUNT);
         response.setTransactionDate(Date.from(Instant.now()).toString());
         response.setSenderName(senderBankAccount.getCustomer().getName());
@@ -316,6 +319,7 @@ public class TransactionServiceImpl implements TransactionService{
         response.setRecipientName(recipientVirtualAccount.getAccountName());
         response.setRecipientAccountNum(transferVirtualAccountRequestDto.getRecipientAccountNum());
         response.setNominal(transferVirtualAccountRequestDto.getNominal().toString());
+        response.setAdminFee(String.valueOf(adminFee));
         response.setNote(transferVirtualAccountRequestDto.getNote());
         return response;
     }

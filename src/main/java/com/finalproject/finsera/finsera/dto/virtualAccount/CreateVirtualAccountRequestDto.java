@@ -1,14 +1,13 @@
-package com.finalproject.finsera.finsera.dto.accountDummy;
+package com.finalproject.finsera.finsera.dto.virtualAccount;
 
 import com.finalproject.finsera.finsera.model.enums.AccountType;
 import lombok.Data;
 
 @Data
-public class CreateAccountDummyRequestDto {
+public class CreateVirtualAccountRequestDto {
     private String accountName;
     private String accountNumber;
     private Double amount;
     private String mpinAccount;
     private AccountType accountType;
-    private Boolean savedAccount;
 }

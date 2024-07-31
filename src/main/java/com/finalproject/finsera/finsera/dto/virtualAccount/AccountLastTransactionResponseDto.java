@@ -1,4 +1,4 @@
-package com.finalproject.finsera.finsera.dto.accountDummy;
+package com.finalproject.finsera.finsera.dto.virtualAccount;
 
 import lombok.Data;
 

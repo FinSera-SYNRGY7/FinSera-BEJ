@@ -1,4 +1,4 @@
-package com.finalproject.finsera.finsera.dto.transferVirtualAccount;
+package com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount;
 
 import com.finalproject.finsera.finsera.model.enums.AccountType;
 import lombok.Data;
@@ -10,4 +10,5 @@ public class TransferVirtualAccountRequestDto {
     Double nominal;
     String note;
     String mpinAccount;
+    Boolean saveAccount;
 }

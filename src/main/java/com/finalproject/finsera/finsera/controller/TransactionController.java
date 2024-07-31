@@ -6,13 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.finalproject.finsera.finsera.dto.transaction.*;
-import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountRequestDto;
-import com.finalproject.finsera.finsera.dto.transferVirtualAccount.TransferVirtualAccountResponseDto;
-import com.finalproject.finsera.finsera.model.entity.AccountDummyData;
+import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
+import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
+import com.finalproject.finsera.finsera.model.entity.VirtualAccounts;
 import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.repository.AccountDummyRepository;
+import com.finalproject.finsera.finsera.repository.VirtualAccountRepository;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
-import com.finalproject.finsera.finsera.service.AccountDummyService;
+import com.finalproject.finsera.finsera.service.VirtualAccountService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
-import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
 
 @Component
@@ -35,13 +34,13 @@ public class TransactionController {
     JwtUtil jwtUtil;
 
     @Autowired
-    AccountDummyService accountDummyService;
+    VirtualAccountService virtualAccountService;
 
     @Autowired
     CustomerRepository customerRepository;
 
     @Autowired
-    AccountDummyRepository accountDummyRepository;
+    VirtualAccountRepository virtualAccountRepository;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -143,7 +142,7 @@ public class TransactionController {
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(userId);
-        Optional<AccountDummyData> accountDummyData = Optional.ofNullable(accountDummyRepository.findByAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum()));
+        Optional<VirtualAccounts> accountDummyData = Optional.ofNullable(virtualAccountRepository.findByAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum()));
 
         if (!accountDummyData.isPresent()){
             Map<String, Object> response = new HashMap<>();
@@ -191,7 +190,7 @@ public class TransactionController {
 
     @PostMapping("/get-va")
     public String getVA(@RequestParam String accountNum){
-        AccountDummyData recipient = accountDummyService.checkAccount(accountNum);
+        VirtualAccounts recipient = virtualAccountService.checkAccount(accountNum);
         System.out.println(recipient.getAccountName());
 
         return "account name " + recipient.getAccountName();
