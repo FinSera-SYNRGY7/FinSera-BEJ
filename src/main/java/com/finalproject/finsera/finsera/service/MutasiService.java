@@ -10,7 +10,6 @@ public interface MutasiService {
 
     List<MutasiResponseDto> getMutasi(
             String username,
-            MutasiRequestDto mutasiRequestDto,
             Timestamp startDate,
             Timestamp endDate,
             int page,
