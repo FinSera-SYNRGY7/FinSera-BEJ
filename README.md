@@ -1,4 +1,4 @@
-
+# FinSera-BEJ
 ## Informasi Saldo API Spec
 
 Endpoint : GET api/v1/amount
@@ -191,21 +191,19 @@ Response Body (failed) :
   "message" : "Invalid OTP"
 }
 ````
-# FinSera-BEJ
+
 
 ## Transfer Sesama Bank API Spec
 
 ### Check Data Rekening API Spec
-Endpoint : POST /v1/transaction/transaction-intra/check
+Endpoint : POST /api/v1/transaction/transaction-intra/check
 
 Authorization Type Bearer Token : "USER_TOKEN"
 
 Request Body:
 ```json
 {
-    "accountnum_recipient": "213818317",
-    "nominal" : 100000,
-    "note" : "Cicilan Motor"
+    "accountnum_recipient": "213818317"
 }
 ```
 
@@ -215,9 +213,7 @@ Response Body (success) :
 {
     "data": {
         "transaction_num": 12138173913,
-        "accountnum_recipient" : "213818317",
-        "nominal" : "Rp.100.000",
-        "note" : "Cicilan Motor" 
+        "accountnum_recipient" : "213818317"
     },
     "message": "Data Rekening tersedia",
     "status": 200
@@ -232,16 +228,15 @@ Response Body (failed) :
     "status": 402
 }
 ```
-## Transfer Sesama Bank API Spec
+### Transaction Sesama Bank API Spec
 
-Endpoint : POST /v1/transaction/transaction-intra/create
+Endpoint : POST /api/v1/transaction/transaction-intra/create
 
 Authorization Type Bearer Token : "USER_TOKEN"
 
 Request Body:
 ```json
 {
-    "id_user": 1,
     "accountnum_recipient": "213818317",
     "nominal" : 100000,
     "note" : "Cicilan Motor",
@@ -292,6 +287,48 @@ Response Body (failed) :
     "status": 402
 }
 ```
+
+### Transaksi Terakhir Sesama Bank API Spec
+
+Endpoint : GET /api/v1/transaction/transaction-intra/history
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Response Body (success) :
+
+```json
+{
+    "data": [
+        {
+            "name_recipient": "badrun",
+            "bank_name": "Bank BCA",
+            "account_number_recipient": "123456"
+        },
+        {
+            "name_recipient": "upin",
+            "bank_name": "Bank BCA",
+            "account_number_recipient": "78909"
+        },
+        {
+            "name_recipient": "badrun",
+            "bank_name": "Bank BCA",
+            "account_number_recipient": "123456"
+        }
+    ],
+    "message": "History Transaksi tersedia",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Transaction is empty
+
+```json
+{
+    "message": "Transaksi belum ada",
+    "status": 402
+}
+```
+
 ---
 ## Transfer Virtual Account Spec
 * Endpoint : POST /v1/transaction/virtual-account
@@ -353,7 +390,7 @@ Response Body (failed) :
 ## Transfer Antar Bank API Spec
 
 ### Check Data Rekening Antar BankAPI Spec
-Endpoint : POST /v1/transaction/transaction-inter/check
+Endpoint : POST /api/v1/transaction/transaction-inter/check
 
 Authorization Type Bearer Token : "USER_TOKEN"
 
@@ -361,9 +398,7 @@ Request Body:
 ```json
 {
     "bank_id":1,
-    "accountnum_recipient": "213818317",
-    "nominal" : 1000,
-    "note" : "cicilan"
+    "accountnum_recipient": "213818317"
 }
 ```
 
@@ -375,10 +410,7 @@ Response Body (success) :
         "bank_id": 1,
         "bank_name": "Mandiri",
         "accountnum_recipient": "12345",
-        "name_recipient": "Userku",
-        "nominal": 1000,
-        "admin_fee": "Rp2.500,00",
-        "note": "cicilan"
+        "name_recipient": "Userku"
     },
     "message": "Data Rekening tersedia",
     "status": 200
@@ -393,16 +425,15 @@ Response Body (failed) :
     "status": 402
 }
 ```
-## Transfer Antar Bank API Spec
+### Transaction Antar Bank API Spec
 
-Endpoint : POST /v1/transaction/transaction-inter/create
+Endpoint : POST /api/v1/transaction/transaction-inter/create
 
 Authorization Type Bearer Token : "USER_TOKEN"
 
 Request Body:
 ```json
 {
-    "id_user":1,
     "bank_id":1,
     "accountnum_recipient":"12345",
     "nominal":10000,
@@ -456,4 +487,80 @@ Response Body (failed) :
     "status": 402
 }
 ```
+### Transaksi Terakhir Antar Bank API Spec
 
+Endpoint : GET /api/v1/transaction/transaction-inter/history
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Response Body (success) :
+
+```json
+{
+    "data": [
+        {
+            "name_recipient": "Userku",
+            "bank_name": "Mandiri",
+            "account_number_recipient": "12345"
+        }
+    ],
+    "message": "History Transaksi tersedia",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Transaction is empty
+
+```json
+{
+    "message": "Transaksi belum ada",
+    "status": 402
+}
+```
+
+## Bank API Spec
+
+### Get All Data Bank API Spec
+Endpoint : GET /api/v1/bank/get-all
+
+Authorization Type Bearer Token : "USER_TOKEN"
+
+Request Body:
+```json
+{
+    "data": [
+        {
+            "bank_code": "002",
+            "bank_id": 1,
+            "bank_image": "image",
+            "bank_name": "Mandiri"
+        }
+    ],
+    "message": "Data Bank tersedia",
+    "status": 200
+}
+```
+
+Response Body (success) :
+
+```json
+{
+    "data": {
+        "bank_id": 1,
+        "bank_name": "Mandiri",
+        "accountnum_recipient": "12345",
+        "name_recipient": "Userku"
+    },
+    "message": "Data Rekening tersedia",
+    "status": 200
+}
+```
+Response Body (failed) :
+1. Data Bank is unavailable
+
+```json
+{
+    "message": "Data bank belum ada",
+    "status": 402
+}
+```
