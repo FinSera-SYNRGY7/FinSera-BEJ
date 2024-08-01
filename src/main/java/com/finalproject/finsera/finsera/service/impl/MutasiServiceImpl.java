@@ -52,13 +52,10 @@ public class MutasiServiceImpl implements MutasiService {
     @Override
     public List<MutasiResponseDto> getMutasi(
             String username,
-            MutasiRequestDto mutasiRequestDto,
             Timestamp startDate,
             Timestamp endDate,
             int page,
             int size) {
-
-        validationService.validate(mutasiRequestDto);
 
         Pageable pageable = PageRequest.of(((page > 0) ? page - 1 : page), size, Sort.by(Sort.Direction.DESC, "createdDate"));
         Page<Transactions> filteredTransactions;
@@ -66,8 +63,10 @@ public class MutasiServiceImpl implements MutasiService {
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found")));
 
-        BankAccounts bankAccounts = bankAccountsRepository.findByAccountNumber(mutasiRequestDto.getAccountNumber())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "The account number does not match the token"));
+        BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
+        if (bankAccounts == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Number not found");
+        }
         if (bankAccounts.getCustomer() == customers.get()) {
             if(startDate != null && endDate != null) {
                 log.info("start and end date: {}");
@@ -85,7 +84,13 @@ public class MutasiServiceImpl implements MutasiService {
 
 
         assert filteredTransactions != null;
-        return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList());
+        if(filteredTransactions.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found");
+        } else if (filteredTransactions.stream().toList().size() > 10) {
+            return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList().subList(0, 10));
+        } else {
+            return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList());
+        }
     }
 
 
