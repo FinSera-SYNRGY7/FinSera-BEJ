@@ -2,6 +2,7 @@ package com.finalproject.finsera.finsera.util;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.login.ExpiredTokenResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,23 +52,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         } catch (ExpiredJwtException e) {
             handleExpiredJwtException(e, request, response);
-//            throw e;
         }
         filterChain.doFilter(request, response);
     }
 
     private void handleExpiredJwtException(ExpiredJwtException e, HttpServletRequest request,
                                            HttpServletResponse response) throws IOException{
-        ExpiredTokenResponse expiredTokenResponse = new ExpiredTokenResponse();
-        expiredTokenResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        expiredTokenResponse.setMessage("JWT Token has expired");
-        expiredTokenResponse.setExpiredAt(e.getClaims().getExpiration().toString());
-        expiredTokenResponse.setCurrentTime(Date.from(Instant.now()).toString());
-        expiredTokenResponse.setPath(request.getRequestURI());
+//        ExpiredTokenResponse expiredTokenResponse = new ExpiredTokenResponse();
+//        expiredTokenResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//        expiredTokenResponse.setMessage("JWT Token has expired");
+//        expiredTokenResponse.setExpiredAt(e.getClaims().getExpiration().toString());
+//        expiredTokenResponse.setCurrentTime(Date.from(Instant.now()).toString());
+//        expiredTokenResponse.setPath(request.getRequestURI());
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        mapper.writeValue(response.getWriter(), expiredTokenResponse);
+        mapper.writeValue(response.getWriter(), BaseResponse.failure(401, "JWT Token has expired"));
     }
 
     private String parseJwt(HttpServletRequest request){
