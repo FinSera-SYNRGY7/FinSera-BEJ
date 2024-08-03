@@ -55,6 +55,7 @@ com\finalproject\finsera\finsera\dto\login\ReloginResponseDto.class
 com\finalproject\finsera\finsera\dto\customer\CustomerDetailResponse.class
 com\finalproject\finsera\finsera\mapper\InfoSaldoMapper.class
 com\finalproject\finsera\finsera\util\ApiSandboxUtils.class
+com\finalproject\finsera\finsera\dto\login\ExpiredTokenResponse.class
 com\finalproject\finsera\finsera\exception\GlobalExceptionHandlers.class
 com\finalproject\finsera\finsera\service\impl\MutasiServiceImpl.class
 com\finalproject\finsera\finsera\dto\login\RefreshTokenRequestDto.class
@@ -85,12 +86,12 @@ com\finalproject\finsera\finsera\model\enums\StatusUser.class
 com\finalproject\finsera\finsera\repository\AccountDummyRepository.class
 com\finalproject\finsera\finsera\controller\TransactionController.class
 com\finalproject\finsera\finsera\model\enums\Gender.class
+com\finalproject\finsera\finsera\controller\TestController.class
 com\finalproject\finsera\finsera\util\UserDetailsImpl.class
 com\finalproject\finsera\finsera\dto\BaseResponse$BaseResponseBuilder.class
 com\finalproject\finsera\finsera\repository\TransactionNumberRepository.class
 com\finalproject\finsera\finsera\dto\transaction\TransactionOtherBankResponse.class
 com\finalproject\finsera\finsera\service\CustomerService.class
-com\finalproject\finsera\finsera\exception\ErrorResponse.class
 com\finalproject\finsera\finsera\util\InsufficientBalanceException.class
 com\finalproject\finsera\finsera\service\BankService.class
 com\finalproject\finsera\finsera\util\JwtAuthFilter.class
