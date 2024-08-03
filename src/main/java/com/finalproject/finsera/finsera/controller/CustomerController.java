@@ -4,6 +4,7 @@ import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.dto.customer.DetailCustomerResponse;
 import com.finalproject.finsera.finsera.dto.customer.UpdateMpinRequest;
 import com.finalproject.finsera.finsera.dto.responseMsg.ResponseConstant;
+import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.ProfileExampleSwagger;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;

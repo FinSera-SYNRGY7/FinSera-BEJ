@@ -56,7 +56,7 @@ public class TransactionController {
     PasswordEncoder passwordEncoder;
 
     @PostMapping("/transaction-intra/create")
-    @Operation(summary = "Transaction intra-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Transaction intra-bank (done)" , security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> createTransaction(@RequestHeader("Authorization") String token, @RequestBody TransactionRequestDto transactionRequestDto) {
         Map<String, Object> response = new HashMap<>();
@@ -88,7 +88,7 @@ public class TransactionController {
     }
 
     @PostMapping("/transaction-intra/check")
-    @Operation(summary = "Transaction check intra-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Transaction check intra-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> checkTransaction(@RequestBody TransactionCheckAccountRequestDto transactionCheckAccountRequestDto) {
         System.out.println(transactionCheckAccountRequestDto.getAccountnum_recipient());
