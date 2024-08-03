@@ -8,7 +8,4 @@ public class TransactionCheckOtherBankResponse {
     private String bank_name;
     private String accountnum_recipient;
     private String name_recipient;
-    private int nominal;
-    private String admin_fee;
-    private String note;
 }

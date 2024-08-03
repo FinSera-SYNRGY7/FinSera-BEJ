@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transactions, Long>{
@@ -31,5 +32,12 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
             @Param("bankAccounts") long bankAccounts,
             Pageable pageable
     );
+
+    @Query(value = "SELECT DISTINCT ON (t.from_account_number) t.* " +
+                   "FROM transaction t " +
+                   "WHERE t.to_account_number = :toAccountNumber " +
+                   "ORDER BY t.from_account_number, t.created_date DESC LIMIT 4", 
+           nativeQuery = true)
+    List<Transactions> findDistinctByToAccountNumber(@Param("toAccountNumber") String toAccountNumber);    
     
 }
