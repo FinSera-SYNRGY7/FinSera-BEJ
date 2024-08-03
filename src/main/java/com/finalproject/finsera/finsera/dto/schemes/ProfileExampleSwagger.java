@@ -1,5 +1,7 @@
 package com.finalproject.finsera.finsera.dto.schemes;
 
+import com.finalproject.finsera.finsera.dto.customer.DetailCustomerResponse;
+import com.finalproject.finsera.finsera.dto.mutasi.MutasiResponseDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,5 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class ProfileExampleSwagger {
-    private Customers data;
+
+    private Integer code;
+    private String message;
+    private Boolean status;
+    private DetailCustomerResponse data;
 }
