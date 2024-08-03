@@ -80,13 +80,13 @@ public class AuthController {
                 () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "username or password invalid")
         ));
         if (customer.get().getStatusUser() == StatusUser.INACTIVE){
-            return ResponseEntity.ok(BaseResponse.failure(400, "your account is inactive"));
+            return ResponseEntity.badRequest().body(BaseResponse.failure(400, "your account is inactive"));
         }
 
         if (!loginRequestDto.getUsername().equals(customer.get().getUsername())){
-            return ResponseEntity.ok(BaseResponse.failure(400, "username or password invalid"));
+            return ResponseEntity.badRequest().body(BaseResponse.failure(400, "username or password invalid"));
         } else if (!passwordEncoder.matches(loginRequestDto.getPassword(), customer.get().getPassword())) {
-            return ResponseEntity.ok(BaseResponse.failure(400, "username or password invalid"));
+            return ResponseEntity.badRequest().body(BaseResponse.failure(400, "username or password invalid"));
         } else {
             LoginResponseDto login = customerService.login(loginRequestDto);
             Map<String, Object> response = new HashMap<>();
