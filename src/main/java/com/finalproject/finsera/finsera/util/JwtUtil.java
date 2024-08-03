@@ -1,8 +1,10 @@
 package com.finalproject.finsera.finsera.util;
 
+import com.finalproject.finsera.finsera.exception.GlobalExceptionHandlers;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -23,6 +25,9 @@ public class JwtUtil {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    GlobalExceptionHandlers globalExceptionHandlers;
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
