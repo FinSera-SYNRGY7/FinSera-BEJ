@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.virtualAccount.AccountLastTransactionResponseDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CreateVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.model.entity.VirtualAccounts;
@@ -11,14 +12,11 @@ import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
 import com.finalproject.finsera.finsera.repository.TransactionRepository;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class VirtualAccountServiceImpl implements VirtualAccountService {
@@ -64,16 +62,24 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
     }
 
     @Override
-    public List<AccountLastTransactionResponseDto> getAccount() {
+    public List<Object> getAccount() {
         List<Transactions> transactionsList = transactionRepository.getLastAccountTransaction();
+        VirtualAccounts virtualAccounts = virtualAccountRepository.findByAccountNumber(
+                transactionsList.stream().map(Transactions::getTransactionsNumber).toString()
+        );
+        if (virtualAccounts == null){
+            return Collections.singletonList(transactionsList.stream()
+                    .map(transactions -> ResponseEntity.ofNullable(BaseResponse.failure(400, "account not found"))).toList());
+        }
+
         Set<String> seenAccountNumbers = new HashSet<>();
-        return transactionsList.stream()
+        return Collections.singletonList(transactionsList.stream()
                 .filter(transactions -> virtualAccountRepository.findByAccountNumber(transactions.getToAccountNumber()).getSavedAccount())
                 .filter(transactions -> seenAccountNumbers.add(transactions.getToAccountNumber()))
                 .map(transactions -> new AccountLastTransactionResponseDto(
                         virtualAccountRepository.findByAccountNumber(transactions.getToAccountNumber())
                                 .getAccountName(),
                         transactions.getToAccountNumber()
-                )).toList();
+                )).toList());
     }
 }
