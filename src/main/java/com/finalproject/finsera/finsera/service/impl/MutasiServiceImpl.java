@@ -118,17 +118,34 @@ public class MutasiServiceImpl implements MutasiService {
             itemsTransactions.add(transactionsReportJasperDto);
         }
         JasperReport jasperReport;
+//        try {
+//            jasperReport = (JasperReport)
+//                    JRLoader.loadObject(ResourceUtils.getFile("classpath:Transactions_report.jasper"));
+//        } catch (FileNotFoundException | JRException e) {
+//            try {
+//                File file = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
+//                jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
+//                JRSaver.saveObject(jasperReport, "Transactions_report.jasper");
+//            } catch (FileNotFoundException | JRException ex) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+
         try {
-            jasperReport = (JasperReport)
-                    JRLoader.loadObject(ResourceUtils.getFile("Transactions_report.jasper"));
-        } catch (FileNotFoundException | JRException e) {
-            try {
-                File file = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
-                jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
-                JRSaver.saveObject(jasperReport, "Transactions_report.jasper");
-            } catch (FileNotFoundException | JRException ex) {
-                throw new RuntimeException(e);
+            File reportDirectory = new File("src/main/resources/");
+            if (!reportDirectory.exists()) {
+                reportDirectory.mkdirs(); // Membuat folder jika belum ada
             }
+            File jasperFile = new File(reportDirectory, "Transactions_report.jasper");
+            if (jasperFile.exists()) {
+                jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
+            } else {
+                File jrxmlFile = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
+                jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+                JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
+            }
+        } catch (FileNotFoundException | JRException e) {
+            throw new RuntimeException("Failed to load or compile report", e);
         }
 
         String norek = bankAccounts.getAccountNumber();
