@@ -1,9 +1,9 @@
-package com.finalproject.finsera.finsera.dto.accountDummy;
+package com.finalproject.finsera.finsera.dto.virtualAccount;
 
 import lombok.Data;
 
 @Data
-public class CheckAccountDummyResponseDto {
+public class CheckVirtualAccountResponseDto {
     private String accountName;
     private String accountNum;
     private Double nominal;
