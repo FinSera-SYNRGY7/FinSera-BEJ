@@ -1,5 +1,9 @@
 FROM openjdk:17-jdk-alpine
 
+RUN apk update && apk upgrade \
+   && apk add --no-cache ttf-dejavu \
+   && apk add --no-cache msttcorefonts-installer \
+   && update-ms-fonts && fc-cache -f
 
 WORKDIR /app
 

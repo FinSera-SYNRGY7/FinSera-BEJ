@@ -12,7 +12,6 @@ import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.repository.TransactionRepository;
 import com.finalproject.finsera.finsera.service.MutasiService;
 import com.finalproject.finsera.finsera.service.ValidationService;
-import io.swagger.v3.core.util.Constants;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jasperreports.engine.*;
@@ -158,8 +157,7 @@ public class MutasiServiceImpl implements MutasiService {
             if (jasperFile.exists()) {
                 jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
             } else {
-                ClassLoader classLoader = Constants.class.getClassLoader();
-                try (InputStream jrxmlStream = classLoader.getResourceAsStream("Transactions_report.jrxml")) {
+                try (InputStream jrxmlStream = getClass().getClassLoader().getResourceAsStream("Transactions_report.jrxml")) {
                     if (jrxmlStream == null) {
                         throw new RuntimeException("File Transactions_report.jrxml not found in classpath");
                     }
