@@ -296,6 +296,8 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public TransferVirtualAccountResponseDto transferVA(Long id, TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
         BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
+        Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        BankAccounts bankAccountsReceiver = optionalBankAccountsReceiver.get();
         VirtualAccounts recipientVirtualAccount = virtualAccountService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
         TransactionsNumber transactionsNumber = new TransactionsNumber();
         transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
@@ -325,9 +327,9 @@ public class TransactionServiceImpl implements TransactionService{
 
         //TBD should be same with noTransaction of sender or not
         recipientTransaction.setTransactionsNumber(transactionsNumber);
-        recipientTransaction.setBankAccounts(senderBankAccount);
-        recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
-        recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        recipientTransaction.setBankAccounts(bankAccountsReceiver);
+        recipientTransaction.setFromAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        recipientTransaction.setToAccountNumber(senderBankAccount.getAccountNumber());
         recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
 
         recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());

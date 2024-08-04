@@ -2,6 +2,7 @@ package com.finalproject.finsera.finsera.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +17,11 @@ public interface TransactionOtherBankRepository extends JpaRepository<Transactio
                    "WHERE t.to_account_number = :toAccountNumber " +
                    "ORDER BY t.from_account_number, t.created_date DESC LIMIT 4", 
            nativeQuery = true)
-    List<TransactionOtherBanks> findDistinctByToAccountNumber(@Param("toAccountNumber") String toAccountNumber);       
+    List<TransactionOtherBanks> findDistinctByToAccountNumber(@Param("toAccountNumber") String toAccountNumber);
+
+
+
+
+//    Page<TransactionOtherBanks> findAllByFromAccountNumber(String fromAccountNumber);
+
 }

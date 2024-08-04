@@ -36,7 +36,7 @@ public class GlobalExceptionHandlers {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<BaseResponse<String>> handleGeneralException(Exception exception) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(BaseResponse.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage()));
+                .body(BaseResponse.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.toString()));
     }
 
 

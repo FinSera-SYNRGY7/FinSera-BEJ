@@ -4,12 +4,8 @@ import com.finalproject.finsera.finsera.dto.jasper.TransactionsReportJasperDto;
 import com.finalproject.finsera.finsera.dto.mutasi.MutasiRequestDto;
 import com.finalproject.finsera.finsera.dto.mutasi.MutasiResponseDto;
 import com.finalproject.finsera.finsera.mapper.MutasiMapper;
-import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.model.entity.Customers;
-import com.finalproject.finsera.finsera.model.entity.Transactions;
-import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
-import com.finalproject.finsera.finsera.repository.CustomerRepository;
-import com.finalproject.finsera.finsera.repository.TransactionRepository;
+import com.finalproject.finsera.finsera.model.entity.*;
+import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.MutasiService;
 import com.finalproject.finsera.finsera.service.ValidationService;
 import jakarta.transaction.Transactional;
@@ -49,7 +45,13 @@ public class MutasiServiceImpl implements MutasiService {
     BankAccountsRepository bankAccountsRepository;
 
     @Autowired
+    BankAccountsOtherBanksRepository bankAccountsOtherBanksRepository;
+
+    @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    TransactionOtherBankRepository transactionOtherBankRepository;
 
     @Autowired
     ValidationService validationService;
