@@ -112,6 +112,22 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.0.4</version>
 		</dependency>
+
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.20.0</version> <!-- or latest version -->
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>6.20.0</version> <!-- or latest version -->
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.github.susom</groupId>-->
+<!--			<artifactId>jasperreports-spring-boot-starter</artifactId>-->
+<!--			<version>1.0.0</version> &lt;!&ndash; or latest version &ndash;&gt;-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>
