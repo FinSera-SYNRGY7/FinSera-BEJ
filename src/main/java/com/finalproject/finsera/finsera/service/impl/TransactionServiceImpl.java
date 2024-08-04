@@ -39,23 +39,16 @@ public class TransactionServiceImpl implements TransactionService{
 
     @Transactional
     @Override
-    public TransactionResponseDto placeTransactionsIntraBank(TransactionRequestDto transactionRequestDto){
-        List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(transactionRequestDto.getId_user());
+    public TransactionResponseDto placeTransactionsIntraBank(TransactionRequestDto transactionRequestDto, long idCustomers ){
+        List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionRequestDto.getAccountnum_recipient());
         if (!optionalBankAccountsReceiver.isPresent()) {
             throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
         }
-        // Optional<Banks> optionalBanks = bankRepository.findById(12L);
-        // Optional<Banks> optionalBanks = bankRepository.findByBankName("BCA");
-        // if (!optionalBanks.isPresent()){
-        //     throw new IllegalArgumentException("Bank Tidak Ditemukan");
-        // }
-        // Banks banks = optionalBanks.get();
+
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
         BankAccounts bankAccountsReceiver = optionalBankAccountsReceiver.get();
-        // if (!(bankAccountsSender.getCustomer().getMpin().equals(transactionRequestDto.getPin()))){
-        //     
-        // }
+
         System.out.println(transactionRequestDto.getPin());
         System.out.println(bankAccountsSender.getMpinAccount());
 
@@ -92,7 +85,7 @@ public class TransactionServiceImpl implements TransactionService{
         transaction_in.setFromAccountNumber(bankAccountsReceiver.getAccountNumber());
         transaction_in.setToAccountNumber(bankAccountsSender.getAccountNumber());
         transaction_in.setAmountTransfer((double) transactionRequestDto.getNominal());
-        transaction_out.setNotes(transactionRequestDto.getNote());
+        transaction_in.setNotes(transactionRequestDto.getNote());
         transaction_in.setType(TransactionsType.SESAMA_BANK);
         transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
 
@@ -123,9 +116,6 @@ public class TransactionServiceImpl implements TransactionService{
         return currencyFormatter.format(amount);
     }
 
-
-
-    
     @Transactional
     @Override
     public TransactionCheckAccountResponseDto checkAccountIntraBank(TransactionCheckAccountRequestDto transactionCheckAccountRequestDto){
@@ -134,19 +124,13 @@ public class TransactionServiceImpl implements TransactionService{
         if (!optionalBankAccountsReceiver.isPresent()) {
             throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
         }
-        // Optional<Banks> optionalBanks = bankRepository.findById(12L);
-        // Optional<Banks> optionalBanks = bankRepository.findByBankName("BCA");
-        // if (!optionalBanks.isPresent()){
-        //     throw new IllegalArgumentException("Bank Tidak Ditemukan");
-        // }
-        // Banks banks = optionalBanks.get();
         BankAccounts bankAccountsReceiver = optionalBankAccountsReceiver.get();
 
         TransactionCheckAccountResponseDto transactionCheckAccountResponseDisplay = new TransactionCheckAccountResponseDto();
         transactionCheckAccountResponseDisplay.setAccountnum_recipient(transactionCheckAccountRequestDto.getAccountnum_recipient());
         transactionCheckAccountResponseDisplay.setName_recipient(bankAccountsReceiver.getCustomer().getName());
-        transactionCheckAccountResponseDisplay.setNominal(transactionCheckAccountRequestDto.getNominal());
-        transactionCheckAccountResponseDisplay.setNote(transactionCheckAccountRequestDto.getNote());
+        // transactionCheckAccountResponseDisplay.setNominal(transactionCheckAccountRequestDto.getNominal());
+        // transactionCheckAccountResponseDisplay.setNote(transactionCheckAccountRequestDto.getNote());
 
         return transactionCheckAccountResponseDisplay;
     }
@@ -154,8 +138,8 @@ public class TransactionServiceImpl implements TransactionService{
 
     @Transactional
     @Override
-    public TransactionOtherBankResponse placeTransactionsInterBank(TransactionOtherBankRequest transactionOtherBankRequest){
-        List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(transactionOtherBankRequest.getId_user());
+    public TransactionOtherBankResponse placeTransactionsInterBank(TransactionOtherBankRequest transactionOtherBankRequest, long customerId){
+        List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(customerId);
         List<BankAccountsOtherBanks>  optionalBankAccountsReceiver = bankAccountsOtherBanksRepository.findBankAccountsByAccountNumberAndBankId( transactionOtherBankRequest.getAccountnum_recipient(), transactionOtherBankRequest.getBank_id());
         if (optionalBankAccountsReceiver.isEmpty()) {
             throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
@@ -207,7 +191,7 @@ public class TransactionServiceImpl implements TransactionService{
         transaction_in.setFromAccountNumber(bankAccountsReceiver.getAccountNumber());
         transaction_in.setToAccountNumber(bankAccountsSender.getAccountNumber());
         transaction_in.setAmountTransfer((double) nominal);
-        transaction_out.setNotes(transactionOtherBankRequest.getNote());
+        transaction_in.setNotes(transactionOtherBankRequest.getNote());
         transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
 
         bankAccountsSender.setAmount(bankAccountsSender.getAmount()-(double) nominal);
@@ -253,13 +237,59 @@ public class TransactionServiceImpl implements TransactionService{
         TransactionCheckOtherBankResponse transactionCheckAccountResponseDisplay = new TransactionCheckOtherBankResponse();
         transactionCheckAccountResponseDisplay.setAccountnum_recipient(transactionCheckAccountRequestDto.getAccountnum_recipient());
         transactionCheckAccountResponseDisplay.setName_recipient(bankAccountsReceiver.getName());
-        transactionCheckAccountResponseDisplay.setNominal(transactionCheckAccountRequestDto.getNominal());
-        transactionCheckAccountResponseDisplay.setAdmin_fee(formatCurrency(2500));
+        // transactionCheckAccountResponseDisplay.setNominal(transactionCheckAccountRequestDto.getNominal());
+        // transactionCheckAccountResponseDisplay.setAdmin_fee(formatCurrency(2500));
         transactionCheckAccountResponseDisplay.setBank_id(transactionCheckAccountRequestDto.getBank_id());
         transactionCheckAccountResponseDisplay.setBank_name(banks.getBankName());
-        transactionCheckAccountResponseDisplay.setNote(transactionCheckAccountRequestDto.getNote());
+        // transactionCheckAccountResponseDisplay.setNote(transactionCheckAccountRequestDto.getNote());
 
         return transactionCheckAccountResponseDisplay;
+    }
+
+    @Override
+    @Transactional
+    public List<?> historyTransaction(long idCustomers){
+        List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
+        BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
+
+        List<Transactions> optionalHistory =  transactionRepository.findDistinctByToAccountNumber(bankAccountsSender.getAccountNumber());
+        if (optionalHistory.isEmpty()) {
+            throw new IllegalArgumentException("Transaksi belum ada");
+        }
+        List<Map<String, Object>> historyList = new ArrayList<>();
+        
+        for (Transactions transaction : optionalHistory) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name_recipient", transaction.getBankAccounts().getCustomer().getName());
+            data.put("bank_name", "Bank BCA");
+            data.put("account_number_recipient", transaction.getBankAccounts().getAccountNumber());
+            historyList.add(data);
+        }
+        
+        return historyList;
+    }
+
+    @Override
+    @Transactional
+    public List<?> historyTransactionInterBank(long idCustomers){
+        List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
+        BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
+
+        List<TransactionOtherBanks> optionalHistory =  transactionOtherBankRepository.findDistinctByToAccountNumber(bankAccountsSender.getAccountNumber());
+        if (optionalHistory.isEmpty()) {
+            throw new IllegalArgumentException("Transaksi belum ada");
+        }
+        List<Map<String, Object>> historyList = new ArrayList<>();
+        
+        for (TransactionOtherBanks transaction : optionalHistory) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("name_recipient", transaction.getBankAccountsOtherBanks().getName());
+            data.put("bank_name", transaction.getBankAccountsOtherBanks().getBanks().getBankName());
+            data.put("account_number_recipient", transaction.getBankAccountsOtherBanks().getAccountNumber());
+            historyList.add(data);
+        }
+        
+        return historyList;
     }
 
     @Transactional

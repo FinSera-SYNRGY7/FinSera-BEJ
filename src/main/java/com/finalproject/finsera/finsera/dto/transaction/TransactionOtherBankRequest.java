@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class TransactionOtherBankRequest {
-    private int id_user;
     private int bank_id;
     private String accountnum_recipient;
     private int nominal;

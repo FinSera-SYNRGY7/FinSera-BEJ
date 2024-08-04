@@ -6,6 +6,4 @@ import lombok.Data;
 public class TransactionCheckOtherBankAccountRequest {
     private int bank_id;
     private String accountnum_recipient;
-    private int nominal;
-    private String note;
 }

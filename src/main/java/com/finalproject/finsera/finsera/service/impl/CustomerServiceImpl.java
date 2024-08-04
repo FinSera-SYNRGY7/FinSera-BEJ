@@ -106,7 +106,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setStatusUser(StatusUser.ACTIVE);
         customerRepository.save(customers);
         LoginResponseDto loginResponseDto = new LoginResponseDto(
-                    token, refreshToken, userDetails.getIdCustomers(), customers.getMpinAuth(), customers.getStatusUser()
+                    token, refreshToken, userDetails.getIdCustomers(), customers.getStatusUser()
             );
 
         return loginResponseDto;

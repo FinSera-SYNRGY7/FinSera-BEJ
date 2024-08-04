@@ -37,4 +37,12 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
             "order by created_date desc limit 3;"
             , nativeQuery = true)
     List<Transactions> getLastAccountTransaction();
+
+    @Query(value = "SELECT DISTINCT ON (t.from_account_number) t.* " +
+                   "FROM transaction t " +
+                   "WHERE t.to_account_number = :toAccountNumber " +
+                   "ORDER BY t.from_account_number, t.created_date DESC LIMIT 4",
+           nativeQuery = true)
+    List<Transactions> findDistinctByToAccountNumber(@Param("toAccountNumber") String toAccountNumber);
+
 }
