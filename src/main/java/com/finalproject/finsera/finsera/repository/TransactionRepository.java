@@ -10,8 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transactions, Long>{
@@ -43,11 +43,16 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
             @Param("bankAccounts") long bankAccounts
     );
 
+    @Query(value = "select distinct * from \"transaction\" t where transaction_information = 0 \n" +
+            "order by created_date desc limit 3;"
+            , nativeQuery = true)
+    List<Transactions> getLastAccountTransaction();
+
     @Query(value = "SELECT DISTINCT ON (t.from_account_number) t.* " +
                    "FROM transaction t " +
                    "WHERE t.to_account_number = :toAccountNumber " +
-                   "ORDER BY t.from_account_number, t.created_date DESC LIMIT 4", 
+                   "ORDER BY t.from_account_number, t.created_date DESC LIMIT 4",
            nativeQuery = true)
-    List<Transactions> findDistinctByToAccountNumber(@Param("toAccountNumber") String toAccountNumber);    
-    
+    List<Transactions> findDistinctByToAccountNumber(@Param("toAccountNumber") String toAccountNumber);
+
 }
