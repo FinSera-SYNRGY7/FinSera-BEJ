@@ -140,12 +140,12 @@ public class MutasiServiceImpl implements MutasiService {
             if (jasperFile.exists()) {
                 jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
             } else {
-                File jrxmlFile = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
-                jasperReport = JasperCompileManager.compileReport(jrxmlFile.getAbsolutePath());
+                File file = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
+                jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
                 JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
             }
         } catch (FileNotFoundException | JRException e) {
-            throw new RuntimeException("Failed to load or compile report", e);
+            throw new RuntimeException(e);
         }
 
         String norek = bankAccounts.getAccountNumber();
