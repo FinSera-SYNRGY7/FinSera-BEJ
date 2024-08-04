@@ -62,24 +62,37 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
     }
 
     @Override
-    public List<Object> getAccount() {
+    public ResponseEntity<Map<String, Object>> getAccount() {
         List<Transactions> transactionsList = transactionRepository.getLastAccountTransaction();
-        VirtualAccounts virtualAccounts = virtualAccountRepository.findByAccountNumber(
-                transactionsList.stream().map(Transactions::getTransactionsNumber).toString()
-        );
-        if (virtualAccounts == null){
-            return Collections.singletonList(transactionsList.stream()
-                    .map(transactions -> ResponseEntity.ofNullable(BaseResponse.failure(400, "account not found"))).toList());
+        List<Transactions> savedAccountList = transactionsList.stream()
+                .filter(transactions -> virtualAccountRepository
+                        .findByAccountNumber(transactions.getToAccountNumber()).getSavedAccount())
+                .toList();
+
+        if (transactionsList.isEmpty()){
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "transaction not found");
+            response.put("data", null);
+            return ResponseEntity.badRequest().body(response);
+        } else if (savedAccountList.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "transaction not found");
+            response.put("data", null);
+            return ResponseEntity.badRequest().body(response);
+        } else {
+            Set<String> seenAccountNumbers = new HashSet<>();
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "success");
+            response.put("data", transactionsList.stream()
+//                    .filter(transactions -> !savedAccountList.isEmpty())
+                    .filter(transactions -> seenAccountNumbers.add(transactions.getToAccountNumber()))
+                    .map(transactions -> new AccountLastTransactionResponseDto(
+                            virtualAccountRepository.findByAccountNumber(transactions.getToAccountNumber())
+                                    .getAccountName(),
+                            transactions.getToAccountNumber()
+                    )).toList());
+            return ResponseEntity.ok(response);
         }
 
-        Set<String> seenAccountNumbers = new HashSet<>();
-        return Collections.singletonList(transactionsList.stream()
-                .filter(transactions -> virtualAccountRepository.findByAccountNumber(transactions.getToAccountNumber()).getSavedAccount())
-                .filter(transactions -> seenAccountNumbers.add(transactions.getToAccountNumber()))
-                .map(transactions -> new AccountLastTransactionResponseDto(
-                        virtualAccountRepository.findByAccountNumber(transactions.getToAccountNumber())
-                                .getAccountName(),
-                        transactions.getToAccountNumber()
-                )).toList());
     }
 }

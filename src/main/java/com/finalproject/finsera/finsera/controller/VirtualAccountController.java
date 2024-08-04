@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/va")
@@ -31,17 +32,7 @@ public class VirtualAccountController {
     }
 
     @GetMapping("account-last-transaction")
-    public ResponseEntity<List<AccountLastTransactionResponseDto>> getAccount(){
-        List<Object> responseList = virtualAccountService.getAccount();
-
-        if (responseList.isEmpty()){
-            return ResponseEntity.ofNullable(
-                    Collections.singletonList((List<AccountLastTransactionResponseDto>) BaseResponse.failure(
-                            400,
-                            "transaction not found"
-                    )));
-        } else {
-            return ResponseEntity.ok(Collections.singletonList(BaseResponse.success(responseList, "success")));
-        }
+    public ResponseEntity<Map<String, Object>> getAccount(){
+        return virtualAccountService.getAccount();
     }
 }
