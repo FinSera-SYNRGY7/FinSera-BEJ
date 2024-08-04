@@ -22,6 +22,7 @@ com\finalproject\finsera\finsera\service\impl\BankServiceImpl.class
 com\finalproject\finsera\finsera\service\InfoSaldoService.class
 com\finalproject\finsera\finsera\model\enums\TransactionsType.class
 com\finalproject\finsera\finsera\service\ValidationService.class
+com\finalproject\finsera\finsera\dto\jasper\TransactionsReportJasperDto.class
 com\finalproject\finsera\finsera\dto\transferVirtualAccount\TransferVirtualAccountRequestDto.class
 com\finalproject\finsera\finsera\model\entity\AccountDummyData.class
 com\finalproject\finsera\finsera\service\impl\AccountDummyServiceImpl.class

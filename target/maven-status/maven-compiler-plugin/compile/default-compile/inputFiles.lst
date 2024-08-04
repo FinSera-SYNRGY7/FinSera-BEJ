@@ -81,6 +81,7 @@ D:\Backup\COLLEGE\SEMESTER 8\SYNGRY BCA\Final Project\finsera\src\main\java\com\
 D:\Backup\COLLEGE\SEMESTER 8\SYNGRY BCA\Final Project\finsera\src\main\java\com\finalproject\finsera\finsera\repository\AccountDummyRepository.java
 D:\Backup\COLLEGE\SEMESTER 8\SYNGRY BCA\Final Project\finsera\src\main\java\com\finalproject\finsera\finsera\dto\transferVirtualAccount\TransferVirtualAccountResponseDto.java
 D:\Backup\COLLEGE\SEMESTER 8\SYNGRY BCA\Final Project\finsera\src\main\java\com\finalproject\finsera\finsera\model\entity\TransactionOtherBanks.java
+D:\Backup\COLLEGE\SEMESTER 8\SYNGRY BCA\Final Project\finsera\src\main\java\com\finalproject\finsera\finsera\dto\jasper\TransactionsReportJasperDto.java
 D:\Backup\COLLEGE\SEMESTER 8\SYNGRY BCA\Final Project\finsera\src\main\java\com\finalproject\finsera\finsera\dto\AuthRequest.java
 D:\Backup\COLLEGE\SEMESTER 8\SYNGRY BCA\Final Project\finsera\src\main\java\com\finalproject\finsera\finsera\util\JwtUtil.java
 D:\Backup\COLLEGE\SEMESTER 8\SYNGRY BCA\Final Project\finsera\src\main\java\com\finalproject\finsera\finsera\model\enums\StatusUser.java

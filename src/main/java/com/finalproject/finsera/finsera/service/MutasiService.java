@@ -14,4 +14,9 @@ public interface MutasiService {
             Timestamp endDate,
             int page,
             int size);
+
+    byte[]  transactionsReport(String username, Timestamp startDate,
+                            Timestamp endDate);
+
+
 }
