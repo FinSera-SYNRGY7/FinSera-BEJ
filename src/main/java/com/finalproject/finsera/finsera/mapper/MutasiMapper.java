@@ -11,7 +11,9 @@ import com.finalproject.finsera.finsera.repository.BankAccountsOtherBanksReposit
 import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -40,17 +42,16 @@ public class MutasiMapper {
         Amount amount = new Amount();
         amount.setAmount(transaction.getAmountTransfer());
         amount.setCurrency("IDR");
-        String toNameAccountNumber = "";
-        log.info("tipe transaksi : " + transaction.getType());
+        String toNameAccountNumber;
         Optional<BankAccounts> bankAccounts = bankAccountsRepository.findByAccountNumber(transaction.getToAccountNumber());
-        if(transaction.getType().equals(TransactionsType.SESAMA_BANK) || transaction.getType().equals(TransactionsType.VIRTUAL_ACCOUNT) ) {
+        if (transaction.getType().equals(TransactionsType.SESAMA_BANK) || transaction.getType().equals(TransactionsType.VIRTUAL_ACCOUNT)) {
             toNameAccountNumber = bankAccounts.get().getCustomer().getName();
-            log.info("toAccountNumber 1 : " + toNameAccountNumber);
         } else if (transaction.getType().equals(TransactionsType.TOP_UP_EWALLET)) {
             toNameAccountNumber = "E-WALLET";
         } else {
-            log.info("toAccountNumber 2 : " + toNameAccountNumber);
-            toNameAccountNumber = bankAccounts.get().getCustomer().getName();
+            Optional<BankAccountsOtherBanks> bankAccountsOtherBanks = Optional.ofNullable(bankAccountsOtherBanksRepository.findByAccountNumber(transaction.getToAccountNumber())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Not Found")));
+            toNameAccountNumber = bankAccountsOtherBanks.get().getName();
         }
         return MutasiResponseDto.builder()
                 .transactionId(transaction.getIdTransaction())
@@ -61,7 +62,6 @@ public class MutasiMapper {
                 .transactionInformation(transaction.getTransactionInformation())
                 .transactionsType(transaction.getType())
                 .build();
+        }
+
     }
-
-
-}

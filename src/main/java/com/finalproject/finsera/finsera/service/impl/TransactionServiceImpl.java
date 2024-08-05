@@ -182,33 +182,33 @@ public class TransactionServiceImpl implements TransactionService{
         TransactionsNumber transactionsNumberSaved =  transactionNumberRepository.save(transactionsNumber);
 
         // logging money out
-        TransactionOtherBanks transaction_out = new TransactionOtherBanks();
+        Transactions transaction_out = new Transactions();
         transaction_out.setBankAccounts(bankAccountsSender);
-        transaction_out.setBankAccountsOtherBanks(bankAccountsReceiver);
         transaction_out.setTransactionsNumber(transactionsNumberSaved);
         transaction_out.setFromAccountNumber(bankAccountsSender.getAccountNumber());
         transaction_out.setToAccountNumber(bankAccountsReceiver.getAccountNumber());
         transaction_out.setAmountTransfer((double) nominal);
         transaction_out.setNotes(transactionOtherBankRequest.getNote());
+        transaction_out.setType(TransactionsType.ANTAR_BANK);
         transaction_out.setTransactionInformation(TransactionInformation.UANG_KELUAR);
 
-        // logging money in
-        TransactionOtherBanks transaction_in = new TransactionOtherBanks();
-        transaction_in.setBankAccounts(bankAccountsSender);
-        transaction_in.setBankAccountsOtherBanks(bankAccountsReceiver);
-        transaction_in.setTransactionsNumber(transactionsNumberSaved);
-        transaction_in.setFromAccountNumber(bankAccountsReceiver.getAccountNumber());
-        transaction_in.setToAccountNumber(bankAccountsSender.getAccountNumber());
-        transaction_in.setAmountTransfer((double) nominal);
-        transaction_in.setNotes(transactionOtherBankRequest.getNote());
-        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
+//        // logging money in
+//        TransactionOtherBanks transaction_in = new TransactionOtherBanks();
+//        transaction_in.setBankAccounts(bankAccountsSender);
+//        transaction_in.setBankAccountsOtherBanks(bankAccountsReceiver);
+//        transaction_in.setTransactionsNumber(transactionsNumberSaved);
+//        transaction_in.setFromAccountNumber(bankAccountsReceiver.getAccountNumber());
+//        transaction_in.setToAccountNumber(bankAccountsSender.getAccountNumber());
+//        transaction_in.setAmountTransfer((double) nominal);
+//        transaction_in.setNotes(transactionOtherBankRequest.getNote());
+//        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
 
         bankAccountsSender.setAmount(bankAccountsSender.getAmount()-(double) nominal);
         bankAccountsReceiver.setAmount(bankAccountsReceiver.getAmount()+(double) transactionOtherBankRequest.getNominal());
         bankAccountsOtherBanksRepository.save(bankAccountsReceiver);
         bankAccountsRepository.save(bankAccountsSender);
-        TransactionOtherBanks transactionsaved = transactionOtherBankRepository.save(transaction_out);
-        transactionOtherBankRepository.save(transaction_in);
+        Transactions transactionsaved = transactionRepository.save(transaction_out);
+//        transactionOtherBankRepository.save(transaction_in);
 
         TransactionOtherBankResponse transactionResponseDto = new TransactionOtherBankResponse();
         // Convert Date to String
