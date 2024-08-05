@@ -14,15 +14,17 @@ import java.util.Locale;
 public class DateFormatterIndonesia {
     public String dateFormatterIND(Date date) {
         String dateTimeString = String.valueOf(date);
-        String dateTimeWithoutZone = dateTimeString.replace(" WIB", "");
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss yyyy", java.util.Locale.ENGLISH);
-        LocalDateTime localDateTime = LocalDateTime.parse(dateTimeWithoutZone, inputFormatter);
-        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("Asia/Jakarta"));
+        DateTimeFormatter inputFormatter = new DateTimeFormatterBuilder()
+                .appendPattern("EEE MMM dd HH:mm:ss z yyyy")
+                .toFormatter();
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateTimeString, inputFormatter.withZone(ZoneId.of("GMT")));
+        ZonedDateTime jakartaTime = zonedDateTime.withZoneSameInstant(ZoneId.of("Asia/Jakarta"));
+
         DateTimeFormatter outputFormatter = new DateTimeFormatterBuilder()
                 .appendPattern("dd MMMM yyyy HH:mm")
                 .toFormatter(new Locale("id", "ID"));
 
-        return zonedDateTime.format(outputFormatter) + " WIB";
+        return jakartaTime.format(outputFormatter) + " WIB";
     }
 
     public String otherDateFormatterIND(Date date) {
