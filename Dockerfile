@@ -3,7 +3,11 @@ FROM openjdk:17-jdk-alpine
 RUN apk update && apk upgrade \
    && apk add --no-cache ttf-dejavu \
    && apk add --no-cache msttcorefonts-installer \
-   && update-ms-fonts && fc-cache -f
+   && update-ms-fonts && fc-cache -f \
+   && apt-get install -y tzdata && \
+   && ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime && \
+   && dpkg-reconfigure
+
 
 WORKDIR /app
 
