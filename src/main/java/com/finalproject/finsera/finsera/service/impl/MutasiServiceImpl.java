@@ -109,18 +109,29 @@ public class MutasiServiceImpl implements MutasiService {
         List<TransactionsReportJasperDto> itemsTransactions = new ArrayList<>();
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found")));
-
+        List<Transactions> transactions;
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
-        List<Transactions> transactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
-        for(var i = transactions.size()-1; i >= 0; i--){
-            TransactionsReportJasperDto transactionsReportJasperDto = new TransactionsReportJasperDto();
-            transactionsReportJasperDto.setCreated_date(transactions.get(i).getCreatedDate());
-            transactionsReportJasperDto.setNotes(transactions.get(i).getNotes());
-            transactionsReportJasperDto.setTransaction_information(transactions.get(i).getTransactionInformation().ordinal());
-            transactionsReportJasperDto.setAmount_transfer(transactions.get(i).getAmountTransfer());
-            itemsTransactions.add(transactionsReportJasperDto);
+        if(startDate != null && endDate != null) {
+            transactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
+            for(var i = transactions.size()-1; i >= 0; i--){
+                toResponseJasperDto(itemsTransactions, transactions, i);
+            }
+        } else {
+            transactions = transactionRepository.findAllByBankAccounts(bankAccounts)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
+            if(transactions.size() > 10) {
+                for(var i = 9; i >= 0; i--){
+                    toResponseJasperDto(itemsTransactions, transactions, i);
+                }
+            } else {
+                for(var i = transactions.size() - 1; i >= 0; i--){
+                    toResponseJasperDto(itemsTransactions, transactions, i);
+                }
+            }
+
         }
+
         JasperReport jasperReport;
 //        try {
 //            jasperReport = (JasperReport)
@@ -181,10 +192,10 @@ public class MutasiServiceImpl implements MutasiService {
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(itemsTransactions);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("norek", norek);
-        parameters.put("tanggalAwal", startDate);
-        parameters.put("tanggalAkhir", endDate);
         parameters.put("uangKeluar", tf0);
         parameters.put("uangMasuk", tf1);
+        parameters.put("tanggalAwal", startDate);
+        parameters.put("tanggalAkhir", endDate);
 
         JasperPrint jasperPrint = null;
         byte[] reportContent;
@@ -199,6 +210,15 @@ public class MutasiServiceImpl implements MutasiService {
         }
         return reportContent;
 
+    }
+
+    private void toResponseJasperDto(List<TransactionsReportJasperDto> itemsTransactions, List<Transactions> transactions, int i) {
+        TransactionsReportJasperDto transactionsReportJasperDto = new TransactionsReportJasperDto();
+        transactionsReportJasperDto.setCreated_date(transactions.get(i).getCreatedDate());
+        transactionsReportJasperDto.setNotes(transactions.get(i).getNotes());
+        transactionsReportJasperDto.setTransaction_information(transactions.get(i).getTransactionInformation().ordinal());
+        transactionsReportJasperDto.setAmount_transfer(transactions.get(i).getAmountTransfer());
+        itemsTransactions.add(transactionsReportJasperDto);
     }
 
 

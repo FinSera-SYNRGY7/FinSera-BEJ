@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<Transactions, Long>{
 
     Optional<Page<Transactions>> findAllByBankAccounts(BankAccounts fromBankAccounts, Pageable pageable);
-    List<Transactions> findAllByBankAccounts(BankAccounts bankAccounts);
+    Optional<List<Transactions>> findAllByBankAccounts(BankAccounts bankAccounts);
 
 //    @Query("SELECT t FROM Transactions t WHERE (t.bankAccounts.idBankAccounts=:bankAccounts) AND (DATE_TRUNC('month', t.createdDate)=DATE_TRUNC('month', CURRENT_DATE))")
 //    Optional<Page<Transactions>> findAllByBankAccountsAndCreatedDateMonth(

@@ -7,7 +7,9 @@ import com.finalproject.finsera.finsera.model.entity.*;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
+import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,10 +20,16 @@ import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 @Service
+@Slf4j
 public class TransactionServiceImpl implements TransactionService{
     @Autowired TransactionRepository transactionRepository;
     @Autowired
@@ -36,6 +44,8 @@ public class TransactionServiceImpl implements TransactionService{
     VirtualAccountService virtualAccountService;
     @Autowired
     VirtualAccountRepository virtualAccountRepository;
+    @Autowired
+    DateFormatterIndonesia dateFormatterIndonesia;
 
     @Transactional
     @Override
@@ -98,8 +108,7 @@ public class TransactionServiceImpl implements TransactionService{
 
         TransactionResponseDto transactionResponseDto = new TransactionResponseDto();
         // Convert Date to String
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm 'WIB'");
-        String dateString = dateFormat.format(transactionsaved.getCreatedDate());
+        String dateString = dateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
         transactionResponseDto.setTransaction_num(String.valueOf(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());
@@ -203,8 +212,7 @@ public class TransactionServiceImpl implements TransactionService{
 
         TransactionOtherBankResponse transactionResponseDto = new TransactionOtherBankResponse();
         // Convert Date to String
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm 'WIB'");
-        String dateString = dateFormat.format(transactionsaved.getCreatedDate());
+        String dateString = dateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
         transactionResponseDto.setTransaction_num(String.valueOf(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());
