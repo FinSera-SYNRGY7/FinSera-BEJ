@@ -114,18 +114,18 @@ public class MutasiServiceImpl implements MutasiService {
         if(startDate != null && endDate != null) {
             transactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
-            for(var i = transactions.size()-1; i >= 0; i--){
+            for(var i = 0; i < transactions.size(); i++){
                 toResponseJasperDto(itemsTransactions, transactions, i);
             }
         } else {
-            transactions = transactionRepository.findAllByBankAccounts(bankAccounts)
+            transactions = transactionRepository.findAllByBankAccountsOrderByCreatedDateDesc(bankAccounts)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
             if(transactions.size() > 10) {
-                for(var i = 9; i >= 0; i--){
+                for(var i = 0; i < 10; i++){
                     toResponseJasperDto(itemsTransactions, transactions, i);
                 }
             } else {
-                for(var i = transactions.size() - 1; i >= 0; i--){
+                for(var i = 0; i < transactions.size(); i++){
                     toResponseJasperDto(itemsTransactions, transactions, i);
                 }
             }
