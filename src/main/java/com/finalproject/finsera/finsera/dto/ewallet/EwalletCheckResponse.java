@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class EwalletCheckResponse {
-    private long ewalletId;
     private String ewalletName;
+    private long ewalletAccountId;
     private String ewalletAccount;
     private String ewalletAccountName;
 }

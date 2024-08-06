@@ -50,7 +50,6 @@ public class EwalletServiceImpl implements EwalletService {
         if(listEwallets.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ewallet tidak ditemukkan");
         }
-
         return ewalletMapper.toGetAllEwalletResponse(listEwallets);
     }
 

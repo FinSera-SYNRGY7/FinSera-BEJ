@@ -24,7 +24,7 @@ public class EwalletMapper {
                 .builder()
                 .ewalletName(ewalletAccount.getEwallet().getEwalletName())
                 .ewalletAccountName(ewalletAccount.getName())
-                .ewalletId(ewalletAccount.getIdEwalletAccounts())
+                .ewalletAccountId(ewalletAccount.getIdEwalletAccounts())
                 .ewalletAccount(ewalletAccount.getEwalletAccountNumber())
                 .build();
     };
