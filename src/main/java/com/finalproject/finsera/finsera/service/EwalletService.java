@@ -1,11 +1,14 @@
 package com.finalproject.finsera.finsera.service;
 
-import com.finalproject.finsera.finsera.dto.ewallet.EwalletRequest;
-import com.finalproject.finsera.finsera.dto.ewallet.EwalletResponse;
+import com.finalproject.finsera.finsera.dto.ewallet.*;
+import com.finalproject.finsera.finsera.model.entity.Ewallet;
+
+import java.util.List;
 
 public interface EwalletService {
 
-    EwalletResponse createTopUpEwallet(long userId, EwalletRequest ewalletRequest);
+    EwalletCheckResponse checkAccountEwallet(EwalletCheckAccountRequest ewalletCheckAccountRequest);
 
+    List<GetAllEwalletResponse> getAllEwallet();
 
 }

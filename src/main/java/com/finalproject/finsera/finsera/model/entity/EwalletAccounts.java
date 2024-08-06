@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 @Data
 @Entity
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "bank_accounts_ob", schema = "public")
+@Table(name = "ewallet_accounts", schema = "public")
 public class EwalletAccounts extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

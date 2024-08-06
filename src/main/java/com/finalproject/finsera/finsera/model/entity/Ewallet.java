@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "banks", schema = "public")
+@Table(name = "ewallet", schema = "public")
 public class Ewallet extends BaseModel{
 
     @Id
@@ -27,7 +27,7 @@ public class Ewallet extends BaseModel{
     @Column(name = "ewallet_image")
     private String ewalletImage;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "banks")
-    private List<BankAccountsOtherBanks> bankAccountsOtherBanks;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "ewallet")
+    private List<EwalletAccounts> ewalletAccounts;
 
 }
