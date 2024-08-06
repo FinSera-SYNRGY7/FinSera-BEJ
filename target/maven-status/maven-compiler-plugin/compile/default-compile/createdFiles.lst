@@ -69,6 +69,7 @@ com\finalproject\finsera\finsera\dto\schemes\LoginExampleSwagger.class
 com\finalproject\finsera\finsera\dto\schemes\InfoSaldoExampleSwagger.class
 com\finalproject\finsera\finsera\dto\virtualAccount\AccountLastTransactionResponseDto.class
 com\finalproject\finsera\finsera\model\entity\VirtualAccounts.class
+com\finalproject\finsera\finsera\util\DateFormatterIndonesia.class
 com\finalproject\finsera\finsera\util\TransactionNumberGenerator.class
 com\finalproject\finsera\finsera\dto\login\RefreshTokenResponseDto.class
 com\finalproject\finsera\finsera\model\enums\AccountType.class
