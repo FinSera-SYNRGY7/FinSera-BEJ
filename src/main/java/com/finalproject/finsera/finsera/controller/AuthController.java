@@ -127,22 +127,7 @@ public class AuthController {
     public ResponseEntity<Map<String, Object>> reloginGetId(@RequestHeader("Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
-        System.out.println(userId);
-
-        String relogin = customerService.relogin(userId, reloginRequestDto);
-        Customers customers = customerRepository.findById(userId).get();
-
-        if (passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())){
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Relogin Success");
-            response.put("data", relogin);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Pin is invalid");
-            response.put("data", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        return customerService.relogin(userId, reloginRequestDto);
     }
 
     @PostMapping(value = {"/user/refresh-token", "/user/refresh-token/"})

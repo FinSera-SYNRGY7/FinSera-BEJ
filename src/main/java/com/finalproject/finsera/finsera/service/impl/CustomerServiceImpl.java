@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.login.*;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
@@ -12,6 +13,7 @@ import com.finalproject.finsera.finsera.util.JwtUtilRefreshToken;
 import com.finalproject.finsera.finsera.util.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -123,25 +129,41 @@ public class CustomerServiceImpl implements CustomerService {
         return refreshTokenResponseDto;
     }
 
-//    @Override
-//    public String relogin(String username, ReloginRequestDto reloginRequestDto) {
-//        Customers customers = customerRepository.findByUsername(username).get();
-//        System.out.println(customers.getMpin());
-//        System.out.println(reloginRequestDto.getMpin());
-//        if (passwordEncoder.matches(customers.getMpin(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
-//            return "Pin Valid";
-//        } else {
-//            return "Pin Invalid";
-//        }
-//    }
-
     @Override
-    public String relogin(Long id, ReloginRequestDto reloginRequestDto) {
+    public ResponseEntity<Map<String, Object>> relogin(Long id, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findById(id).get();
-        if (passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())){
-            return "Pin Valid";
+        if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "your account is inactive");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        if (!passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())) {
+            int newFailAttempts = customers.getFailedAttempt() + 1;
+            customers.setFailedAttempt(newFailAttempts);
+            customerRepository.save(customers);
+            if (customers.getFailedAttempt() > 3) {
+                customers.setStatusUser(StatusUser.INACTIVE);
+                customers.setBannedTime(Date.from(Instant.now()));
+                customerRepository.save(customers);
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("data", null);
+                response.put("message", "Your account is banned, due to invalid pin more than 3 times");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "Pin is invalid");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
-            return "Pin Invalid";
+            customers.setFailedAttempt(0);
+            customerRepository.save(customers);
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", "Pin Valid");
+            response.put("message", "Relogin Success");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
 }
