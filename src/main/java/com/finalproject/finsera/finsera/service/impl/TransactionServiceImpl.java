@@ -11,6 +11,7 @@ import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -54,6 +56,9 @@ public class TransactionServiceImpl implements TransactionService{
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionRequestDto.getAccountnum_recipient());
         if (!optionalBankAccountsReceiver.isPresent()) {
             throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
+        }
+        if(transactionRequestDto.getAccountnum_recipient().equals(optionalBankAccountsSender.get(0).getAccountNumber())) {
+            throw new IllegalArgumentException("Nomor rekening tujuan tidak boleh sama dengan nomor rekening pengirim");
         }
 
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
@@ -157,6 +162,10 @@ public class TransactionServiceImpl implements TransactionService{
         // Optional<Banks> optionalBanks = bankRepository.findByBankName("BCA");
         if (!optionalBanks.isPresent()){
             throw new IllegalArgumentException("Bank Tidak Ditemukan");
+        }
+
+        if(transactionOtherBankRequest.getAccountnum_recipient().equals(optionalBankAccountsSender.get(0).getAccountNumber())) {
+            throw new IllegalArgumentException("Nomor rekening tujuan tidak boleh sama dengan nomor rekening pengirim");
         }
         Banks banks = optionalBanks.get();
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
