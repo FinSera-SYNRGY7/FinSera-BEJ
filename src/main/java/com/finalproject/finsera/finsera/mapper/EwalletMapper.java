@@ -1,9 +1,6 @@
 package com.finalproject.finsera.finsera.mapper;
 
-import com.finalproject.finsera.finsera.dto.ewallet.EwalletCheckResponse;
-import com.finalproject.finsera.finsera.dto.ewallet.EwalletRequest;
-import com.finalproject.finsera.finsera.dto.ewallet.EwalletResponse;
-import com.finalproject.finsera.finsera.dto.ewallet.GetAllEwalletResponse;
+import com.finalproject.finsera.finsera.dto.ewallet.*;
 import com.finalproject.finsera.finsera.model.entity.BankAccounts;
 import com.finalproject.finsera.finsera.model.entity.Ewallet;
 import com.finalproject.finsera.finsera.model.entity.EwalletAccounts;
@@ -64,6 +61,23 @@ public class EwalletMapper {
                 .ewalletId(ewallet.getIdEwallet())
                 .ewalletName(ewallet.getEwalletName())
                 .ewalletImage(ewallet.getEwalletImage())
+                .build();
+    };
+
+    public List<EwalletHistoryResponse> toGetAllHistoryEwalletResponse(List<EwalletAccounts> ewalletAccounts) {
+        return ewalletAccounts.stream()
+                .map(this::mapToGetAllHistoryEwalletResponse)
+                .collect(Collectors.toList());
+    }
+
+    public EwalletHistoryResponse mapToGetAllHistoryEwalletResponse(EwalletAccounts ewalletAccounts) {
+        return EwalletHistoryResponse
+                .builder()
+                .ewalletAccountName(ewalletAccounts.getName())
+                .ewalletName(ewalletAccounts.getEwallet().getEwalletName())
+                .ewalletAccountId(ewalletAccounts.getIdEwalletAccounts())
+                .ewalletAccount(ewalletAccounts.getEwalletAccountNumber())
+                .ewalletImage(ewalletAccounts.getEwallet().getEwalletImage())
                 .build();
     };
 }

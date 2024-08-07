@@ -17,4 +17,6 @@ public interface EwalletAccountsRepository extends JpaRepository<EwalletAccounts
 
     Optional<EwalletAccounts> findByEwalletAndEwalletAccountNumber(Ewallet ewallet, String ewalletAcccountNumber);
 
+    Optional<EwalletAccounts> findByEwalletAccountNumber(String ewalletAccountNumber);
+
 }

@@ -118,4 +118,23 @@ public class EwalletServiceImpl implements EwalletService {
         return ewalletMapper.toGetAllEwalletResponse(listEwallets);
     }
 
+    @Override
+    @Transactional
+    public List<EwalletHistoryResponse> historyTransactionEwallet(long idCustomers){
+        List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
+        Optional<List<Transactions>> sender = transactionRepository.getAllHistoryByToAccountNumber(optionalBankAccountsSender.get(0).getAccountNumber(), TransactionsType.TOP_UP_EWALLET);
+        if (sender.isEmpty()) {
+            throw new IllegalArgumentException("Transaksi belum ada");
+        }
+//        log.info("optional History: " + optionalHistory);
+        List<EwalletAccounts> historyList = new ArrayList<>();
+
+        for (Transactions transaction : sender.get()) {
+            Optional<EwalletAccounts> bankAccountsOtherBanks = ewalletAccountsRepository.findByEwalletAccountNumber(transaction.getToAccountNumber());
+            historyList.add(bankAccountsOtherBanks.get());
+        }
+
+        return ewalletMapper.toGetAllHistoryEwalletResponse(historyList);
+    }
+
 }

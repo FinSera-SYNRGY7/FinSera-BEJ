@@ -50,28 +50,31 @@ public class EwalletController {
 
 
     @PostMapping("/ewallet/create")
-    @Operation(summary = "Top Up Ewallet (done)" , security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Create Top Up Ewallet (done)" , security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<?> createTransaction(@RequestHeader("Authorization") String token, @RequestBody EwalletRequest ewalletRequest) {
 
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
 
-        return ResponseEntity.ok(BaseResponse.success(ewalletService.createEwalletTransactions(userId, ewalletRequest), "Nomor Rekening ditemukan"));
+        return ResponseEntity.ok(BaseResponse.success(ewalletService.createEwalletTransactions(userId, ewalletRequest), "Top Up berhasil"));
 
     }
 //
 //
-//    @GetMapping("/ewallet/history")
-//    @Operation(summary = "Transaction history intra-bank", security = @SecurityRequirement(name = "bearerAuth"))
-//    // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
-//    public ResponseEntity<Map<String, Object>> historyTransaction(@RequestHeader("Authorization") String token) {
-//
-//    }
+    @GetMapping("/ewallet/history")
+    @Operation(summary = "Transaction history intra-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
+    public ResponseEntity<?> historyTransaction(@RequestHeader("Authorization") String token) {
+        String jwt = token.substring("Bearer ".length());
+        Long userId = jwtUtil.getId(jwt);
+        return ResponseEntity.ok(BaseResponse.success(ewalletService.historyTransactionEwallet(userId), "Ewallet history ditemukan"));
+
+    }
 //
 
     @GetMapping({"/ewallet/", "/ewallet"})
-    @Operation(summary = "Get All E-Wallet", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Get All E-Wallet (done)", security = @SecurityRequirement(name = "bearerAuth"))
     // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<?> getAllEwallet() {
         return ResponseEntity.ok(BaseResponse.success(ewalletService.getAllEwallet(), "Ewallet ditemukan"));

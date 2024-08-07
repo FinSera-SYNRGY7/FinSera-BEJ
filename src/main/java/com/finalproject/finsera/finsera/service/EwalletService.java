@@ -13,4 +13,6 @@ public interface EwalletService {
 
     List<GetAllEwalletResponse> getAllEwallet();
 
+    List<EwalletHistoryResponse> historyTransactionEwallet(long idCustomers);
+
 }
