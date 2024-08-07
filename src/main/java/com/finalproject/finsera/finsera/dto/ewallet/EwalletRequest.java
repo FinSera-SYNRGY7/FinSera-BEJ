@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class EwalletRequest {
-    private int ewalletId;
+    private long ewalletId;
     private String ewalletAccount;
     private int nominal;
     private String note;

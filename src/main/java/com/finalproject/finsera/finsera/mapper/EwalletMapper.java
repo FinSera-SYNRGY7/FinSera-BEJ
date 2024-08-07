@@ -2,21 +2,41 @@ package com.finalproject.finsera.finsera.mapper;
 
 import com.finalproject.finsera.finsera.dto.ewallet.EwalletCheckResponse;
 import com.finalproject.finsera.finsera.dto.ewallet.EwalletRequest;
+import com.finalproject.finsera.finsera.dto.ewallet.EwalletResponse;
 import com.finalproject.finsera.finsera.dto.ewallet.GetAllEwalletResponse;
-import com.finalproject.finsera.finsera.dto.infosaldo.Amount;
-import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoResponse;
-import com.finalproject.finsera.finsera.dto.mutasi.MutasiResponseDto;
 import com.finalproject.finsera.finsera.model.entity.BankAccounts;
 import com.finalproject.finsera.finsera.model.entity.Ewallet;
 import com.finalproject.finsera.finsera.model.entity.EwalletAccounts;
 import com.finalproject.finsera.finsera.model.entity.Transactions;
+import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class EwalletMapper {
+
+    public EwalletResponse toCreateTransactionEwalletResponse(
+            Optional<EwalletAccounts> ewalletAccount,
+            BankAccounts bankAccounts,
+            EwalletRequest ewalletRequest,
+            Transactions transactions
+    ) {
+        return EwalletResponse
+                .builder()
+                .ewalletName(ewalletAccount.get().getEwallet().getEwalletName())
+                .ewalletAccountName(ewalletAccount.get().getName())
+                .ewalletAccount(ewalletAccount.get().getEwalletAccountNumber())
+                .accountSender(bankAccounts.getAccountNumber())
+                .nominal(DateFormatterIndonesia.formatCurrency(ewalletRequest.getNominal()))
+                .nameSender(bankAccounts.getCustomer().getName())
+                .transactionDate(DateFormatterIndonesia.dateFormatterIND(transactions.getCreatedDate()))
+                .transactionNum(transactions.getTransactionsNumber().getTransactionNumber())
+                .note(ewalletRequest.getNote())
+                .build();
+    };
 
 
     public EwalletCheckResponse toEwalletResponse(EwalletAccounts ewalletAccount) {
@@ -29,6 +49,15 @@ public class EwalletMapper {
                 .build();
     };
 
+
+
+    public List<GetAllEwalletResponse> toGetAllEwalletResponse(List<Ewallet> ewallet) {
+        return ewallet.stream()
+                .map(this::mapToGetAllEwalletResponse)
+                .collect(Collectors.toList());
+    }
+
+
     public GetAllEwalletResponse mapToGetAllEwalletResponse(Ewallet ewallet) {
         return GetAllEwalletResponse
                 .builder()
@@ -37,10 +66,4 @@ public class EwalletMapper {
                 .ewalletImage(ewallet.getEwalletImage())
                 .build();
     };
-
-    public List<GetAllEwalletResponse> toGetAllEwalletResponse(List<Ewallet> ewallet) {
-        return ewallet.stream()
-                .map(this::mapToGetAllEwalletResponse)
-                .collect(Collectors.toList());
-    }
 }

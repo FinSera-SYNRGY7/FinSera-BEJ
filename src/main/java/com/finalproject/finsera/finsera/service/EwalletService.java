@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface EwalletService {
 
+    EwalletResponse createEwalletTransactions(long idCustomers, EwalletRequest ewalletRequest);
+
     EwalletCheckResponse checkAccountEwallet(EwalletCheckAccountRequest ewalletCheckAccountRequest);
 
     List<GetAllEwalletResponse> getAllEwallet();

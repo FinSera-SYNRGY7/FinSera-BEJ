@@ -32,12 +32,12 @@ public class GlobalExceptionHandlers {
                 .body(BaseResponse.failure(HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<BaseResponse<String>> handleGeneralException(Exception exception) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(BaseResponse.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.toString()));
-    }
+//    @ExceptionHandler(Exception.class)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ResponseEntity<BaseResponse<String>> handleGeneralException(Exception exception) {
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                .body(BaseResponse.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.toString()));
+//    }
 
 
     @ExceptionHandler(ResponseStatusException.class)
