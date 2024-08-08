@@ -25,7 +25,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -102,13 +106,15 @@ public class MutasiController {
             reportContent = mutasiService.transactionsReport(username, null, null);
         }
         ByteArrayResource resource = new ByteArrayResource(reportContent);
-
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Jakarta"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedNow = now.format(formatter);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .contentLength(resource.contentLength())
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.attachment()
-                                .filename("Transactions-report("+ startDate + "-" + endDate + ").pdf")
+                                .filename("Transactions-Report (" + formattedNow +").pdf")
                                 .build().toString())
                 .body(resource);
     }

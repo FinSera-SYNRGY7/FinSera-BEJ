@@ -2,6 +2,7 @@ package com.finalproject.finsera.finsera.dto.mutasi;
 
 import com.finalproject.finsera.finsera.dto.infosaldo.Amount;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
+import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,10 +19,12 @@ public class MutasiResponseDto {
 
     private String noTransaction;
 
-    private String accountNumber;
+    private String destinationNameAccountNumber;
 
     private Amount amountTransfer;
 
     private TransactionInformation transactionInformation;
+
+    private TransactionsType transactionsType;
 
 }

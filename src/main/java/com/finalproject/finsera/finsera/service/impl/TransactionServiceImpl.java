@@ -7,8 +7,11 @@ import com.finalproject.finsera.finsera.model.entity.*;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
+import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,12 +19,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 @Service
+@Slf4j
 public class TransactionServiceImpl implements TransactionService{
     @Autowired TransactionRepository transactionRepository;
     @Autowired
@@ -36,6 +46,8 @@ public class TransactionServiceImpl implements TransactionService{
     VirtualAccountService virtualAccountService;
     @Autowired
     VirtualAccountRepository virtualAccountRepository;
+    @Autowired
+    DateFormatterIndonesia dateFormatterIndonesia;
 
     @Transactional
     @Override
@@ -44,6 +56,9 @@ public class TransactionServiceImpl implements TransactionService{
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionRequestDto.getAccountnum_recipient());
         if (!optionalBankAccountsReceiver.isPresent()) {
             throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
+        }
+        if(transactionRequestDto.getAccountnum_recipient().equals(optionalBankAccountsSender.get(0).getAccountNumber())) {
+            throw new IllegalArgumentException("Nomor rekening tujuan tidak boleh sama dengan nomor rekening pengirim");
         }
 
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
@@ -98,8 +113,7 @@ public class TransactionServiceImpl implements TransactionService{
 
         TransactionResponseDto transactionResponseDto = new TransactionResponseDto();
         // Convert Date to String
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm 'WIB'");
-        String dateString = dateFormat.format(transactionsaved.getCreatedDate());
+        String dateString = dateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
         transactionResponseDto.setTransaction_num(String.valueOf(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());
@@ -149,6 +163,10 @@ public class TransactionServiceImpl implements TransactionService{
         if (!optionalBanks.isPresent()){
             throw new IllegalArgumentException("Bank Tidak Ditemukan");
         }
+
+        if(transactionOtherBankRequest.getAccountnum_recipient().equals(optionalBankAccountsSender.get(0).getAccountNumber())) {
+            throw new IllegalArgumentException("Nomor rekening tujuan tidak boleh sama dengan nomor rekening pengirim");
+        }
         Banks banks = optionalBanks.get();
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
         BankAccountsOtherBanks bankAccountsReceiver = optionalBankAccountsReceiver.get(0);
@@ -173,38 +191,37 @@ public class TransactionServiceImpl implements TransactionService{
         TransactionsNumber transactionsNumberSaved =  transactionNumberRepository.save(transactionsNumber);
 
         // logging money out
-        TransactionOtherBanks transaction_out = new TransactionOtherBanks();
+        Transactions transaction_out = new Transactions();
         transaction_out.setBankAccounts(bankAccountsSender);
-        transaction_out.setBankAccountsOtherBanks(bankAccountsReceiver);
         transaction_out.setTransactionsNumber(transactionsNumberSaved);
         transaction_out.setFromAccountNumber(bankAccountsSender.getAccountNumber());
         transaction_out.setToAccountNumber(bankAccountsReceiver.getAccountNumber());
         transaction_out.setAmountTransfer((double) nominal);
         transaction_out.setNotes(transactionOtherBankRequest.getNote());
+        transaction_out.setType(TransactionsType.ANTAR_BANK);
         transaction_out.setTransactionInformation(TransactionInformation.UANG_KELUAR);
 
-        // logging money in
-        TransactionOtherBanks transaction_in = new TransactionOtherBanks();
-        transaction_in.setBankAccounts(bankAccountsSender);
-        transaction_in.setBankAccountsOtherBanks(bankAccountsReceiver);
-        transaction_in.setTransactionsNumber(transactionsNumberSaved);
-        transaction_in.setFromAccountNumber(bankAccountsReceiver.getAccountNumber());
-        transaction_in.setToAccountNumber(bankAccountsSender.getAccountNumber());
-        transaction_in.setAmountTransfer((double) nominal);
-        transaction_in.setNotes(transactionOtherBankRequest.getNote());
-        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
+//        // logging money in
+//        TransactionOtherBanks transaction_in = new TransactionOtherBanks();
+//        transaction_in.setBankAccounts(bankAccountsSender);
+//        transaction_in.setBankAccountsOtherBanks(bankAccountsReceiver);
+//        transaction_in.setTransactionsNumber(transactionsNumberSaved);
+//        transaction_in.setFromAccountNumber(bankAccountsReceiver.getAccountNumber());
+//        transaction_in.setToAccountNumber(bankAccountsSender.getAccountNumber());
+//        transaction_in.setAmountTransfer((double) nominal);
+//        transaction_in.setNotes(transactionOtherBankRequest.getNote());
+//        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
 
         bankAccountsSender.setAmount(bankAccountsSender.getAmount()-(double) nominal);
         bankAccountsReceiver.setAmount(bankAccountsReceiver.getAmount()+(double) transactionOtherBankRequest.getNominal());
         bankAccountsOtherBanksRepository.save(bankAccountsReceiver);
         bankAccountsRepository.save(bankAccountsSender);
-        TransactionOtherBanks transactionsaved = transactionOtherBankRepository.save(transaction_out);
-        transactionOtherBankRepository.save(transaction_in);
+        Transactions transactionsaved = transactionRepository.save(transaction_out);
+//        transactionOtherBankRepository.save(transaction_in);
 
         TransactionOtherBankResponse transactionResponseDto = new TransactionOtherBankResponse();
         // Convert Date to String
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm 'WIB'");
-        String dateString = dateFormat.format(transactionsaved.getCreatedDate());
+        String dateString = dateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
         transactionResponseDto.setTransaction_num(String.valueOf(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());
@@ -296,6 +313,8 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public TransferVirtualAccountResponseDto transferVA(Long id, TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
         BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
+        Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        BankAccounts bankAccountsReceiver = optionalBankAccountsReceiver.get();
         VirtualAccounts recipientVirtualAccount = virtualAccountService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
         TransactionsNumber transactionsNumber = new TransactionsNumber();
         transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
@@ -325,9 +344,9 @@ public class TransactionServiceImpl implements TransactionService{
 
         //TBD should be same with noTransaction of sender or not
         recipientTransaction.setTransactionsNumber(transactionsNumber);
-        recipientTransaction.setBankAccounts(senderBankAccount);
-        recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
-        recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        recipientTransaction.setBankAccounts(bankAccountsReceiver);
+        recipientTransaction.setFromAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
+        recipientTransaction.setToAccountNumber(senderBankAccount.getAccountNumber());
         recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
 
         recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());

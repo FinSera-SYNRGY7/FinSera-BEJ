@@ -4,12 +4,8 @@ import com.finalproject.finsera.finsera.dto.jasper.TransactionsReportJasperDto;
 import com.finalproject.finsera.finsera.dto.mutasi.MutasiRequestDto;
 import com.finalproject.finsera.finsera.dto.mutasi.MutasiResponseDto;
 import com.finalproject.finsera.finsera.mapper.MutasiMapper;
-import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.model.entity.Customers;
-import com.finalproject.finsera.finsera.model.entity.Transactions;
-import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
-import com.finalproject.finsera.finsera.repository.CustomerRepository;
-import com.finalproject.finsera.finsera.repository.TransactionRepository;
+import com.finalproject.finsera.finsera.model.entity.*;
+import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.MutasiService;
 import com.finalproject.finsera.finsera.service.ValidationService;
 import jakarta.transaction.Transactional;
@@ -30,6 +26,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -47,7 +45,13 @@ public class MutasiServiceImpl implements MutasiService {
     BankAccountsRepository bankAccountsRepository;
 
     @Autowired
+    BankAccountsOtherBanksRepository bankAccountsOtherBanksRepository;
+
+    @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    TransactionOtherBankRepository transactionOtherBankRepository;
 
     @Autowired
     ValidationService validationService;
@@ -105,30 +109,80 @@ public class MutasiServiceImpl implements MutasiService {
         List<TransactionsReportJasperDto> itemsTransactions = new ArrayList<>();
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found")));
-
+        List<Transactions> transactions;
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
-        List<Transactions> transactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
-        for(var i = transactions.size()-1; i >= 0; i--){
-            TransactionsReportJasperDto transactionsReportJasperDto = new TransactionsReportJasperDto();
-            transactionsReportJasperDto.setCreated_date(transactions.get(i).getCreatedDate());
-            transactionsReportJasperDto.setNotes(transactions.get(i).getNotes());
-            transactionsReportJasperDto.setTransaction_information(transactions.get(i).getTransactionInformation().ordinal());
-            transactionsReportJasperDto.setAmount_transfer(transactions.get(i).getAmountTransfer());
-            itemsTransactions.add(transactionsReportJasperDto);
-        }
-        JasperReport jasperReport;
-        try {
-            jasperReport = (JasperReport)
-                    JRLoader.loadObject(ResourceUtils.getFile("Transactions_report.jasper"));
-        } catch (FileNotFoundException | JRException e) {
-            try {
-                File file = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
-                jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
-                JRSaver.saveObject(jasperReport, "Transactions_report.jasper");
-            } catch (FileNotFoundException | JRException ex) {
-                throw new RuntimeException(e);
+        if(startDate != null && endDate != null) {
+            transactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
+            for(var i = 0; i < transactions.size(); i++){
+                toResponseJasperDto(itemsTransactions, transactions, i);
             }
+        } else {
+            transactions = transactionRepository.findAllByBankAccountsOrderByCreatedDateDesc(bankAccounts)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
+            if(transactions.size() > 10) {
+                for(var i = 0; i < 10; i++){
+                    toResponseJasperDto(itemsTransactions, transactions, i);
+                }
+            } else {
+                for(var i = 0; i < transactions.size(); i++){
+                    toResponseJasperDto(itemsTransactions, transactions, i);
+                }
+            }
+
+        }
+
+        JasperReport jasperReport;
+//        try {
+//            jasperReport = (JasperReport)
+//                    JRLoader.loadObject(ResourceUtils.getFile("classpath:Transactions_report.jasper"));
+//        } catch (FileNotFoundException | JRException e) {
+//            try {
+//                File file = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
+//                jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
+//                JRSaver.saveObject(jasperReport, "Transactions_report.jasper");
+//            } catch (FileNotFoundException | JRException ex) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+
+//        try {
+//            File reportDirectory = new File("src/main/resources/");
+//            if (!reportDirectory.exists()) {
+//                reportDirectory.mkdirs(); // Membuat folder jika belum ada
+//            }
+//            File jasperFile = new File(reportDirectory, "Transactions_report.jasper");
+//            if (jasperFile.exists()) {
+//                jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
+//            } else {
+//                File file = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
+//                jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
+//                JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
+//            }
+//        } catch (FileNotFoundException | JRException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        try {
+            File tempDir = new File(System.getProperty("java.io.tmpdir"));
+            File jasperFile = new File(tempDir, "Transactions_report.jasper");
+
+            if (jasperFile.exists()) {
+                jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
+            } else {
+                try (InputStream jrxmlStream = getClass().getClassLoader().getResourceAsStream("Transactions_report.jrxml")) {
+                    if (jrxmlStream == null) {
+                        throw new RuntimeException("File Transactions_report.jrxml not found in classpath");
+                    }
+
+                    jasperReport = JasperCompileManager.compileReport(jrxmlStream);
+                    JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
+                } catch (IOException e) {
+                    throw new RuntimeException("Failed to read resource: " + e.getMessage(), e);
+                }
+            }
+        } catch (JRException e) {
+            throw new RuntimeException("JasperReports exception: " + e.getMessage(), e);
         }
 
         String norek = bankAccounts.getAccountNumber();
@@ -138,10 +192,10 @@ public class MutasiServiceImpl implements MutasiService {
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(itemsTransactions);
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("norek", norek);
-        parameters.put("tanggalAwal", startDate);
-        parameters.put("tanggalAkhir", endDate);
         parameters.put("uangKeluar", tf0);
         parameters.put("uangMasuk", tf1);
+        parameters.put("tanggalAwal", startDate);
+        parameters.put("tanggalAkhir", endDate);
 
         JasperPrint jasperPrint = null;
         byte[] reportContent;
@@ -156,6 +210,15 @@ public class MutasiServiceImpl implements MutasiService {
         }
         return reportContent;
 
+    }
+
+    private void toResponseJasperDto(List<TransactionsReportJasperDto> itemsTransactions, List<Transactions> transactions, int i) {
+        TransactionsReportJasperDto transactionsReportJasperDto = new TransactionsReportJasperDto();
+        transactionsReportJasperDto.setCreated_date(transactions.get(i).getCreatedDate());
+        transactionsReportJasperDto.setNotes(transactions.get(i).getNotes());
+        transactionsReportJasperDto.setTransaction_information(transactions.get(i).getTransactionInformation().ordinal());
+        transactionsReportJasperDto.setAmount_transfer(transactions.get(i).getAmountTransfer());
+        itemsTransactions.add(transactionsReportJasperDto);
     }
 
 
