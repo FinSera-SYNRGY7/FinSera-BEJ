@@ -27,7 +27,7 @@ public class JwtUtilRefreshToken {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
-    @Value("${security.jwt.expiration-time}")
+    @Value("${security.jwt.refresh-token-expiration-time}")
     private long jwtExpiration;
 
     public String extractUsername(String token) {
@@ -84,7 +84,7 @@ public class JwtUtilRefreshToken {
                 .setSubject(username)
                 .claim("userId", customers.getIdCustomers())
                 .setIssuedAt(now)
-//                .setExpiration(null)
+                .setExpiration(new Date(now.getTime() + jwtExpiration))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
