@@ -1,6 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
-import com.finalproject.finsera.finsera.dto.BaseResponse;
+import com.finalproject.finsera.finsera.dto.customer.ForgotMpinRequestDto;
 import com.finalproject.finsera.finsera.dto.login.*;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
@@ -70,7 +70,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         customers.setEmail(registerRequestDto.getEmail());
         customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpinAuth()));
-        customers.setStatusUser(StatusUser.INACTIVE);
+        customers.setStatusUser(StatusUser.ACTIVE);
 
         customerRepository.save(customers);
         return customers;
@@ -166,4 +166,31 @@ public class CustomerServiceImpl implements CustomerService {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
+
+    @Override
+    public ResponseEntity<Map<String, Object>> forgotMpin(Long id, ForgotMpinRequestDto forgotMpinRequestDto) {
+        Customers customers = customerRepository.findById(id).get();
+
+        if (!passwordEncoder.matches(forgotMpinRequestDto.getPassword(), customers.getPassword())){
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "Password incorrect");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } else if (!forgotMpinRequestDto.getNewMpin().equalsIgnoreCase(forgotMpinRequestDto.getConfirmNewMpin())) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "MPin not valid");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } else {
+            customers.setPassword(passwordEncoder.encode(forgotMpinRequestDto.getPassword()));
+            customers.setMpinAuth(passwordEncoder.encode(forgotMpinRequestDto.getNewMpin()));
+            customerRepository.save(customers);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", "Your pin is changed");
+            response.put("message", "success");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+    }
+
 }

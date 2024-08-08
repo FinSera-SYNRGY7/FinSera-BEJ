@@ -1,6 +1,7 @@
 package com.finalproject.finsera.finsera.controller;
 
 import com.finalproject.finsera.finsera.dto.BaseResponse;
+import com.finalproject.finsera.finsera.dto.customer.ForgotMpinRequestDto;
 import com.finalproject.finsera.finsera.dto.login.*;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.dto.schemes.LoginExampleSwagger;
@@ -55,9 +56,6 @@ public class AuthController {
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
-
-
-
 
 
     //ignore register service
@@ -144,5 +142,14 @@ public class AuthController {
             RefreshTokenResponseDto refreshTokenResponseDto = customerService.refreshToken(refreshTokenRequestDto);
             return ResponseEntity.ok(BaseResponse.success(refreshTokenResponseDto, "accessToken"));
         }
+    }
+
+    @PostMapping(value = {"/user/forgot-mpin", "/user/forgot-mpin/"})
+    @Operation(summary = "Forgot Mpin", security = @SecurityRequirement(name = "bearerAuth"))
+    @ApiResponse(responseCode = "200")
+    public ResponseEntity<Map<String, Object>> forgotMpin(@RequestHeader("Authorization") String token, @RequestBody ForgotMpinRequestDto forgotMpinRequestDto){
+        String jwt = token.substring("Bearer ".length());
+        Long userId = jwtUtil.getId(jwt);
+        return customerService.forgotMpin(userId, forgotMpinRequestDto);
     }
 }
