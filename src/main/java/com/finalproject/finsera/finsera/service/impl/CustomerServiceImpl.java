@@ -159,6 +159,7 @@ public class CustomerServiceImpl implements CustomerService {
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
             customers.setFailedAttempt(0);
+            customers.setBannedTime(null);
             customerRepository.save(customers);
             Map<String, Object> response = new HashMap<>();
             response.put("data", "Pin Valid");
