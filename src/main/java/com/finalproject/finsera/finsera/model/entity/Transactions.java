@@ -20,7 +20,7 @@ public class Transactions extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_id")
-    private long idTransaction;
+    private Long idTransaction;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_bank_accounts")
