@@ -86,17 +86,5 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("/qris")
-    public ResponseEntity<BaseResponse<QrisResponseDto>> generateQris(@RequestHeader(name = "Authorization") String token) {
-        String jwt = token.substring("Bearer ".length());
-        String username = jwtUtil.getUsername(jwt);
-        try{
-            QrisResponseDto responseDto =  customerService.generateQris(username);
-            return ResponseEntity.ok(BaseResponse.success(responseDto, ResponseConstant.GET_SUCCESS));
-        }catch(ResponseStatusException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, e.getMessage()));
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.failure(500, e.getMessage()));
-        }
-    }
+
 }
