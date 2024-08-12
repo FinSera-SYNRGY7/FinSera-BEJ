@@ -4,7 +4,9 @@ import com.finalproject.finsera.finsera.model.entity.VirtualAccounts;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface VirtualAccountRepository extends JpaRepository<VirtualAccounts, Long> {
-    VirtualAccounts findByAccountNumber(String accountNumber);
+    Optional<VirtualAccounts> findByVirtualAccountNumber(String virtualAccountNumber);
 }

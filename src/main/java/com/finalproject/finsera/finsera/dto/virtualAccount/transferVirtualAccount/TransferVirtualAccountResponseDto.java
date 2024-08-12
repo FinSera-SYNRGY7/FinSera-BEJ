@@ -3,18 +3,13 @@ package com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccou
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import lombok.Data;
 
-import java.util.Date;
-
 @Data
 public class TransferVirtualAccountResponseDto {
-    String transactionNum;
-    TransactionsType type;
     String transactionDate;
-    String senderName;
-    String senderAccountNum;
+    String transactionNum;
     String recipientName;
-    String recipientAccountNum;
+    TransactionsType type;
+    String recipientVirtualAccountNum;
     String nominal;
     String adminFee;
-    String note;
 }

@@ -11,7 +11,6 @@ import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,17 +18,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+
 @Service
 @Slf4j
 public class TransactionServiceImpl implements TransactionService{
@@ -42,10 +35,6 @@ public class TransactionServiceImpl implements TransactionService{
     @Autowired TransactionNumberRepository transactionNumberRepository;
     @Autowired BankRepository bankRepository;
     @Autowired PasswordEncoder passwordEncoder;
-    @Autowired
-    VirtualAccountService virtualAccountService;
-    @Autowired
-    VirtualAccountRepository virtualAccountRepository;
     @Autowired
     DateFormatterIndonesia dateFormatterIndonesia;
 
@@ -311,70 +300,6 @@ public class TransactionServiceImpl implements TransactionService{
         }
         
         return historyList;
-    }
-
-    @Transactional
-    @Override
-    public TransferVirtualAccountResponseDto transferVA(Long id, TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
-        BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
-        Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        BankAccounts bankAccountsReceiver = optionalBankAccountsReceiver.get();
-        VirtualAccounts recipientVirtualAccount = virtualAccountService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        TransactionsNumber transactionsNumber = new TransactionsNumber();
-        transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
-        transactionNumberRepository.save(transactionsNumber);
-        Double adminFee = 2500.0;
-
-        //sender transaction
-        Transactions senderTransaction = new Transactions();
-        senderTransaction.setTransactionInformation(TransactionInformation.UANG_KELUAR);
-        senderTransaction.setBankAccounts(senderBankAccount);
-        senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
-        senderTransaction.setTransactionsNumber(transactionsNumber);
-        senderTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
-        senderTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        senderTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
-        senderTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
-        transactionRepository.save(senderTransaction);
-
-        //sender update amount
-        senderBankAccount.setAmount(senderBankAccount.getAmount() - transferVirtualAccountRequestDto.getNominal() - adminFee);
-        bankAccountsRepository.save(senderBankAccount);
-
-        //recipient transaction
-        Transactions recipientTransaction = new Transactions();
-        recipientTransaction.setTransactionInformation(TransactionInformation.UANG_MASUK);
-        recipientTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
-
-        //TBD should be same with noTransaction of sender or not
-        recipientTransaction.setTransactionsNumber(transactionsNumber);
-        recipientTransaction.setBankAccounts(bankAccountsReceiver);
-        recipientTransaction.setFromAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        recipientTransaction.setToAccountNumber(senderBankAccount.getAccountNumber());
-        recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
-
-        recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
-        transactionRepository.save(recipientTransaction);
-
-        //recipient update amount and save
-        recipientVirtualAccount.setAmount(
-                recipientVirtualAccount.getAmount() + transferVirtualAccountRequestDto.getNominal()
-        );
-        recipientVirtualAccount.setSavedAccount(transferVirtualAccountRequestDto.getSaveAccount());
-        virtualAccountRepository.save(recipientVirtualAccount);
-
-        TransferVirtualAccountResponseDto response = new TransferVirtualAccountResponseDto();
-        response.setTransactionNum(transactionsNumber.getTransactionNumber());
-        response.setType(TransactionsType.VIRTUAL_ACCOUNT);
-        response.setTransactionDate(Date.from(Instant.now()).toString());
-        response.setSenderName(senderBankAccount.getCustomer().getName());
-        response.setSenderAccountNum(senderBankAccount.getAccountNumber());
-        response.setRecipientName(recipientVirtualAccount.getAccountName());
-        response.setRecipientAccountNum(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        response.setNominal(transferVirtualAccountRequestDto.getNominal().toString());
-        response.setAdminFee(String.valueOf(adminFee));
-        response.setNote(transferVirtualAccountRequestDto.getNote());
-        return response;
     }
 
 }
