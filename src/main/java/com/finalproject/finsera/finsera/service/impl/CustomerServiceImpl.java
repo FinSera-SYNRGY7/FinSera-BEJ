@@ -106,6 +106,9 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
         }
         Customers customer = optionalCustomers.get();
+        if (passwordEncoder.matches(newMpin, customer.getMpinAuth())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock is already in use.");
+        }
         customer.setMpinAuth(passwordEncoder.encode(newMpin));
 
         customerRepository.save(customer);
