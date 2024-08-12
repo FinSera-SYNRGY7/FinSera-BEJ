@@ -2,10 +2,12 @@ package com.finalproject.finsera.finsera.service;
 
 import com.finalproject.finsera.finsera.dto.customer.ForgotMpinRequestDto;
 import com.finalproject.finsera.finsera.dto.login.*;
+import com.finalproject.finsera.finsera.dto.qris.QrisResponseDto;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import org.springframework.http.ResponseEntity;
 
+import java.security.Principal;
 import java.util.Map;
 
 public interface CustomerService {
@@ -17,4 +19,7 @@ public interface CustomerService {
     RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto refreshTokenRequestDto);
     Customers updateMpin(String username, String newMpin);
     ResponseEntity<Map<String, Object>> forgotMpin(Long id, ForgotMpinRequestDto forgotMpinRequestDto);
+
+    QrisResponseDto generateQris(String username);
+
 }

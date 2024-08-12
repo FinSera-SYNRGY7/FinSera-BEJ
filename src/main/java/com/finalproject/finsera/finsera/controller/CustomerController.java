@@ -3,6 +3,7 @@ package com.finalproject.finsera.finsera.controller;
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.dto.customer.DetailCustomerResponse;
 import com.finalproject.finsera.finsera.dto.customer.UpdateMpinRequest;
+import com.finalproject.finsera.finsera.dto.qris.QrisResponseDto;
 import com.finalproject.finsera.finsera.dto.responseMsg.ResponseConstant;
 import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.ProfileExampleSwagger;
@@ -79,9 +80,23 @@ public class CustomerController {
             Customers updatedCustomer =  customerService.updateMpin(username, mpin.getMpinAuth());
             return ResponseEntity.ok(BaseResponse.success(null, ResponseConstant.UPDATE_SUCCESS));
         }catch(ResponseStatusException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, ResponseConstant.UPDATE_FAIL));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, e.getMessage()));
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.failure(500, ResponseConstant.UPDATE_FAIL));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.failure(500, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/qris")
+    public ResponseEntity<BaseResponse<QrisResponseDto>> generateQris(@RequestHeader(name = "Authorization") String token) {
+        String jwt = token.substring("Bearer ".length());
+        String username = jwtUtil.getUsername(jwt);
+        try{
+            QrisResponseDto responseDto =  customerService.generateQris(username);
+            return ResponseEntity.ok(BaseResponse.success(responseDto, ResponseConstant.GET_SUCCESS));
+        }catch(ResponseStatusException e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, e.getMessage()));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.failure(500, e.getMessage()));
         }
     }
 }
