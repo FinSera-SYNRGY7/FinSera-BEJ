@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -56,5 +57,11 @@ public class Customers extends BaseModel{
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<Notifications> notifications;
+
+    @Column(name = "failed_attempt")
+    private Integer failedAttempt;
+
+    @Column(name = "banned_time")
+    private Date bannedTime;
 
 }

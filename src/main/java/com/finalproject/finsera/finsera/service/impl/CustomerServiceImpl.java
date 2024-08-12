@@ -1,6 +1,8 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.finalproject.finsera.finsera.dto.customer.ForgotMpinRequestDto;
 import com.finalproject.finsera.finsera.dto.login.*;
+import com.finalproject.finsera.finsera.dto.qris.QrisResponseDto;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.model.enums.Gender;
@@ -12,6 +14,7 @@ import com.finalproject.finsera.finsera.util.JwtUtilRefreshToken;
 import com.finalproject.finsera.finsera.util.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +23,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -64,7 +71,7 @@ public class CustomerServiceImpl implements CustomerService {
         customers.setPassword(passwordEncoder.encode(registerRequestDto.getPassword()));
         customers.setEmail(registerRequestDto.getEmail());
         customers.setMpinAuth(passwordEncoder.encode(registerRequestDto.getMpinAuth()));
-        customers.setStatusUser(StatusUser.INACTIVE);
+        customers.setStatusUser(StatusUser.ACTIVE);
 
         customerRepository.save(customers);
         return customers;
@@ -77,6 +84,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public QrisResponseDto generateQris(String username) {
+        Optional<Customers> optionalCustomer = customerRepository.findByUsername(username);
+
+        if (optionalCustomer.isPresent()) {
+            Customers customers = optionalCustomer.get();
+            QrisResponseDto response = new QrisResponseDto();
+            response.setAccountNumber(customers.getBankAccounts().get(0).getAccountNumber());
+            response.setUsername(customers.getUsername());
+            return response;
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+        }
+    }
+
+    @Override
     public Customers updateMpin(String username, String newMpin){
         Optional<Customers> optionalCustomers = customerRepository.findByUsername(username);
 
@@ -84,6 +106,9 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
         }
         Customers customer = optionalCustomers.get();
+        if (passwordEncoder.matches(newMpin, customer.getMpinAuth())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock is already in use.");
+        }
         customer.setMpinAuth(passwordEncoder.encode(newMpin));
 
         customerRepository.save(customer);
@@ -123,25 +148,68 @@ public class CustomerServiceImpl implements CustomerService {
         return refreshTokenResponseDto;
     }
 
-//    @Override
-//    public String relogin(String username, ReloginRequestDto reloginRequestDto) {
-//        Customers customers = customerRepository.findByUsername(username).get();
-//        System.out.println(customers.getMpin());
-//        System.out.println(reloginRequestDto.getMpin());
-//        if (passwordEncoder.matches(customers.getMpin(), passwordEncoder.encode(reloginRequestDto.getMpin()))){
-//            return "Pin Valid";
-//        } else {
-//            return "Pin Invalid";
-//        }
-//    }
-
     @Override
-    public String relogin(Long id, ReloginRequestDto reloginRequestDto) {
+    public ResponseEntity<Map<String, Object>> relogin(Long id, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findById(id).get();
-        if (passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())){
-            return "Pin Valid";
+        if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "your account is inactive");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        if (!passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())) {
+            int newFailAttempts = customers.getFailedAttempt() + 1;
+            customers.setFailedAttempt(newFailAttempts);
+            customerRepository.save(customers);
+            if (customers.getFailedAttempt() > 3) {
+                customers.setStatusUser(StatusUser.INACTIVE);
+                customers.setBannedTime(Date.from(Instant.now()));
+                customerRepository.save(customers);
+
+                Map<String, Object> response = new HashMap<>();
+                response.put("data", null);
+                response.put("message", "Your account is banned, due to invalid pin more than 3 times");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "Pin is invalid");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
-            return "Pin Invalid";
+            customers.setFailedAttempt(0);
+            customerRepository.save(customers);
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", "Pin Valid");
+            response.put("message", "Relogin Success");
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
+
+    @Override
+    public ResponseEntity<Map<String, Object>> forgotMpin(Long id, ForgotMpinRequestDto forgotMpinRequestDto) {
+        Customers customers = customerRepository.findById(id).get();
+
+        if (!passwordEncoder.matches(forgotMpinRequestDto.getPassword(), customers.getPassword())){
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "Password incorrect");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } else if (!forgotMpinRequestDto.getNewMpin().equalsIgnoreCase(forgotMpinRequestDto.getConfirmNewMpin())) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "MPin not valid");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } else {
+            customers.setPassword(passwordEncoder.encode(forgotMpinRequestDto.getPassword()));
+            customers.setMpinAuth(passwordEncoder.encode(forgotMpinRequestDto.getNewMpin()));
+            customerRepository.save(customers);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", "Your pin is changed");
+            response.put("message", "success");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+    }
+
 }
