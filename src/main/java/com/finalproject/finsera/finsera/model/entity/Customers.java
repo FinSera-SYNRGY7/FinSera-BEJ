@@ -59,7 +59,7 @@ public class Customers extends BaseModel{
     private List<Notifications> notifications;
 
     @Column(name = "failed_attempt")
-    private int failedAttempt;
+    private Integer failedAttempt;
 
     @Column(name = "banned_time")
     private Date bannedTime;
