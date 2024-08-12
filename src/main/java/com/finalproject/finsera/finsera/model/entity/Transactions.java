@@ -1,7 +1,6 @@
 package com.finalproject.finsera.finsera.model.entity;
 
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
-import com.finalproject.finsera.finsera.model.enums.TransactionsByBankType;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import jakarta.persistence.*;
 import lombok.Data;
