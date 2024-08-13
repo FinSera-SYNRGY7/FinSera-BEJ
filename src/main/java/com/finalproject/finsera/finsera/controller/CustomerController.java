@@ -56,6 +56,7 @@ public class CustomerController {
         detailCustomerResponse.setIdCustomer(customer.get().getIdCustomers());
         detailCustomerResponse.setName(customer.get().getName());
         detailCustomerResponse.setEmail(customer.get().getEmail());
+        detailCustomerResponse.setGender(customer.get().getGender());
         detailCustomerResponse.setPhone(customer.get().getPhoneNumber());
         detailCustomerResponse.setUsername(customer.get().getUsername());
 
