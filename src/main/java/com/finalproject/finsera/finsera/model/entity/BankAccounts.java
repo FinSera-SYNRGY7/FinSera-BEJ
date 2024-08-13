@@ -43,4 +43,7 @@ public class BankAccounts extends BaseModel{
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "bankAccounts")
     private List<Transactions> transactions;
+
+    @Column(name = "failed_attempt")
+    private Integer failedAttempt;
 }

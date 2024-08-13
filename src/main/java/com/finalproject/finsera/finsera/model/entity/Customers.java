@@ -58,10 +58,6 @@ public class Customers extends BaseModel{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<Notifications> notifications;
 
-    @Column(name = "failed_attempt")
-    private Integer failedAttempt;
-
     @Column(name = "banned_time")
     private Date bannedTime;
-
 }

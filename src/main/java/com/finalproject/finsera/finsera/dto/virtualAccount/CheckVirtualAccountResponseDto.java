@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class CheckVirtualAccountResponseDto {
-    private String accountName;
     private String accountNum;
+    private String accountName;
     private Double nominal;
 }

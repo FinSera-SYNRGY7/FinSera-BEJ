@@ -5,4 +5,5 @@ import lombok.Data;
 @Data
 public class CheckVirtualAccountRequestDto {
     private String virtualAccountNumber;
+    private Boolean saveAccount;
 }

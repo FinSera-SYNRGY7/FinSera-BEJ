@@ -22,12 +22,6 @@ public class VirtualAccounts extends BaseModel {
     @Column(name = "nominal")
     private Double nominal;
 
-    @Column(name = "mpin_account")
-    private String mpinAccount;
-
     @Column(name = "account_type")
     private AccountType accountType;
-
-    @Column(name = "saved_account")
-    private Boolean savedAccount;
 }

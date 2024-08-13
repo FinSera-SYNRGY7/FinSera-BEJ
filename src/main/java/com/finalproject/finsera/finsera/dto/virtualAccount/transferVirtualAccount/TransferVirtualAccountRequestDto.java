@@ -5,10 +5,6 @@ import lombok.Data;
 
 @Data
 public class TransferVirtualAccountRequestDto {
-//    String recipientVirtualAccountNum;
-//    AccountType recipientAccountType;
-    Double nominal;
-//    String note;
+    String virtualAccountNumber;
     String mpinAccount;
-    Boolean saveAccount;
 }

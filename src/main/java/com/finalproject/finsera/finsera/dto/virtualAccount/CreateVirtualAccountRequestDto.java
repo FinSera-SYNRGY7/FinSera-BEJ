@@ -8,6 +8,5 @@ public class CreateVirtualAccountRequestDto {
     private String accountName;
     private String accountNumber;
     private Double nominal;
-    private String mpinAccount;
     private AccountType accountType;
 }
