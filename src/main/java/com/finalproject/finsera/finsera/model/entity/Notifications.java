@@ -15,7 +15,7 @@ public class Notifications {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "notification_id")
-    private long idNotification;
+    private Long idNotification;
 
     @Column(name = "date_notification")
     private Timestamp dateNotification;

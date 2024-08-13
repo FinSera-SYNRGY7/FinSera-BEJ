@@ -28,7 +28,6 @@ public class QrisController {
     @Autowired
     CustomerService customerService;
 
-
     @Autowired
     JwtUtil jwtUtil;
 

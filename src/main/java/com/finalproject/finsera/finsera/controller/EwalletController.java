@@ -63,7 +63,7 @@ public class EwalletController {
 //
 //
     @GetMapping("/ewallet/history")
-    @Operation(summary = "Transaction history intra-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Ewallet history", security = @SecurityRequirement(name = "bearerAuth"))
     // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<?> historyTransaction(@RequestHeader("Authorization") String token) {
         String jwt = token.substring("Bearer ".length());

@@ -12,7 +12,7 @@ public class EwalletAccounts extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_ewallet_accounts")
-    private long idEwalletAccounts;
+    private Long idEwalletAccounts;
 
     @Column(name = "name")
     private String name;

@@ -26,7 +26,7 @@ public class BankAccounts extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_bank_accounts")
-    private long idBankAccounts;
+    private Long idBankAccounts;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")

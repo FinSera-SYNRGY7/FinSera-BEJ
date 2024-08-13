@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.text.NumberFormat;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.Locale;
 
 @Component
+@Slf4j
 public class DateFormatterIndonesia {
     public static String dateFormatterIND(Date date) {
         String dateTimeString = String.valueOf(date);
@@ -30,9 +32,7 @@ public class DateFormatterIndonesia {
 
     public static String otherDateFormatterIND(Date date) {
         String dateTimeString = String.valueOf(date);
-        String dateTimeWithoutZone = dateTimeString.replace(" WIB", "");
-        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss yyyy", java.util.Locale.ENGLISH);
-        LocalDateTime localDateTime = LocalDateTime.parse(dateTimeWithoutZone, inputFormatter);
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTimeString);
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("Asia/Jakarta"));
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("M/d/yy, h:mm a");
         return zonedDateTime.format(outputFormatter) + " WIB";

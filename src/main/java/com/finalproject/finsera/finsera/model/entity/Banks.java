@@ -23,7 +23,7 @@ public class Banks extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "bank_id")
-    private long idBank;
+    private Long idBank;
 
     @Column(name = "bank_name")
     private String bankName;

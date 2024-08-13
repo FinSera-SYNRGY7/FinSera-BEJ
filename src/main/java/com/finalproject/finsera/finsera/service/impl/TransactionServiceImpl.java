@@ -210,7 +210,7 @@ public class TransactionServiceImpl implements TransactionService{
 
         TransactionOtherBankResponse transactionResponseDto = new TransactionOtherBankResponse();
         // Convert Date to String
-        String dateString = dateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
+        String dateString = DateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
         transactionResponseDto.setTransaction_num(String.valueOf(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());

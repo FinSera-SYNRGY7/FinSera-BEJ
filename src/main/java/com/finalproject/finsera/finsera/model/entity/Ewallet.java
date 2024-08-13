@@ -16,7 +16,7 @@ public class Ewallet extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ewallet_id")
-    private long idEwallet;
+    private Long idEwallet;
 
     @Column(name = "ewallet_name")
     private String ewalletName;
