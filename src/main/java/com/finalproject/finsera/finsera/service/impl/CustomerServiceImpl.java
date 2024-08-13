@@ -2,6 +2,7 @@ package com.finalproject.finsera.finsera.service.impl;
 
 import com.finalproject.finsera.finsera.dto.customer.ForgotMpinRequestDto;
 import com.finalproject.finsera.finsera.dto.login.*;
+import com.finalproject.finsera.finsera.dto.qris.QrisResponseDto;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.model.enums.Gender;
@@ -83,6 +84,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public QrisResponseDto generateQris(String username) {
+        Optional<Customers> optionalCustomer = customerRepository.findByUsername(username);
+
+        if (optionalCustomer.isPresent()) {
+            Customers customers = optionalCustomer.get();
+            QrisResponseDto response = new QrisResponseDto();
+            response.setAccountNumber(customers.getBankAccounts().get(0).getAccountNumber());
+            response.setUsername(customers.getUsername());
+            return response;
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+        }
+    }
+
+    @Override
     public Customers updateMpin(String username, String newMpin){
         Optional<Customers> optionalCustomers = customerRepository.findByUsername(username);
 
@@ -90,6 +106,9 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
         }
         Customers customer = optionalCustomers.get();
+        if (passwordEncoder.matches(newMpin, customer.getMpinAuth())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock is already in use.");
+        }
         customer.setMpinAuth(passwordEncoder.encode(newMpin));
 
         customerRepository.save(customer);

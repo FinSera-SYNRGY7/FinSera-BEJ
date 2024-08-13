@@ -221,7 +221,7 @@ public class TransactionServiceImpl implements TransactionService{
 
         TransactionOtherBankResponse transactionResponseDto = new TransactionOtherBankResponse();
         // Convert Date to String
-        String dateString = dateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
+        String dateString = DateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
         transactionResponseDto.setTransaction_num(String.valueOf(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());
@@ -269,7 +269,7 @@ public class TransactionServiceImpl implements TransactionService{
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
 
-        List<Transactions> optionalHistory =  transactionRepository.findDistinctByToAccountNumber(bankAccountsSender.getAccountNumber());
+        List<Transactions> optionalHistory =  transactionRepository.findDistinctByToAccountNumber(bankAccountsSender.getAccountNumber(), TransactionsType.SESAMA_BANK);
         if (optionalHistory.isEmpty()) {
             throw new IllegalArgumentException("Transaksi belum ada");
         }
@@ -290,19 +290,23 @@ public class TransactionServiceImpl implements TransactionService{
     @Transactional
     public List<?> historyTransactionInterBank(long idCustomers){
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
-        BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
-
-        List<TransactionOtherBanks> optionalHistory =  transactionOtherBankRepository.findDistinctByToAccountNumber(bankAccountsSender.getAccountNumber());
-        if (optionalHistory.isEmpty()) {
+        log.info("bank account: " + optionalBankAccountsSender.get(0).getAccountNumber());
+//        BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
+        Optional<List<Transactions>> sender = transactionRepository.getAllHistoryByToAccountNumber(optionalBankAccountsSender.get(0).getAccountNumber(), TransactionsType.ANTAR_BANK);
+//        List<Transactions> optionalHistory =  transactionRepository.findDistinctByToAccountNumber("789012345", TransactionsType.ANTAR_BANK);
+//        log.info("optional History: " + optionalHistory.size());
+        if (sender.isEmpty()) {
             throw new IllegalArgumentException("Transaksi belum ada");
         }
+//        log.info("optional History: " + optionalHistory);
         List<Map<String, Object>> historyList = new ArrayList<>();
         
-        for (TransactionOtherBanks transaction : optionalHistory) {
+        for (Transactions transaction : sender.get()) {
+            Optional<BankAccountsOtherBanks> bankAccountsOtherBanks = bankAccountsOtherBanksRepository.findByAccountNumber(transaction.getToAccountNumber());
             Map<String, Object> data = new HashMap<>();
-            data.put("name_recipient", transaction.getBankAccountsOtherBanks().getName());
-            data.put("bank_name", transaction.getBankAccountsOtherBanks().getBanks().getBankName());
-            data.put("account_number_recipient", transaction.getBankAccountsOtherBanks().getAccountNumber());
+            data.put("name_recipient", bankAccountsOtherBanks.get().getName());
+            data.put("bank_name", bankAccountsOtherBanks.get().getBanks().getBankName());
+            data.put("account_number_recipient", bankAccountsOtherBanks.get().getAccountNumber());
             historyList.add(data);
         }
         

@@ -15,7 +15,7 @@ public class TransactionsNumber extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "transaction_number_id")
-    private long idTransactionNumber;
+    private Long idTransactionNumber;
 
     @Column(name = "transaction_number", unique = true)
     private String transactionNumber;

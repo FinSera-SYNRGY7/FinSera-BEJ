@@ -3,6 +3,7 @@ package com.finalproject.finsera.finsera.controller;
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.dto.customer.DetailCustomerResponse;
 import com.finalproject.finsera.finsera.dto.customer.UpdateMpinRequest;
+import com.finalproject.finsera.finsera.dto.qris.QrisResponseDto;
 import com.finalproject.finsera.finsera.dto.responseMsg.ResponseConstant;
 import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.ProfileExampleSwagger;
@@ -55,6 +56,7 @@ public class CustomerController {
         detailCustomerResponse.setIdCustomer(customer.get().getIdCustomers());
         detailCustomerResponse.setName(customer.get().getName());
         detailCustomerResponse.setEmail(customer.get().getEmail());
+        detailCustomerResponse.setGender(customer.get().getGender());
         detailCustomerResponse.setPhone(customer.get().getPhoneNumber());
         detailCustomerResponse.setUsername(customer.get().getUsername());
 
@@ -79,9 +81,11 @@ public class CustomerController {
             Customers updatedCustomer =  customerService.updateMpin(username, mpin.getMpinAuth());
             return ResponseEntity.ok(BaseResponse.success(null, ResponseConstant.UPDATE_SUCCESS));
         }catch(ResponseStatusException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, ResponseConstant.UPDATE_FAIL));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, e.getMessage()));
         }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.failure(500, ResponseConstant.UPDATE_FAIL));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.failure(500, e.getMessage()));
         }
     }
+
+
 }

@@ -19,7 +19,7 @@ public class Customers extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
-    private long idCustomers;
+    private Long idCustomers;
 
     private String address;
 
