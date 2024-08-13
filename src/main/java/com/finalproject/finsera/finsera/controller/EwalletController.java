@@ -76,7 +76,7 @@ public class EwalletController {
     @GetMapping({"/ewallet/", "/ewallet"})
     @Operation(summary = "Get All E-Wallet (done)", security = @SecurityRequirement(name = "bearerAuth"))
     // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
-    public ResponseEntity<?> getAllEwallet() {
+    public ResponseEntity<?> getAllEwallet(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(BaseResponse.success(ewalletService.getAllEwallet(), "Ewallet ditemukan"));
     }
 }
