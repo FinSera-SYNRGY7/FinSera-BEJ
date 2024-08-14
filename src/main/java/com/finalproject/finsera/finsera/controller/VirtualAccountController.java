@@ -47,10 +47,10 @@ public class VirtualAccountController {
 //        return ResponseEntity.ok(virtualAccountService.getAll());
 //    }
 
-//    @GetMapping("account-last-transaction")
-//    public ResponseEntity<Map<String, Object>> getAccount(){
-//        return virtualAccountService.getAccount();
-//    }
+    @GetMapping("va-last-transaction")
+    public ResponseEntity<Map<String, Object>> getAccount(){
+        return virtualAccountService.getLastTransactionAccountVA();
+    }
 
     @PostMapping("check-virtual-account")
     @Operation(summary = "Check Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))

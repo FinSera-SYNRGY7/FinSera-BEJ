@@ -1,7 +1,6 @@
 package com.finalproject.finsera.finsera.repository;
 
 import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.model.entity.TransactionOtherBanks;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,10 +56,10 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
             @Param("bankAccounts") long bankAccounts
     );
 
-    @Query(value = "select distinct * from \"transaction\" t where transaction_information = 0 \n" +
-            "order by created_date desc limit 3;"
+    @Query(value = "select * from \"transaction\" t where transaction_information = 0 \n" +
+            "order by created_date;"
             , nativeQuery = true)
-    List<Transactions> getLastAccountTransaction();
+    List<Transactions> getLastAccountTransactionVA();
 
 //    @Query(value = "SELECT DISTINCT ON (t.from_account_number) t.* " +
 //                   "FROM transaction t " +
