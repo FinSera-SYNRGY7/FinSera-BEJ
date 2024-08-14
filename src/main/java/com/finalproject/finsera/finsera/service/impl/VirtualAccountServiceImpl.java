@@ -1,7 +1,5 @@
 package com.finalproject.finsera.finsera.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.finalproject.finsera.finsera.dto.virtualAccount.AccountLastTransactionResponseDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CheckVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CheckVirtualAccountResponseDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CreateVirtualAccountRequestDto;
@@ -16,7 +14,6 @@ import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
 import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -194,6 +191,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             transferVAResponse.setTransactionNum(transactionsNumber.getTransactionNumber());
             transferVAResponse.setRecipientName(virtualAccounts.getAccountName());
             transferVAResponse.setType(TransactionsType.VIRTUAL_ACCOUNT);
+            transferVAResponse.setRecipientVirtualAccountNum(transferVirtualAccountRequestDto.getVirtualAccountNumber());
             transferVAResponse.setNominal(transferVirtualAccount.getAmountTransfer().toString());
             transferVAResponse.setAdminFee(adminFee.toString());
 
