@@ -23,6 +23,7 @@ public class AppConfig {
         return new HttpComponentsClientHttpRequestFactory();
     }
 
+    @Bean
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
@@ -31,5 +32,7 @@ public class AppConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+
 }
 

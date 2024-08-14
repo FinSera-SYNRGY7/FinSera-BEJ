@@ -6,7 +6,6 @@ import java.util.*;
 // import java.util.Map;
 // import java.util.Optional;
 
-import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.dto.transaction.*;
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
@@ -30,7 +29,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
-import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.service.impl.TransactionServiceImpl;
 
 @Component
@@ -206,64 +204,4 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/virtual-account")
-    @Operation(summary = "Virtual Accounts", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransferVirtualAccountResponseDto.class), mediaType = "application/json") })
-    public ResponseEntity<Map<String, Object>> virtualAccount(@RequestHeader("Authorization") String token, @RequestBody TransferVirtualAccountRequestDto transferVirtualAccountRequestDto){
-        String jwt = token.substring("Bearer ".length());
-        Long userId = jwtUtil.getId(jwt);
-        BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(userId);
-        Optional<VirtualAccounts> accountDummyData = Optional.ofNullable(virtualAccountRepository.findByAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum()));
-
-        if (!accountDummyData.isPresent()){
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "recipient account not found");
-            response.put("data", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } else if (bankAccounts.getAmount() < transferVirtualAccountRequestDto.getNominal()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "your balance is insufficient");
-            response.put("data", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } else if (!bankAccounts.getMpinAccount().equals(transferVirtualAccountRequestDto.getMpinAccount())) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "your pin is invalid");
-            response.put("data", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        } else {
-            TransferVirtualAccountResponseDto transferVirtualAccount = transactionServiceImpl.transferVA(userId, transferVirtualAccountRequestDto);
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
-            response.put("data", transferVirtualAccount);
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-    }
-
-//    @PostMapping("/hello")
-//    public String hello(@RequestHeader("Authorization") String token, @RequestBody TransferVirtualAccountRequestDto transferVirtualAccountRequestDto){
-////        Long id = 1L;
-////        String accountNum = "1234567890";
-//
-//        String jwt = token.substring("Bearer ".length());
-//        Long id = jwtUtil.getId(jwt);
-//        System.out.println(id);
-//
-//        BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(id);
-//        System.out.println("customer id  = " + bankAccounts.getCustomer().getIdCustomers());
-//        System.out.println("customer name = " + bankAccounts.getAccountNumber());
-//
-//        AccountDummyData recipientVirtualAccount = accountDummyService.checkAccount(
-//                transferVirtualAccountRequestDto.getRecipientAccountNum()
-//        );
-//        System.out.println("to : " + recipientVirtualAccount.getAccountName());
-//        return "from : " + bankAccounts.getCustomer().getUsername() + "\n" + "to : " + recipientVirtualAccount.getAccountName();
-//    }
-
-    @PostMapping("/get-va")
-    public String getVA(@RequestParam String accountNum){
-        VirtualAccounts recipient = virtualAccountService.checkAccount(accountNum);
-        System.out.println(recipient.getAccountName());
-
-        return "account name " + recipient.getAccountName();
-    }
 }
