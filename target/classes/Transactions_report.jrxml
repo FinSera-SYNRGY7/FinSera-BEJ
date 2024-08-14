@@ -133,7 +133,7 @@
                 <box>
                     <pen lineWidth="0.5" lineStyle="Solid"/>
                 </box>
-                <imageExpression><![CDATA["https://s3-alpha-sig.figma.com/img/9025/99ab/4070dcb71bedd7f353ff14de2f79559b?Expires=1723420800&Key-Pair-Id=APKAQ4GOSFWCVNEHN3O4&Signature=p7s-Zq2j2TmT7QDVACu3JwgdpGw6mfuBUuklcCK53K~oDICSJ6B1S6qtDgnpZ2EbSpNr~UU9mmcgLJMf26SlKl0FIbpspwqoeHSgsSEQQ3T7sMVCdGQGDmCQMjge1ud6b4yaPFhouLWKWpiXvbbaB5WX0luVIAyzxLBGyTNWQeh~VjgWRu0xLCZJ~fQL~Qd7p-~a7GuVnLJtiaRH3lUSFxw-J5nk6A9bZ15XGTApEUWHeNaL-EjZDOAiCHBKcGamuarDimfybcMfvS2au65W1Nse-KN42GhWr4-boSDl1B1kH8VMTIhtEW3sKO9cGC3F42JImSNEtxpa3Z7gjUydwQ__"]]></imageExpression>
+                <imageExpression><![CDATA["https://res.cloudinary.com/dkjrt4bx2/image/upload/v1723612918/hxo2oto8oiq7muermsgg.png"]]></imageExpression>
             </image>
             <staticText>
                 <reportElement x="80" y="20" width="210" height="25" uuid="e622555d-198b-4ccd-a4a1-c59c53304058">
