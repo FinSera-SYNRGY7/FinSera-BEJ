@@ -78,18 +78,6 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             response.put("data", null);
             return ResponseEntity.badRequest().body(response);
         } else {
-////            Set<String> seenAccountNumbers = new HashSet<>();
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("message", "success");
-//            response.put("data", transactionsList.stream()
-////                    .filter(transactions -> !savedAccountList.isEmpty())
-////                    .filter(transactions -> seenAccountNumbers.add(transactions.getToAccountNumber()))
-//                    .map(transactions -> new AccountLastTransactionResponseDto(
-//                            virtualAccountRepository.findByVirtualAccountNumber(transactions.getToAccountNumber())
-//                                    .getAccountName(),
-//                            transactions.getToAccountNumber()
-//                    )).toList());
-
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
             response.put("data", transactionsList.stream()
