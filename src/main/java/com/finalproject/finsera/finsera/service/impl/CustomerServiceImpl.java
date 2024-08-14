@@ -159,27 +159,11 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
         if (!passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())) {
-            int newFailAttempts = customers.getFailedAttempt() + 1;
-            customers.setFailedAttempt(newFailAttempts);
-            customerRepository.save(customers);
-            if (customers.getFailedAttempt() > 3) {
-                customers.setStatusUser(StatusUser.INACTIVE);
-                customers.setBannedTime(Date.from(Instant.now()));
-                customerRepository.save(customers);
-
-                Map<String, Object> response = new HashMap<>();
-                response.put("data", null);
-                response.put("message", "Your account is banned, due to invalid pin more than 3 times");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-            }
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
             response.put("message", "Pin is invalid");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
-            customers.setFailedAttempt(0);
-            customers.setBannedTime(null);
-            customerRepository.save(customers);
             Map<String, Object> response = new HashMap<>();
             response.put("data", "Pin Valid");
             response.put("message", "Relogin Success");
