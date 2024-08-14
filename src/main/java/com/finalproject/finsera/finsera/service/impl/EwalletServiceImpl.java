@@ -3,6 +3,7 @@ package com.finalproject.finsera.finsera.service.impl;
 import com.finalproject.finsera.finsera.dto.ewallet.*;
 import com.finalproject.finsera.finsera.mapper.EwalletMapper;
 import com.finalproject.finsera.finsera.model.entity.*;
+import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.repository.*;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -63,13 +65,25 @@ public class EwalletServiceImpl implements EwalletService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor rekening tidak ditemukan");
         }
 
-        if (!(passwordEncoder.matches(ewalletRequest.getPin(), bankAccounts.getMpinAccount())))
-        {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin Anda Salah");
-        }
+
         int nominal = ewalletRequest.getNominal();
         if (bankAccounts.getAmount() - nominal < 0) {
             throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+        }
+        if (!(passwordEncoder.matches(ewalletRequest.getPin(), bankAccounts.getMpinAccount()))) {
+            int newFailAttempts = bankAccounts.getFailedAttempt() + 1;
+            bankAccounts.setFailedAttempt(newFailAttempts);
+            bankAccountsRepository.save(bankAccounts);
+            if (bankAccounts.getFailedAttempt() > 3) {
+                customers.get().setStatusUser(StatusUser.INACTIVE);
+                customers.get().setBannedTime(Date.from(Instant.now()));
+                customerRepository.save(customers.get());
+                throw new IllegalArgumentException("Your account is banned");
+            }
+            throw new IllegalArgumentException("Pin Anda Salah");
+        } else {
+            bankAccounts.setFailedAttempt(0);
+            bankAccountsRepository.save(bankAccounts);
         }
         TransactionsNumber transactionsNumber = new TransactionsNumber();
         transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());

@@ -4,6 +4,7 @@ import com.finalproject.finsera.finsera.dto.transaction.*;
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
 import com.finalproject.finsera.finsera.model.entity.*;
+import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
@@ -11,6 +12,8 @@ import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.service.TransactionService;
 import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.*;
@@ -38,9 +42,14 @@ public class TransactionServiceImpl implements TransactionService{
     @Autowired
     DateFormatterIndonesia dateFormatterIndonesia;
 
+    @Autowired
+    CustomerRepository customerRepository;
+
     @Transactional
     @Override
     public TransactionResponseDto placeTransactionsIntraBank(TransactionRequestDto transactionRequestDto, long idCustomers ){
+        Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(idCustomers)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionRequestDto.getAccountnum_recipient());
         if (!optionalBankAccountsReceiver.isPresent()) {
@@ -56,14 +65,25 @@ public class TransactionServiceImpl implements TransactionService{
         System.out.println(transactionRequestDto.getPin());
         System.out.println(bankAccountsSender.getMpinAccount());
 
-        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getCustomer().getMpinAuth())))
-        {
-            throw new IllegalArgumentException("Pin Anda Salah");
-        } 
+
         if (bankAccountsSender.getAmount()-transactionRequestDto.getNominal() <0) {
             throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
         }
-
+        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getMpinAccount()))) {
+            int newFailAttempts = bankAccountsSender.getFailedAttempt() + 1;
+            bankAccountsSender.setFailedAttempt(newFailAttempts);
+            bankAccountsRepository.save(bankAccountsSender);
+            if (bankAccountsSender.getFailedAttempt() > 3) {
+                customers.get().setStatusUser(StatusUser.INACTIVE);
+                customers.get().setBannedTime(Date.from(Instant.now()));
+                customerRepository.save(customers.get());
+                throw new IllegalArgumentException("Your account is banned");
+            }
+            throw new IllegalArgumentException("Pin Anda Salah");
+        } else {
+            bankAccountsSender.setFailedAttempt(0);
+            bankAccountsRepository.save(bankAccountsSender);
+        }
         // transactionNumber
         Random random = new Random();
         long randomLong = Math.abs(random.nextLong());
@@ -142,6 +162,8 @@ public class TransactionServiceImpl implements TransactionService{
     @Transactional
     @Override
     public TransactionOtherBankResponse placeTransactionsInterBank(TransactionOtherBankRequest transactionOtherBankRequest, long customerId){
+        Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(customerId);
         List<BankAccountsOtherBanks>  optionalBankAccountsReceiver = bankAccountsOtherBanksRepository.findBankAccountsByAccountNumberAndBankId( transactionOtherBankRequest.getAccountnum_recipient(), transactionOtherBankRequest.getBank_id());
         if (optionalBankAccountsReceiver.isEmpty()) {
@@ -172,6 +194,21 @@ public class TransactionServiceImpl implements TransactionService{
             throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
         }
 
+        if (!(passwordEncoder.matches(transactionOtherBankRequest.getPin(), bankAccountsSender.getMpinAccount()))) {
+            int newFailAttempts = bankAccountsSender.getFailedAttempt() + 1;
+            bankAccountsSender.setFailedAttempt(newFailAttempts);
+            bankAccountsRepository.save(bankAccountsSender);
+            if (bankAccountsSender.getFailedAttempt() > 3) {
+                customers.get().setStatusUser(StatusUser.INACTIVE);
+                customers.get().setBannedTime(Date.from(Instant.now()));
+                customerRepository.save(customers.get());
+                throw new IllegalArgumentException("Your account is banned");
+            }
+            throw new IllegalArgumentException("Pin Anda Salah");
+        } else {
+            bankAccountsSender.setFailedAttempt(0);
+            bankAccountsRepository.save(bankAccountsSender);
+        }
         // transactionNumber
         Random random = new Random();
         long randomLong = Math.abs(random.nextLong());

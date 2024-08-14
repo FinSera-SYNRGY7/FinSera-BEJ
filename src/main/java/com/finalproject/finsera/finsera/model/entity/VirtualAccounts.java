@@ -8,6 +8,7 @@ import lombok.Data;
 @Entity
 @Table(name = "virtual_account", schema = "public")
 public class VirtualAccounts extends BaseModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
