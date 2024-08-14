@@ -108,7 +108,7 @@ public class TransactionController {
     }
 
     @GetMapping("/transaction-intra/history")
-    @Operation(summary = "Transaction history intra-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Transaction history intra-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
     // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> historyTransaction(@RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
@@ -131,7 +131,7 @@ public class TransactionController {
     }
 
     @PostMapping(value ={"/transaction-inter/create"})
-    @Operation(summary = "Transaction inter-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Transaction inter-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionOtherBankResponse.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> createTransactionInter(@RequestHeader("Authorization") String token, @RequestBody TransactionOtherBankRequest transactionOtherBankRequest) {
         Map<String, Object> response = new HashMap<>();
@@ -161,7 +161,7 @@ public class TransactionController {
         }
     }
     @PostMapping(value ={"/transaction-inter/check"})
-    @Operation(summary = "Transaction check inter-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Transaction check inter-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckOtherBankResponse.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> checkTransactionInter(@RequestBody TransactionCheckOtherBankAccountRequest transactionCheckOtherBankAccountRequest) {
         Map<String, Object> response = new HashMap<>();
@@ -182,7 +182,7 @@ public class TransactionController {
     }
 
     @GetMapping("/transaction-inter/history")
-    @Operation(summary = "Transaction history inter-bank", security = @SecurityRequirement(name = "bearerAuth"))
+    @Operation(summary = "Transaction history inter-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
     // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> historyTransactionInterBank(@RequestHeader("Authorization") String token) {
         Map<String, Object> response = new HashMap<>();
