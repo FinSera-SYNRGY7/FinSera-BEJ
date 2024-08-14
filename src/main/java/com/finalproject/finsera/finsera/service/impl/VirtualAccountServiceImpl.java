@@ -52,6 +52,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         account.setVirtualAccountNumber(createVirtualAccountRequestDto.getAccountNumber());
         account.setAccountType(AccountType.VIRTUAL_ACCOUNT);
         account.setNominal(createVirtualAccountRequestDto.getNominal());
+//        account.setSavedAccount(false);
         virtualAccountRepository.save(account);
         return account;
     }
@@ -77,9 +78,11 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             response.put("data", null);
             return ResponseEntity.badRequest().body(response);
         } else {
+            Set<String> seenVirtualAccountNumbers = new HashSet<>();
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
             response.put("data", transactionsList.stream()
+                    .filter(transactions -> seenVirtualAccountNumbers.add(transactions.getToAccountNumber()))
                     .map(transactions -> new AccountLastTransactionResponseDto(
                       virtualAccountRepository.findByVirtualAccountNumber(transactions.getToAccountNumber()).getAccountName(),
                             transactions.getToAccountNumber()

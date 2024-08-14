@@ -56,8 +56,8 @@ public interface TransactionRepository extends JpaRepository<Transactions, Long>
             @Param("bankAccounts") long bankAccounts
     );
 
-    @Query(value = "select distinct * from \"transaction\" t where transaction_information = 0 \n" +
-            "order by created_date desc limit 3;"
+    @Query(value = "select * from \"transaction\" t where transaction_information = 0 \n" +
+            "order by created_date;"
             , nativeQuery = true)
     List<Transactions> getLastAccountTransactionVA();
 
