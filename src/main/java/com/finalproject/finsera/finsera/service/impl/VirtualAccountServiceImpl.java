@@ -1,6 +1,5 @@
 package com.finalproject.finsera.finsera.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finalproject.finsera.finsera.dto.virtualAccount.AccountLastTransactionResponseDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CheckVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CheckVirtualAccountResponseDto;
@@ -16,7 +15,6 @@ import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
 import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,40 +68,39 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         return transactionsList;
     }
 
-//    @Override
-//    public ResponseEntity<Map<String, Object>> getAccount() {
-//        List<Transactions> transactionsList = transactionRepository.getLastAccountTransaction();
-////        List<Transactions> savedAccountList = transactionsList.stream()
-////                .filter(transactions -> virtualAccountRepository
-////                        .findByVirtualAccountNumber(transactions.getToAccountNumber()).getSavedAccount())
-////                .toList();
-//
-//        if (transactionsList.isEmpty()){
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("message", "transaction not found");
-//            response.put("data", null);
-//            return ResponseEntity.badRequest().body(response);
-//        } else if (savedAccountList.isEmpty()) {
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("message", "transaction not found");
-//            response.put("data", null);
-//            return ResponseEntity.badRequest().body(response);
-//        } else {
-//            Set<String> seenAccountNumbers = new HashSet<>();
+    @Override
+    public ResponseEntity<Map<String, Object>> getLastTransactionAccountVA() {
+        List<Transactions> transactionsList = transactionRepository.getLastAccountTransactionVA();
+
+        if (transactionsList.isEmpty()){
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "transaction not found");
+            response.put("data", null);
+            return ResponseEntity.badRequest().body(response);
+        } else {
+////            Set<String> seenAccountNumbers = new HashSet<>();
 //            Map<String, Object> response = new HashMap<>();
 //            response.put("message", "success");
 //            response.put("data", transactionsList.stream()
 ////                    .filter(transactions -> !savedAccountList.isEmpty())
-//                    .filter(transactions -> seenAccountNumbers.add(transactions.getToAccountNumber()))
+////                    .filter(transactions -> seenAccountNumbers.add(transactions.getToAccountNumber()))
 //                    .map(transactions -> new AccountLastTransactionResponseDto(
 //                            virtualAccountRepository.findByVirtualAccountNumber(transactions.getToAccountNumber())
 //                                    .getAccountName(),
 //                            transactions.getToAccountNumber()
 //                    )).toList());
-//            return ResponseEntity.ok(response);
-//        }
-//
-//    }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "success");
+            response.put("data", transactionsList.stream()
+                    .map(transactions -> new AccountLastTransactionResponseDto(
+                      virtualAccountRepository.findByVirtualAccountNumber(transactions.getToAccountNumber()).getAccountName(),
+                            transactions.getToAccountNumber()
+                    )));
+            return ResponseEntity.ok(response);
+        }
+
+    }
 
     @Override
     public ResponseEntity<Map<String, Object>> checkVirtualAccount(CheckVirtualAccountRequestDto checkVirtualAccountRequestDto) {
