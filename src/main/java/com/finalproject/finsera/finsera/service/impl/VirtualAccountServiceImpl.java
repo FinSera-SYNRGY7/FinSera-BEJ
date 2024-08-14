@@ -52,7 +52,6 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         account.setVirtualAccountNumber(createVirtualAccountRequestDto.getAccountNumber());
         account.setAccountType(AccountType.VIRTUAL_ACCOUNT);
         account.setNominal(createVirtualAccountRequestDto.getNominal());
-//        account.setSavedAccount(false);
         virtualAccountRepository.save(account);
         return account;
     }
