@@ -76,7 +76,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             Map<String, Object> response = new HashMap<>();
             response.put("message", "transaction not found");
             response.put("data", null);
-            return ResponseEntity.badRequest().body(response);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
             Set<String> seenVirtualAccountNumbers = new HashSet<>();
             Map<String, Object> response = new HashMap<>();
@@ -87,7 +87,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
                       virtualAccountRepository.findByVirtualAccountNumber(transactions.getToAccountNumber()).getAccountName(),
                             transactions.getToAccountNumber()
                     )));
-            return ResponseEntity.ok(response);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
     }
@@ -180,6 +180,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             transferVAResponse.setTransactionDate(DateFormatterIndonesia.dateFormatterIND(Date.from(Instant.now())));
             transferVAResponse.setTransactionNum(transactionsNumber.getTransactionNumber());
             transferVAResponse.setRecipientName(virtualAccounts.getAccountName());
+            transferVAResponse.setRecipientVirtualAccountNum(virtualAccounts.getVirtualAccountNumber());
             transferVAResponse.setType(TransactionsType.VIRTUAL_ACCOUNT);
             transferVAResponse.setNominal(transferVirtualAccount.getAmountTransfer().toString());
             transferVAResponse.setAdminFee(adminFee.toString());
