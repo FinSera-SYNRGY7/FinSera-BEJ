@@ -101,3 +101,5 @@ esrc/main/java/com/finalproject/finsera/finsera/dto/virtualAccount/CheckVirtualA
 Msrc/main/java/com/finalproject/finsera/finsera/model/entity/BankAccounts.java,6\f\6ffc7503604d93e3003966bd0f25703804bd5c50
 �
 Wsrc/main/java/com/finalproject/finsera/finsera/model/entity/BankAccountsOtherBanks.java,9\6\967b46f3bb855822f2c299020f6d2901accffb9a
+�
+hsrc/main/java/com/finalproject/finsera/finsera/dto/virtualAccount/AccountLastTransactionResponseDto.java,3\0\30ab88cc8089a5da321fc20955d8c6d3af73c708

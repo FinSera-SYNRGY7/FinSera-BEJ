@@ -33,7 +33,7 @@ public class VirtualAccountController {
     @Autowired
     JwtUtil jwtUtil;
 
-    @PostMapping("create-virtual-account")
+    @PostMapping("/create-virtual-account")
     @Operation(summary = "Create Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<VirtualAccounts> create(@RequestBody CreateVirtualAccountRequestDto createVirtualAccountRequestDto){
         VirtualAccounts virtualAccounts = virtualAccountService.createVirtualAccount(createVirtualAccountRequestDto);
@@ -45,12 +45,13 @@ public class VirtualAccountController {
 //        return ResponseEntity.ok(virtualAccountService.getAll());
 //    }
 
-//    @GetMapping("account-last-transaction")
-//    public ResponseEntity<Map<String, Object>> getAccount(){
-//        return virtualAccountService.getAccount();
-//    }
+    @GetMapping("/va-last-transaction")
+    @Operation(summary = "Last Transactions Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Map<String, Object>> getAccount(){
+        return virtualAccountService.getLastTransactionAccountVA();
+    }
 
-    @PostMapping("check-virtual-account")
+    @PostMapping("/check-virtual-account")
     @Operation(summary = "Check Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<Map<String, Object>> checkVirtualAccount(@RequestBody CheckVirtualAccountRequestDto checkVirtualAccountRequestDto){
         return virtualAccountService.checkVirtualAccount(checkVirtualAccountRequestDto);

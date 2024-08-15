@@ -15,7 +15,7 @@ public interface VirtualAccountService {
     VirtualAccounts createVirtualAccount(CreateVirtualAccountRequestDto createVirtualAccountRequestDto);
     BankAccounts checkBankAccount(Long id);
     List<Transactions> getAll();
-//    ResponseEntity<Map<String, Object>> getAccount();
+    ResponseEntity<Map<String, Object>> getLastTransactionAccountVA();
     ResponseEntity<Map<String, Object>> checkVirtualAccount(CheckVirtualAccountRequestDto checkVirtualAccountRequestDto);
     ResponseEntity<Map<String, Object>> transferVA(Long id,
                                                  TransferVirtualAccountRequestDto transferVirtualAccountRequestDto);
