@@ -48,26 +48,32 @@ public class MutasiMapper {
         amount.setAmount(transaction.getAmountTransfer());
         amount.setCurrency("IDR");
         String toNameAccountNumber;
+        String toBankName;
         Optional<BankAccounts> bankAccounts = bankAccountsRepository.findByAccountNumber(transaction.getToAccountNumber());
         if (transaction.getType().equals(TransactionsType.SESAMA_BANK)) {
             toNameAccountNumber = bankAccounts.get().getCustomer().getName();
+            toBankName = "BCA";
         } else if (transaction.getType().equals(TransactionsType.VIRTUAL_ACCOUNT)) {
             VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(transaction.getToAccountNumber());
             toNameAccountNumber = virtualAccounts.getAccountName();
+            toBankName = "BCA";
         } else if (transaction.getType().equals(TransactionsType.TOP_UP_EWALLET)) {
             Optional<EwalletAccounts> ewalletAccounts = Optional.ofNullable(ewalletAccountsRepository.findByEwalletAccountNumber(transaction.getToAccountNumber())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ewallet account not found")));
             toNameAccountNumber = ewalletAccounts.get().getName();
+            toBankName = ewalletAccounts.get().getEwallet().getEwalletName();
         } else {
             Optional<BankAccountsOtherBanks> bankAccountsOtherBanks = Optional.ofNullable(bankAccountsOtherBanksRepository.findByAccountNumber(transaction.getToAccountNumber())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Not Found")));
             toNameAccountNumber = bankAccountsOtherBanks.get().getName();
+            toBankName = bankAccountsOtherBanks.get().getBanks().getBankName();
         }
         return MutasiResponseDto.builder()
                 .transactionId(transaction.getIdTransaction())
                 .noTransaction(transaction.getTransactionsNumber().getTransactionNumber())
                 .transactionDate(transaction.getCreatedDate())
                 .destinationNameAccountNumber(toNameAccountNumber)
+                .destinationBankName(toBankName)
                 .amountTransfer(amount)
                 .transactionInformation(transaction.getTransactionInformation())
                 .transactionsType(transaction.getType())
