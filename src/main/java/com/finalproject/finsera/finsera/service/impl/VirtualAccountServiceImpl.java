@@ -152,6 +152,11 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             response.put("data", null);
             response.put("message", "Pin is Invalid");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        } else if (virtualAccounts.getNominal() > senderBankAccount.getAmount()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("data", null);
+            response.put("message", "Your amount is insufficient");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
             senderBankAccount.setFailedAttempt(0);
             bankAccountsRepository.save(senderBankAccount);
@@ -159,7 +164,6 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             TransactionsNumber transactionsNumber = new TransactionsNumber();
             transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
             transactionNumberRepository.save(transactionsNumber);
-            Double adminFee = 2500.0;
 
             //sender transaction
             Transactions transferVirtualAccount = new Transactions();
@@ -183,7 +187,6 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             transferVAResponse.setRecipientVirtualAccountNum(virtualAccounts.getVirtualAccountNumber());
             transferVAResponse.setType(TransactionsType.VIRTUAL_ACCOUNT);
             transferVAResponse.setNominal(transferVirtualAccount.getAmountTransfer().toString());
-            transferVAResponse.setAdminFee(adminFee.toString());
 
             Map<String, Object> response = new HashMap<>();
             response.put("message", "success");
