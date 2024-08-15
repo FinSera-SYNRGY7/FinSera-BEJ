@@ -11,5 +11,4 @@ public class TransferVirtualAccountResponseDto {
     TransactionsType type;
     String recipientVirtualAccountNum;
     String nominal;
-    String adminFee;
 }
