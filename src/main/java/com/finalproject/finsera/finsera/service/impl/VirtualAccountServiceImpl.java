@@ -161,6 +161,9 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             senderBankAccount.setFailedAttempt(0);
             bankAccountsRepository.save(senderBankAccount);
 
+            customers.setBannedTime(null);
+            customerRepository.save(customers);
+
             TransactionsNumber transactionsNumber = new TransactionsNumber();
             transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
             transactionNumberRepository.save(transactionsNumber);
