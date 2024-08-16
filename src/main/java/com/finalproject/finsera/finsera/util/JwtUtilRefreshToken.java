@@ -20,10 +20,6 @@ import java.util.function.Function;
 @Slf4j
 @Service
 public class JwtUtilRefreshToken {
-
-    @Autowired
-    private CustomerRepository customerRepository;
-
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
