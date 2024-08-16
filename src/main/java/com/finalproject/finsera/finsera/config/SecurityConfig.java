@@ -54,6 +54,7 @@ public class SecurityConfig implements WebMvcConfigurer {
                             auth.anyRequest().authenticated();
                         }
                 )
+
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);
