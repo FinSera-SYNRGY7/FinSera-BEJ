@@ -26,9 +26,6 @@ public class JwtUtil {
     @Autowired
     private CustomerRepository customerRepository;
 
-    @Autowired
-    GlobalExceptionHandlers globalExceptionHandlers;
-
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 

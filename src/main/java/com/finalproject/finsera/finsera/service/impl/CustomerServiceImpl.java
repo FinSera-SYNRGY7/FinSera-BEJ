@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
+import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.customer.ForgotMpinRequestDto;
 import com.finalproject.finsera.finsera.dto.login.*;
 import com.finalproject.finsera.finsera.dto.qris.QrisResponseDto;
@@ -117,35 +118,51 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-        Optional<Customers> optionalCustomers = customerRepository.findByUsername(loginRequestDto.getUsername());
-        Customers customers = optionalCustomers.get();
-        Authentication authentication = authenticationManager.authenticate(
+        Optional<Customers> customer = Optional.ofNullable(customerRepository.findByUsername(loginRequestDto.getUsername()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username or Password is invalid")
+        ));
+        Customers customers = customer.get();
+
+        if (!passwordEncoder.matches(loginRequestDto.getPassword(), customers.getPassword())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username or Password is invalid");
+        } else if (customer.get().getStatusUser() == StatusUser.INACTIVE) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your account is inactive");
+        } else {
+            Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequestDto.getUsername(),
                             loginRequestDto.getPassword()
                     ));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtUtil.generateToken(authentication);
-        String refreshToken = jwtUtilRefreshToken.generateRefreshToken(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        customers.setStatusUser(StatusUser.ACTIVE);
-        customerRepository.save(customers);
-        LoginResponseDto loginResponseDto = new LoginResponseDto(
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String token = jwtUtil.generateToken(authentication);
+            String refreshToken = jwtUtilRefreshToken.generateRefreshToken(authentication);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            customers.setStatusUser(StatusUser.ACTIVE);
+            customerRepository.save(customers);
+            LoginResponseDto loginResponseDto = new LoginResponseDto(
                     token, refreshToken, userDetails.getIdCustomers(), customers.getStatusUser()
             );
 
-        return loginResponseDto;
+            return loginResponseDto;
+        }
     }
 
     @Override
     public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto refreshTokenRequestDto) {
-        //TODO validate present or not
-        //TODO validate active or inactive
         String username = jwtUtilRefreshToken.getUsername(refreshTokenRequestDto.getRefreshToken());
         String token = jwtUtil.generateTokenFromUsername(username);
-        RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
-        refreshTokenResponseDto.setAccessToken(token);
-        return refreshTokenResponseDto;
+        Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
+        ));
+
+        if (customers.get().getStatusUser() == StatusUser.INACTIVE){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your account is inactive");
+        } else {
+            RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
+            refreshTokenResponseDto.setAccessToken(token);
+            return refreshTokenResponseDto;
+        }
+
     }
 
     @Override

@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandlers {
@@ -25,20 +27,17 @@ public class GlobalExceptionHandlers {
                 .body(BaseResponse.failure(HttpStatus.UNAUTHORIZED.value(), errorMessage));
     }
 
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, WebRequest request){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponse.failure(404, "URL Not Found"));
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<BaseResponse<String>> constraintViolationException(ConstraintViolationException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(BaseResponse.failure(HttpStatus.BAD_REQUEST.value(), exception.getMessage()));
     }
-
-//    @ExceptionHandler(Exception.class)
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ResponseEntity<BaseResponse<String>> handleGeneralException(Exception exception) {
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                .body(BaseResponse.failure(HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.toString()));
-//    }
-
 
     @ExceptionHandler(ResponseStatusException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

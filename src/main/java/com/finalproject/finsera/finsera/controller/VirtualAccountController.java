@@ -27,9 +27,6 @@ import java.util.Map;
 @Tag(name = "Virtual Account Controller", description = "API untuk operasi virtual account")
 public class VirtualAccountController {
     @Autowired
-    BankAccountsRepository bankAccountsRepository;
-
-    @Autowired
     VirtualAccountService virtualAccountService;
 
     @Autowired
@@ -41,11 +38,6 @@ public class VirtualAccountController {
         VirtualAccounts virtualAccounts = virtualAccountService.createVirtualAccount(createVirtualAccountRequestDto);
         return ResponseEntity.ok(virtualAccounts);
     }
-
-//    @GetMapping("all-transaction")
-//    public ResponseEntity<List<Transactions>> get(){
-//        return ResponseEntity.ok(virtualAccountService.getAll());
-//    }
 
     @GetMapping("/va-last-transaction")
     @Operation(summary = "Last Transactions Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
