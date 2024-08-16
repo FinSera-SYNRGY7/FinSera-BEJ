@@ -45,7 +45,6 @@ public class AuthController {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
-
     //ignore register service
     @PostMapping(value = {"user/register", "user/register/"})
     @Operation(summary = "Registrasi User (done)")
