@@ -40,19 +40,7 @@ public class AuthController {
     CustomerService customerService;
 
     @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
     JwtUtil jwtUtil;
-
-    @Autowired
-    JwtUtilRefreshToken jwtUtilRefreshToken;
-
-    @Autowired
-    CustomerRepository customerRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -77,47 +65,12 @@ public class AuthController {
     @Operation(summary = "Login user (done)")
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = LoginExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<Object> login(@RequestBody LoginRequestDto loginRequestDto){
-        Optional<Customers> customer = Optional.ofNullable(customerRepository.findByUsername(loginRequestDto.getUsername()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "username or password invalid")
-        ));
-        if (customer.get().getStatusUser() == StatusUser.INACTIVE){
-            return ResponseEntity.badRequest().body(BaseResponse.failure(400, "your account is inactive"));
-        }
-
-        if (!loginRequestDto.getUsername().equals(customer.get().getUsername())){
-            return ResponseEntity.badRequest().body(BaseResponse.failure(400, "username or password invalid"));
-        } else if (!passwordEncoder.matches(loginRequestDto.getPassword(), customer.get().getPassword())) {
-            return ResponseEntity.badRequest().body(BaseResponse.failure(400, "username or password invalid"));
-        } else {
-            LoginResponseDto login = customerService.login(loginRequestDto);
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Login success");
-            response.put("data", login);
-            return ResponseEntity.ok(BaseResponse.success(login, "login success"));
-        }
+         LoginResponseDto login = customerService.login(loginRequestDto);
+         Map<String, Object> response = new HashMap<>();
+         response.put("message", "Login success");
+         response.put("data", login);
+         return ResponseEntity.ok(BaseResponse.success(login, "login success"));
     }
-
-//    @PostMapping(value = {"/relogin", "/relogin/"})
-//    @Operation(summary = "Relogin user", security = @SecurityRequirement(name = "bearerAuth"))
-//    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = ReloginExampleSwagger.class), mediaType = "application/json") })
-//    public ResponseEntity<Map<String, Object>> relogin(@RequestHeader("Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
-//        String jwt = token.substring("Bearer ".length());
-//        String username = jwtUtil.getUsername(jwt);
-//        String relogin = customerService.relogin(username, reloginRequestDto);
-//        Customers customers = customerRepository.findByUsername(username).get();
-//
-//        if (customers.getMpin().equals(reloginRequestDto.getMpin())){
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("message", "Relogin Success");
-//            response.put("data", relogin);
-//            return new ResponseEntity<>(response, HttpStatus.OK);
-//        } else {
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("message", "Pin is invalid");
-//            response.put("data", null);
-//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//        }
-//    }
 
     @PostMapping(value = {"/relogin", "/relogin/"})
     @Operation(summary = "Relogin user (done)", security = @SecurityRequirement(name = "bearerAuth"))
@@ -132,16 +85,8 @@ public class AuthController {
     @Operation(summary = "Refresh Token (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = RefreshTokenResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Object> relogin(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto){
-        String username = jwtUtilRefreshToken.getUsername(refreshTokenRequestDto.getRefreshToken());
-        Customers customers = customerRepository.findByUsername(username).get();
-        if (!customerRepository.existsById(customers.getIdCustomers())){
-            return ResponseEntity.ok(BaseResponse.failure(400, "user not found"));
-        } else if (customers.getStatusUser().equals(StatusUser.INACTIVE)) {
-            return ResponseEntity.ok(BaseResponse.failure(400, "your account is inactive"));
-        } else {
-            RefreshTokenResponseDto refreshTokenResponseDto = customerService.refreshToken(refreshTokenRequestDto);
-            return ResponseEntity.ok(BaseResponse.success(refreshTokenResponseDto, "accessToken"));
-        }
+        RefreshTokenResponseDto response = customerService.refreshToken(refreshTokenRequestDto);
+        return ResponseEntity.ok(BaseResponse.success(response, "accessToken"));
     }
 
     @PostMapping(value = {"/user/forgot-mpin", "/user/forgot-mpin/"})
