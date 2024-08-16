@@ -52,7 +52,6 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         account.setVirtualAccountNumber(createVirtualAccountRequestDto.getAccountNumber());
         account.setAccountType(AccountType.VIRTUAL_ACCOUNT);
         account.setNominal(createVirtualAccountRequestDto.getNominal());
-//        account.setSavedAccount(false);
         virtualAccountRepository.save(account);
         return account;
     }
@@ -122,7 +121,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "your account is inactive");
+            response.put("message", "Your account is inactive");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
@@ -150,7 +149,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             }
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "Pin is Invalid");
+            response.put("message", "Pin is invalid");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else if (virtualAccounts.getNominal() > senderBankAccount.getAmount()) {
             Map<String, Object> response = new HashMap<>();
