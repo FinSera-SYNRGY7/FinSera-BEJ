@@ -14,5 +14,6 @@ public class EwalletResponse {
     private String ewalletAccountName;
     private String ewalletAccount;
     private String nominal;
+    private String feeAdmin;
     private String note;
 }
