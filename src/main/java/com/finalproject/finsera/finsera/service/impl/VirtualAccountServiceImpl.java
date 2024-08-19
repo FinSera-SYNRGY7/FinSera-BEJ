@@ -14,6 +14,7 @@ import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
 import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
+import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.*;
@@ -72,10 +74,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         List<Transactions> transactionsList = transactionRepository.getLastAccountTransactionVA();
 
         if (transactionsList.isEmpty()){
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Transaksi tidak ditemukan");
-            response.put("data", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Transaksi tidak ditemukan");
         } else {
             Set<String> seenVirtualAccountNumbers = new HashSet<>();
             Map<String, Object> response = new HashMap<>();
@@ -96,10 +95,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(checkVirtualAccountRequestDto.getVirtualAccountNumber());
 
         if (virtualAccounts == null){
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "Virtual Account tidak ditemukan");
-            response.put("data", null);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Virtual Account tidak ditemukan");
         } else {
             CheckVirtualAccountResponseDto responseVirtualAccount = new CheckVirtualAccountResponseDto();
             responseVirtualAccount.setAccountNum(virtualAccounts.getVirtualAccountNumber());
@@ -119,10 +115,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
                                                         TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
         Customers customers = customerRepository.findById(id).get();
         if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", null);
-            response.put("message", "Akun anda tidak aktif!");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda tidak aktif");
         }
 
         BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
@@ -142,20 +135,11 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
                 customers.setBannedTime(Date.from(Instant.now()));
                 customerRepository.save(customers);
 
-                Map<String, Object> response = new HashMap<>();
-                response.put("data", null);
-                response.put("message", "Akun anda terblokir!");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda terblokir");
             }
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", null);
-            response.put("message", "Pin yang anda masukkan salah!");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Pin yang anda masukkan salah");
         } else if (virtualAccounts.getNominal() > senderBankAccount.getAmount()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", null);
-            response.put("message", "Saldo anda tidak cukup");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
         } else {
             senderBankAccount.setFailedAttempt(0);
             bankAccountsRepository.save(senderBankAccount);

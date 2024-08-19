@@ -72,31 +72,29 @@ public class MutasiServiceImpl implements MutasiService {
         Page<Transactions> filteredTransactions;
 
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
 
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
         if (bankAccounts == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Number not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening tidak ditemukan");
         }
         if (bankAccounts.getCustomer() == customers.get()) {
             if(startDate != null && endDate != null) {
-                log.info("start and end date: {}");
                 filteredTransactions = transactionRepository.findAllByBankAccountsAndCreatedDateWithPage(startDate, endDate, bankAccounts.getIdBankAccounts(), pageable)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan"));
             } else {
-                log.info("else: {}");
                 filteredTransactions = transactionRepository.findAllByBankAccounts(bankAccounts, pageable)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan"));
             }
 
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Number not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening tidak ditemukan");
         }
 
 
         assert filteredTransactions != null;
         if(filteredTransactions.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
         } else if (filteredTransactions.stream().toList().size() > 10) {
             return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList().subList(0, 10));
         } else {
@@ -108,18 +106,18 @@ public class MutasiServiceImpl implements MutasiService {
     public byte[] transactionsReport(String username, Timestamp startDate, Timestamp endDate) {
         List<TransactionsReportJasperDto> itemsTransactions = new ArrayList<>();
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Username not found")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
         List<Transactions> transactions;
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
         if(startDate != null && endDate != null) {
             transactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan"));
             for(var i = 0; i < transactions.size(); i++){
                 toResponseJasperDto(itemsTransactions, transactions, i);
             }
         } else {
             transactions = transactionRepository.findAllByBankAccountsOrderByCreatedDateDesc(bankAccounts)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Transaction not found"));
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan"));
             if(transactions.size() > 10) {
                 for(var i = 0; i < 10; i++){
                     toResponseJasperDto(itemsTransactions, transactions, i);
@@ -131,59 +129,6 @@ public class MutasiServiceImpl implements MutasiService {
             }
 
         }
-
-
-//        try {
-//            jasperReport = (JasperReport)
-//                    JRLoader.loadObject(ResourceUtils.getFile("classpath:Transactions_report.jasper"));
-//        } catch (FileNotFoundException | JRException e) {
-//            try {
-//                File file = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
-//                jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
-//                JRSaver.saveObject(jasperReport, "Transactions_report.jasper");
-//            } catch (FileNotFoundException | JRException ex) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-
-//        try {
-//            File reportDirectory = new File("src/main/resources/");
-//            if (!reportDirectory.exists()) {
-//                reportDirectory.mkdirs(); // Membuat folder jika belum ada
-//            }
-//            File jasperFile = new File(reportDirectory, "Transactions_report.jasper");
-//            if (jasperFile.exists()) {
-//                jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
-//            } else {
-//                File file = ResourceUtils.getFile("classpath:Transactions_report.jrxml");
-//                jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
-//                JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
-//            }
-//        } catch (FileNotFoundException | JRException e) {
-//            throw new RuntimeException(e);
-//        }
-
-//        try {
-//            File tempDir = new File(System.getProperty("java.io.tmpdir"));
-//            File jasperFile = new File(tempDir, "Transactions_report.jasper");
-//
-//            if (jasperFile.exists()) {
-//                jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
-//            } else {
-//                try (InputStream jrxmlStream = getClass().getClassLoader().getResourceAsStream("Transactions_report.jrxml")) {
-//                    if (jrxmlStream == null) {
-//                        throw new RuntimeException("File Transactions_report.jrxml not found in classpath");
-//                    }
-//
-//                    jasperReport = JasperCompileManager.compileReport(jrxmlStream);
-//                    JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
-//                } catch (IOException e) {
-//                    throw new RuntimeException("Failed to read resource: " + e.getMessage(), e);
-//                }
-//            }
-//        } catch (JRException e) {
-//            throw new RuntimeException("JasperReports exception: " + e.getMessage(), e);
-//        }
         JasperReport jasperReport;
         try {
             File tempDir = new File(System.getProperty("java.io.tmpdir"));
@@ -191,19 +136,19 @@ public class MutasiServiceImpl implements MutasiService {
 
             if (jasperFile.exists()) {
                 if (!jasperFile.delete()) {
-                    throw new RuntimeException("Failed to delete existing Jasper file");
+                    throw new RuntimeException("Gagal menghapus file jesper yang sudah ada");
                 }
             }
 
             try (InputStream jrxmlStream = getClass().getClassLoader().getResourceAsStream("Transactions_report.jrxml")) {
                 if (jrxmlStream == null) {
-                    throw new RuntimeException("File Transactions_report.jrxml not found in classpath");
+                    throw new RuntimeException("File Transactions_report.jrxml tidak ditemukan di classpath");
                 }
 
                 jasperReport = JasperCompileManager.compileReport(jrxmlStream);
                 JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
             } catch (IOException e) {
-                throw new RuntimeException("Failed to read resource: " + e.getMessage(), e);
+                throw new RuntimeException("Gagal membaca resource: " + e.getMessage(), e);
             }
         } catch (JRException e) {
             throw new RuntimeException("JasperReports exception: " + e.getMessage(), e);

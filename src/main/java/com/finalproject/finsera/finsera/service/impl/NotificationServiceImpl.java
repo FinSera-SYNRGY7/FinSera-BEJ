@@ -39,19 +39,17 @@ public class NotificationServiceImpl  implements NotificationService {
     NotificationMapper notificationMapper;
     @Override
     public List<NotificationResponseDto> getNotif(Long userId) {
-
-        List<NotificationResponseDto> itemNotif = new ArrayList<>();
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
 
 
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
         if(bankAccounts == null){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bank Account not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor rekening tidak ditemukan");
         }
 
         List<Transactions> transactions = transactionRepository.findAllByBankAccountsOrderByCreatedDateDesc(bankAccounts)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Trasactions not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan"));
 
         if(transactions.size() <= 10) {
             return notificationMapper.toNotificationsResponse(transactions);
