@@ -78,7 +78,7 @@ public class EwalletServiceImpl implements EwalletService {
                 customers.get().setStatusUser(StatusUser.INACTIVE);
                 customers.get().setBannedTime(Date.from(Instant.now()));
                 customerRepository.save(customers.get());
-                throw new IllegalArgumentException("Your account is banned");
+                throw new IllegalArgumentException("Akun anda terblokir");
             }
             throw new IllegalArgumentException("Pin Anda Salah");
         } else {
