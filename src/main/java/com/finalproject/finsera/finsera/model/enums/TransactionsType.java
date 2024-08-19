@@ -5,5 +5,6 @@ public enum TransactionsType {
     ANTAR_BANK,
     VIRTUAL_ACCOUNT,
     TOP_UP_EWALLET,
+    QRIS
 
 }

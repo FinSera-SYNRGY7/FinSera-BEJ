@@ -84,20 +84,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customers.getMpinAuth();
     }
 
-    @Override
-    public QrisResponseDto generateQris(String username) {
-        Optional<Customers> optionalCustomer = customerRepository.findByUsername(username);
 
-        if (optionalCustomer.isPresent()) {
-            Customers customers = optionalCustomer.get();
-            QrisResponseDto response = new QrisResponseDto();
-            response.setAccountNumber(customers.getBankAccounts().get(0).getAccountNumber());
-            response.setUsername(customers.getUsername());
-            return response;
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
-        }
-    }
 
     @Override
     public Customers updateMpin(String username, String newMpin){

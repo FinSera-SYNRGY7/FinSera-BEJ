@@ -180,10 +180,6 @@ public class TransactionServiceImpl implements TransactionService{
         //
         // }
 
-        if (!(passwordEncoder.matches(transactionOtherBankRequest.getPin(), bankAccountsSender.getMpinAccount())))
-        {
-            throw new IllegalArgumentException("Pin Anda Salah");
-        }
         int nominal = transactionOtherBankRequest.getNominal()+2500;
         if (bankAccountsSender.getAmount()-nominal <0) {
             throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
