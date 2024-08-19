@@ -86,7 +86,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Customers> optionalCustomers = customerRepository.findByUsername(username);
 
         if (!optionalCustomers.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User tidak ditemukan");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan");
         }
         Customers customer = optionalCustomers.get();
         if (passwordEncoder.matches(newMpin, customer.getMpinAuth())) {
@@ -101,14 +101,14 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         Optional<Customers> customer = Optional.ofNullable(customerRepository.findByUsername(loginRequestDto.getUsername()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username atau password yang Anda masukkan salah!")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")
         ));
         Customers customers = customer.get();
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), customers.getPassword())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username atau password yang anda masukkan salah!");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username atau password yang anda masukkan salah!");
         } else if (customer.get().getStatusUser() == StatusUser.INACTIVE) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Akun anda tidak aktif!");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda tidak aktif!");
         } else {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -134,11 +134,11 @@ public class CustomerServiceImpl implements CustomerService {
         String username = jwtUtilRefreshToken.getUsername(refreshTokenRequestDto.getRefreshToken());
         String token = jwtUtil.generateTokenFromUsername(username);
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User tidak ditemukan")
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")
         ));
 
         if (customers.get().getStatusUser() == StatusUser.INACTIVE){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Akun anda tidak aktif");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda tidak aktif");
         } else {
             RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
             refreshTokenResponseDto.setAccessToken(token);
@@ -154,14 +154,14 @@ public class CustomerServiceImpl implements CustomerService {
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
             response.put("message", "Akun anda tidak aktif");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
 
         if (!passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())) {
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
             response.put("message", "Pin yang anda masukkan salah!");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         } else {
             Map<String, Object> response = new HashMap<>();
             response.put("data", "Pin valid");
@@ -178,12 +178,12 @@ public class CustomerServiceImpl implements CustomerService {
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
             response.put("message", "Password yang anda masukkan salah!");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         } else if (!forgotMpinRequestDto.getNewMpin().equalsIgnoreCase(forgotMpinRequestDto.getConfirmNewMpin())) {
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
             response.put("message", "MPin yang anda masukkan salah!");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         } else {
             customers.setPassword(passwordEncoder.encode(forgotMpinRequestDto.getPassword()));
             customers.setMpinAuth(passwordEncoder.encode(forgotMpinRequestDto.getNewMpin()));

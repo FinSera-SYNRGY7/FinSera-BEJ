@@ -63,17 +63,17 @@ public class QrisServiceImpl implements QrisService {
             response.setUsername(customers.getUsername());
             return response;
         } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan");
         }
     }
 
     @Override
     public QrisMerchantResponseDto merchnatQris(long customerId, QrisMerchantRequestDto qrisMerchantRequestDto) {
         Customers customers = customerRepository.findById(customerId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
         BankAccounts bankAccountsSender = bankAccountsRepository.findByCustomerId(customerId);
         if (bankAccountsSender.getAmount() - qrisMerchantRequestDto.getNominal() < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Saldo Anda Tidak Cukup");
+            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
         }
         if (!(passwordEncoder.matches(qrisMerchantRequestDto.getPin(), bankAccountsSender.getMpinAccount()))) {
             int newFailAttempts = bankAccountsSender.getFailedAttempt() + 1;
@@ -83,9 +83,9 @@ public class QrisServiceImpl implements QrisService {
                 customers.setStatusUser(StatusUser.INACTIVE);
                 customers.setBannedTime(Date.from(Instant.now()));
                 customerRepository.save(customers);
-                throw new IllegalArgumentException("Your account is banned");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Akun anda terblokir");
             }
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin Anda Salah");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Pin yang anda masukkan salah");
         } else {
             bankAccountsSender.setFailedAttempt(0);
             bankAccountsRepository.save(bankAccountsSender);

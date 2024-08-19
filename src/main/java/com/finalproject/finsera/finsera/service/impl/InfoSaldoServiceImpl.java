@@ -35,7 +35,7 @@ public class InfoSaldoServiceImpl implements InfoSaldoService {
         validationService.validate(username);
 
         Customers customers = customersRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer Tidak Ditemukan"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Tidak Ditemukan"));
 
         Optional<BankAccounts> bankAccounts = Optional.ofNullable(infoSaldoRepository.findByCustomer(customers)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening Tidak Ditemukan")));

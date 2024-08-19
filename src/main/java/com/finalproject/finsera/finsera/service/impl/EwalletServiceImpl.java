@@ -54,11 +54,11 @@ public class EwalletServiceImpl implements EwalletService {
     @Transactional
     public EwalletResponse createEwalletTransactions(long idCustomers, EwalletRequest ewalletRequest) {
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(idCustomers)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Customer tidak ditemukan")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
         Optional<Ewallet> ewallet = Optional.ofNullable(ewalletRepository.findById(ewalletRequest.getEwalletId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ewallet tidak ditemukkan")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "E-Wallet tidak ditemukkan")));
         Optional<EwalletAccounts> ewalletAccounts = Optional.ofNullable(ewalletAccountsRepository.findByEwalletAndEwalletAccountNumber(ewallet.get(), ewalletRequest.getEwalletAccount())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ewallet account tidak ditemukan")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor E-Wallet tidak ditemukan")));
 
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
         if(bankAccounts == null) {
@@ -78,9 +78,9 @@ public class EwalletServiceImpl implements EwalletService {
                 customers.get().setStatusUser(StatusUser.INACTIVE);
                 customers.get().setBannedTime(Date.from(Instant.now()));
                 customerRepository.save(customers.get());
-                throw new IllegalArgumentException("Akun anda terblokir");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda terblokir");
             }
-            throw new IllegalArgumentException("Pin Anda Salah");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Pin yang anda masukkan salah");
         } else {
             bankAccounts.setFailedAttempt(0);
             bankAccountsRepository.save(bankAccounts);
@@ -119,7 +119,7 @@ public class EwalletServiceImpl implements EwalletService {
         Optional<Ewallet> ewallet = Optional.ofNullable(ewalletRepository.findById(ewalletCheckAccountRequest.getEwalletId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "E-wallet tidak ditemukkan")));
         Optional<EwalletAccounts> ewalletAccount = Optional.ofNullable(ewalletAccountsRepository.findByEwalletAndEwalletAccountNumber(ewallet.get(), ewalletCheckAccountRequest.getEwalletAccount())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor e-wallet tidak ditemukkan")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor E-wallet tidak ditemukkan")));
 
         return ewalletMapper.toEwalletResponse(ewalletAccount.get());
     }
@@ -129,7 +129,7 @@ public class EwalletServiceImpl implements EwalletService {
         List<Ewallet> listEwallets = ewalletRepository.findAll();
 
         if(listEwallets.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ewallet tidak ditemukkan");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "E-Wallet tidak ditemukkan");
         }
         return ewalletMapper.toGetAllEwalletResponse(listEwallets);
     }
@@ -140,9 +140,8 @@ public class EwalletServiceImpl implements EwalletService {
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
         Optional<List<Transactions>> sender = transactionRepository.getAllHistoryByToAccountNumber(optionalBankAccountsSender.get(0).getAccountNumber(), TransactionsType.TOP_UP_EWALLET);
         if (sender.isEmpty()) {
-            throw new IllegalArgumentException("Transaksi belum ada");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
         }
-//        log.info("optional History: " + optionalHistory);
         List<EwalletAccounts> historyList = new ArrayList<>();
 
         for (Transactions transaction : sender.get()) {
