@@ -109,3 +109,5 @@ Osrc/main/java/com/finalproject/finsera/finsera/controller/MutasiController.java
 Usrc/main/java/com/finalproject/finsera/finsera/dto/login/RefreshTokenResponseDto.java,f\b\fb8407b75802390a806eb815520c70c50335b171
 
 Osrc/main/java/com/finalproject/finsera/finsera/service/impl/JwtServiceImpl.java,d\e\de42742dac009b76b757eb5f7777c606280ea980
+~
+Nsrc/main/java/com/finalproject/finsera/finsera/dto/login/LoginResponseDto.java,1\1\11b3e572250b911d58f04aa39915a06bfa02992d
