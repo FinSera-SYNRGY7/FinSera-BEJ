@@ -3,12 +3,9 @@ package com.finalproject.finsera.finsera.mapper;
 import com.finalproject.finsera.finsera.dto.infosaldo.Amount;
 import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoResponse;
 import com.finalproject.finsera.finsera.dto.mutasi.MutasiResponseDto;
-import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.model.entity.BankAccountsOtherBanks;
-import com.finalproject.finsera.finsera.model.entity.Transactions;
+import com.finalproject.finsera.finsera.model.entity.*;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
-import com.finalproject.finsera.finsera.repository.BankAccountsOtherBanksRepository;
-import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
+import com.finalproject.finsera.finsera.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,9 +24,14 @@ public class MutasiMapper {
     @Autowired
     BankAccountsRepository bankAccountsRepository;
 
-
     @Autowired
     BankAccountsOtherBanksRepository bankAccountsOtherBanksRepository;
+    @Autowired
+    VirtualAccountRepository virtualAccountRepository;
+
+    @Autowired
+    EwalletAccountsRepository ewalletAccountsRepository;
+
 
     public List<MutasiResponseDto> toMutasiResponse(List<Transactions> transactions) {
         return transactions.stream()
@@ -43,21 +45,35 @@ public class MutasiMapper {
         amount.setAmount(transaction.getAmountTransfer());
         amount.setCurrency("IDR");
         String toNameAccountNumber;
+        String toBankName;
         Optional<BankAccounts> bankAccounts = bankAccountsRepository.findByAccountNumber(transaction.getToAccountNumber());
-        if (transaction.getType().equals(TransactionsType.SESAMA_BANK) || transaction.getType().equals(TransactionsType.VIRTUAL_ACCOUNT)) {
+        if (transaction.getType().equals(TransactionsType.SESAMA_BANK)) {
             toNameAccountNumber = bankAccounts.get().getCustomer().getName();
+            toBankName = "BCA";
+        } else if (transaction.getType().equals(TransactionsType.VIRTUAL_ACCOUNT)) {
+            VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(transaction.getToAccountNumber());
+            toNameAccountNumber = virtualAccounts.getAccountName();
+            toBankName = "BCA";
         } else if (transaction.getType().equals(TransactionsType.TOP_UP_EWALLET)) {
-            toNameAccountNumber = "E-WALLET";
-        } else {
+            Optional<EwalletAccounts> ewalletAccounts = Optional.ofNullable(ewalletAccountsRepository.findByEwalletAccountNumber(transaction.getToAccountNumber())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ewallet account not found")));
+            toNameAccountNumber = ewalletAccounts.get().getName();
+            toBankName = ewalletAccounts.get().getEwallet().getEwalletName();
+        } else if (transaction.getType().equals(TransactionsType.ANTAR_BANK)){
             Optional<BankAccountsOtherBanks> bankAccountsOtherBanks = Optional.ofNullable(bankAccountsOtherBanksRepository.findByAccountNumber(transaction.getToAccountNumber())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Account Not Found")));
             toNameAccountNumber = bankAccountsOtherBanks.get().getName();
+            toBankName = bankAccountsOtherBanks.get().getBanks().getBankName();
+        } else {
+            toNameAccountNumber = transaction.getToAccountNumber();
+            toBankName = "Qris";
         }
         return MutasiResponseDto.builder()
                 .transactionId(transaction.getIdTransaction())
                 .noTransaction(transaction.getTransactionsNumber().getTransactionNumber())
                 .transactionDate(transaction.getCreatedDate())
                 .destinationNameAccountNumber(toNameAccountNumber)
+                .destinationBankName(toBankName)
                 .amountTransfer(amount)
                 .transactionInformation(transaction.getTransactionInformation())
                 .transactionsType(transaction.getType())

@@ -21,6 +21,8 @@ public class MutasiResponseDto {
 
     private String destinationNameAccountNumber;
 
+    private String destinationBankName;
+
     private Amount amountTransfer;
 
     private TransactionInformation transactionInformation;

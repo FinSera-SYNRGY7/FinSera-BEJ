@@ -5,7 +5,6 @@ import com.finalproject.finsera.finsera.dto.virtualAccount.CreateVirtualAccountR
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
 import com.finalproject.finsera.finsera.model.entity.VirtualAccounts;
-import com.finalproject.finsera.finsera.model.entity.Transactions;
 import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Map;
 
 @RestController

@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.text.NumberFormat;
+import java.time.Instant;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -31,10 +33,14 @@ public class DateFormatterIndonesia {
     }
 
     public static String otherDateFormatterIND(Date date) {
-        String dateTimeString = String.valueOf(date);
-        LocalDateTime localDateTime = LocalDateTime.parse(dateTimeString);
+        LocalDateTime localDateTime = Instant.ofEpochMilli(date.getTime())
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+        DateTimeFormatter outputFormatter = new DateTimeFormatterBuilder()
+                .appendPattern("d MMMM yyyy HH:mm")
+                .toFormatter(new Locale("id", "ID"));
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("Asia/Jakarta"));
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("M/d/yy, h:mm a");
         return zonedDateTime.format(outputFormatter) + " WIB";
     }
     public static String formatCurrency(int amount) {

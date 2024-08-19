@@ -20,6 +20,6 @@ public interface CustomerService {
     Customers updateMpin(String username, String newMpin);
     ResponseEntity<Map<String, Object>> forgotMpin(Long id, ForgotMpinRequestDto forgotMpinRequestDto);
 
-    QrisResponseDto generateQris(String username);
+
 
 }

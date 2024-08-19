@@ -8,13 +8,20 @@ import com.finalproject.finsera.finsera.model.entity.Transactions;
 import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import org.springframework.stereotype.Component;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class EwalletMapper {
 
+
+    public static String formatCurrency(int amount) {
+        NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+        return currencyFormatter.format(amount);
+    }
     public EwalletResponse toCreateTransactionEwalletResponse(
             Optional<EwalletAccounts> ewalletAccount,
             BankAccounts bankAccounts,
@@ -31,6 +38,7 @@ public class EwalletMapper {
                 .nameSender(bankAccounts.getCustomer().getName())
                 .transactionDate(DateFormatterIndonesia.dateFormatterIND(transactions.getCreatedDate()))
                 .transactionNum(transactions.getTransactionsNumber().getTransactionNumber())
+                .feeAdmin(formatCurrency(2500))
                 .note(ewalletRequest.getNote())
                 .build();
     };

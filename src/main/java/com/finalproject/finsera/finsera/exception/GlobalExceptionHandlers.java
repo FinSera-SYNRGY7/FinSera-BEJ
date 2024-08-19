@@ -29,7 +29,7 @@ public class GlobalExceptionHandlers {
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, WebRequest request){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponse.failure(404, "URL Not Found"));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(BaseResponse.failure(404, ex.getMessage()));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

@@ -7,10 +7,6 @@ import java.util.*;
 // import java.util.Optional;
 
 import com.finalproject.finsera.finsera.dto.transaction.*;
-import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
-import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
-import com.finalproject.finsera.finsera.model.entity.VirtualAccounts;
-import com.finalproject.finsera.finsera.model.entity.BankAccounts;
 import com.finalproject.finsera.finsera.repository.VirtualAccountRepository;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
@@ -22,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;

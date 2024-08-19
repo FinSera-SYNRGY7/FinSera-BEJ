@@ -66,7 +66,7 @@ public class EwalletServiceImpl implements EwalletService {
         }
 
 
-        int nominal = ewalletRequest.getNominal();
+        int nominal = ewalletRequest.getNominal() + 2500;
         if (bankAccounts.getAmount() - nominal < 0) {
             throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
         }
@@ -94,14 +94,14 @@ public class EwalletServiceImpl implements EwalletService {
         transactions.setTransactionsNumber(transactionsNumberSaved);
         transactions.setFromAccountNumber(bankAccounts.getAccountNumber());
         transactions.setToAccountNumber(ewalletAccounts.get().getEwalletAccountNumber());
-        transactions.setAmountTransfer((double) ewalletRequest.getNominal());
+        transactions.setAmountTransfer((double) nominal);
         transactions.setNotes(ewalletRequest.getNote());
         transactions.setType(TransactionsType.TOP_UP_EWALLET);
         transactions.setTransactionInformation(TransactionInformation.UANG_KELUAR);
 
 
-        bankAccounts.setAmount(bankAccounts.getAmount() - (double) ewalletRequest.getNominal());
-        ewalletAccounts.get().setAmount(ewalletAccounts.get().getAmount() + (double) ewalletRequest.getNominal());
+        bankAccounts.setAmount(bankAccounts.getAmount() - (double) nominal);
+        ewalletAccounts.get().setAmount(ewalletAccounts.get().getAmount() + (double) nominal);
         bankAccountsRepository.save(bankAccounts);
         ewalletAccountsRepository.save(ewalletAccounts.get());
         Transactions transactionSaved = transactionRepository.save(transactions);
@@ -110,6 +110,8 @@ public class EwalletServiceImpl implements EwalletService {
 
         return ewalletMapper.toCreateTransactionEwalletResponse(ewalletAccounts,bankAccounts, ewalletRequest, transactionSaved);
     }
+
+
 
     @Override
     public EwalletCheckResponse checkAccountEwallet(EwalletCheckAccountRequest ewalletCheckAccountRequest) {

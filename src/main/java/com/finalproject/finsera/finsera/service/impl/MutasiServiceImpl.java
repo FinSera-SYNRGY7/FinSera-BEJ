@@ -132,7 +132,7 @@ public class MutasiServiceImpl implements MutasiService {
 
         }
 
-        JasperReport jasperReport;
+
 //        try {
 //            jasperReport = (JasperReport)
 //                    JRLoader.loadObject(ResourceUtils.getFile("classpath:Transactions_report.jasper"));
@@ -163,23 +163,47 @@ public class MutasiServiceImpl implements MutasiService {
 //            throw new RuntimeException(e);
 //        }
 
+//        try {
+//            File tempDir = new File(System.getProperty("java.io.tmpdir"));
+//            File jasperFile = new File(tempDir, "Transactions_report.jasper");
+//
+//            if (jasperFile.exists()) {
+//                jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
+//            } else {
+//                try (InputStream jrxmlStream = getClass().getClassLoader().getResourceAsStream("Transactions_report.jrxml")) {
+//                    if (jrxmlStream == null) {
+//                        throw new RuntimeException("File Transactions_report.jrxml not found in classpath");
+//                    }
+//
+//                    jasperReport = JasperCompileManager.compileReport(jrxmlStream);
+//                    JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
+//                } catch (IOException e) {
+//                    throw new RuntimeException("Failed to read resource: " + e.getMessage(), e);
+//                }
+//            }
+//        } catch (JRException e) {
+//            throw new RuntimeException("JasperReports exception: " + e.getMessage(), e);
+//        }
+        JasperReport jasperReport;
         try {
             File tempDir = new File(System.getProperty("java.io.tmpdir"));
             File jasperFile = new File(tempDir, "Transactions_report.jasper");
 
             if (jasperFile.exists()) {
-                jasperReport = (JasperReport) JRLoader.loadObject(jasperFile);
-            } else {
-                try (InputStream jrxmlStream = getClass().getClassLoader().getResourceAsStream("Transactions_report.jrxml")) {
-                    if (jrxmlStream == null) {
-                        throw new RuntimeException("File Transactions_report.jrxml not found in classpath");
-                    }
-
-                    jasperReport = JasperCompileManager.compileReport(jrxmlStream);
-                    JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
-                } catch (IOException e) {
-                    throw new RuntimeException("Failed to read resource: " + e.getMessage(), e);
+                if (!jasperFile.delete()) {
+                    throw new RuntimeException("Failed to delete existing Jasper file");
                 }
+            }
+
+            try (InputStream jrxmlStream = getClass().getClassLoader().getResourceAsStream("Transactions_report.jrxml")) {
+                if (jrxmlStream == null) {
+                    throw new RuntimeException("File Transactions_report.jrxml not found in classpath");
+                }
+
+                jasperReport = JasperCompileManager.compileReport(jrxmlStream);
+                JRSaver.saveObject(jasperReport, jasperFile.getAbsolutePath());
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read resource: " + e.getMessage(), e);
             }
         } catch (JRException e) {
             throw new RuntimeException("JasperReports exception: " + e.getMessage(), e);

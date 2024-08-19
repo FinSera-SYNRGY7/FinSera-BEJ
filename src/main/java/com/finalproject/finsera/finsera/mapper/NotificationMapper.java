@@ -41,6 +41,7 @@ public class NotificationMapper {
         String typeNotif = "Transaksi";
         String decription;
         String tittle;
+        String createdDate = DateFormatterIndonesia.otherDateFormatterIND(transactions.getCreatedDate());
         if(transactions.getType() == TransactionsType.SESAMA_BANK) {
             if(transactions.getTransactionInformation() == TransactionInformation.UANG_KELUAR) {
                 tittle = "Transfer ke sesama bank telah berhasil";
@@ -56,7 +57,7 @@ public class NotificationMapper {
             Optional<EwalletAccounts> ewalletAccounts = Optional.ofNullable(ewalletAccountsRepository.findByEwalletAccountNumber(transactions.getToAccountNumber())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ewallet account not found")));
             tittle = "Topup ke " + ewalletAccounts.get().getEwallet().getEwalletName() + " telah berhasil";
-            decription = "Transfer senilai " + transactions.getAmountTransfer() + " ke rekening " + transactions.getToAccountNumber();
+            decription = "Transfer senilai " + transactions.getAmountTransfer() + " ke nomor " + transactions.getToAccountNumber();
         } else {
             if(transactions.getTransactionInformation() == TransactionInformation.UANG_KELUAR) {
                 tittle = "Transfer ke Virtual Account telah berhasil";
@@ -70,7 +71,7 @@ public class NotificationMapper {
         return NotificationResponseDto
                 .builder()
                 .typeNotification(typeNotif)
-                .createdDate(transactions.getCreatedDate().toString())
+                .createdDate(createdDate)
                 .description(decription)
                 .tittle(tittle)
                 .build();
