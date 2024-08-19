@@ -73,13 +73,13 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
 
         if (transactionsList.isEmpty()){
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "transaction not found");
+            response.put("message", "Transaksi tidak ditemukan");
             response.put("data", null);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
             Set<String> seenVirtualAccountNumbers = new HashSet<>();
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
+            response.put("message", "sukses");
             response.put("data", transactionsList.stream()
                     .filter(transactions -> seenVirtualAccountNumbers.add(transactions.getToAccountNumber()))
                     .map(transactions -> new AccountLastTransactionResponseDto(
@@ -97,7 +97,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
 
         if (virtualAccounts == null){
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "Virtual Account not found");
+            response.put("message", "Virtual Account tidak ditemukan");
             response.put("data", null);
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
@@ -107,7 +107,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             responseVirtualAccount.setNominal(virtualAccounts.getNominal());
 
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
+            response.put("message", "sukses");
             response.put("data", responseVirtualAccount);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
@@ -121,7 +121,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "Your account is inactive");
+            response.put("message", "Akun anda tidak aktif!");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
@@ -144,17 +144,17 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
 
                 Map<String, Object> response = new HashMap<>();
                 response.put("data", null);
-                response.put("message", "Your account is banned");
+                response.put("message", "Akun anda terblokir!");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "Pin is invalid");
+            response.put("message", "Pin yang anda masukkan salah!");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else if (virtualAccounts.getNominal() > senderBankAccount.getAmount()) {
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "Your amount is insufficient");
+            response.put("message", "Saldo anda tidak cukup");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
             senderBankAccount.setFailedAttempt(0);
@@ -191,7 +191,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             transferVAResponse.setNominal(transferVirtualAccount.getAmountTransfer().toString());
 
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
+            response.put("message", "sukses");
             response.put("data", transferVAResponse);
             return new ResponseEntity<>(response, HttpStatus.OK);
         }

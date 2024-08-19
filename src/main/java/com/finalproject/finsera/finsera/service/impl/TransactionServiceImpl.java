@@ -44,7 +44,7 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public TransactionResponseDto placeTransactionsIntraBank(TransactionRequestDto transactionRequestDto, long idCustomers ){
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(idCustomers)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionRequestDto.getAccountnum_recipient());
         if (!optionalBankAccountsReceiver.isPresent()) {
@@ -72,9 +72,9 @@ public class TransactionServiceImpl implements TransactionService{
                 customers.get().setStatusUser(StatusUser.INACTIVE);
                 customers.get().setBannedTime(Date.from(Instant.now()));
                 customerRepository.save(customers.get());
-                throw new IllegalArgumentException("Your account is banned");
+                throw new IllegalArgumentException("Akun anda terblokir");
             }
-            throw new IllegalArgumentException("Pin Anda Salah");
+            throw new IllegalArgumentException("Pin yang anda masukkan salah!");
         } else {
             bankAccountsSender.setFailedAttempt(0);
             bankAccountsRepository.save(bankAccountsSender);
@@ -193,9 +193,9 @@ public class TransactionServiceImpl implements TransactionService{
                 customers.get().setStatusUser(StatusUser.INACTIVE);
                 customers.get().setBannedTime(Date.from(Instant.now()));
                 customerRepository.save(customers.get());
-                throw new IllegalArgumentException("Your account is banned");
+                throw new IllegalArgumentException("Akun anda terblokir");
             }
-            throw new IllegalArgumentException("Pin Anda Salah");
+            throw new IllegalArgumentException("Pin yang anda masukkan salah!");
         } else {
             bankAccountsSender.setFailedAttempt(0);
             bankAccountsRepository.save(bankAccountsSender);
