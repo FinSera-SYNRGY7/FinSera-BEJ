@@ -1,9 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
-
-import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.customer.ForgotMpinRequestDto;
 import com.finalproject.finsera.finsera.dto.login.*;
-import com.finalproject.finsera.finsera.dto.qris.QrisResponseDto;
 import com.finalproject.finsera.finsera.dto.register.RegisterRequestDto;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.model.enums.Gender;
@@ -24,8 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.Instant;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -91,11 +86,11 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<Customers> optionalCustomers = customerRepository.findByUsername(username);
 
         if (!optionalCustomers.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Not Found");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User tidak ditemukan");
         }
         Customers customer = optionalCustomers.get();
         if (passwordEncoder.matches(newMpin, customer.getMpinAuth())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock is already in use.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock sudah digunakan.");
         }
         customer.setMpinAuth(passwordEncoder.encode(newMpin));
 
@@ -106,14 +101,14 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         Optional<Customers> customer = Optional.ofNullable(customerRepository.findByUsername(loginRequestDto.getUsername()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username or Password is invalid")
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username atau password yang Anda masukkan salah!")
         ));
         Customers customers = customer.get();
 
         if (!passwordEncoder.matches(loginRequestDto.getPassword(), customers.getPassword())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username or Password is invalid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username atau password yang anda masukkan salah!");
         } else if (customer.get().getStatusUser() == StatusUser.INACTIVE) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your account is inactive");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Akun anda tidak aktif!");
         } else {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -139,11 +134,11 @@ public class CustomerServiceImpl implements CustomerService {
         String username = jwtUtilRefreshToken.getUsername(refreshTokenRequestDto.getRefreshToken());
         String token = jwtUtil.generateTokenFromUsername(username);
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
+                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User tidak ditemukan")
         ));
 
         if (customers.get().getStatusUser() == StatusUser.INACTIVE){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Your account is inactive");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Akun anda tidak aktif");
         } else {
             RefreshTokenResponseDto refreshTokenResponseDto = new RefreshTokenResponseDto();
             refreshTokenResponseDto.setAccessToken(token);
@@ -158,19 +153,19 @@ public class CustomerServiceImpl implements CustomerService {
         if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "your account is inactive");
+            response.put("message", "Akun anda tidak aktif");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
 
         if (!passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())) {
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "Pin is invalid");
+            response.put("message", "Pin yang anda masukkan salah!");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
             Map<String, Object> response = new HashMap<>();
-            response.put("data", "Pin Valid");
-            response.put("message", "Relogin Success");
+            response.put("data", "Pin valid");
+            response.put("message", "Relogin Sukses!");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
@@ -182,12 +177,12 @@ public class CustomerServiceImpl implements CustomerService {
         if (!passwordEncoder.matches(forgotMpinRequestDto.getPassword(), customers.getPassword())){
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "Password incorrect");
+            response.put("message", "Password yang anda masukkan salah!");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else if (!forgotMpinRequestDto.getNewMpin().equalsIgnoreCase(forgotMpinRequestDto.getConfirmNewMpin())) {
             Map<String, Object> response = new HashMap<>();
             response.put("data", null);
-            response.put("message", "MPin not valid");
+            response.put("message", "MPin yang anda masukkan salah!");
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         } else {
             customers.setPassword(passwordEncoder.encode(forgotMpinRequestDto.getPassword()));
@@ -195,8 +190,8 @@ public class CustomerServiceImpl implements CustomerService {
             customerRepository.save(customers);
 
             Map<String, Object> response = new HashMap<>();
-            response.put("data", "Your pin is changed");
-            response.put("message", "success");
+            response.put("data", "Pin anda berhasil diubah");
+            response.put("message", "sukses");
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }

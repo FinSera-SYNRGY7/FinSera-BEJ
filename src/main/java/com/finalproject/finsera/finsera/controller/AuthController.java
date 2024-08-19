@@ -51,7 +51,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = RegisterExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequestDto registerRequestDto){
         Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
+        response.put("status", "sukses");
 
         Map<String, Object> data = new HashMap<>();
         Customers registerCustomer = customerService.register(registerRequestDto);
@@ -66,9 +66,9 @@ public class AuthController {
     public ResponseEntity<Object> login(@RequestBody LoginRequestDto loginRequestDto){
          LoginResponseDto login = customerService.login(loginRequestDto);
          Map<String, Object> response = new HashMap<>();
-         response.put("message", "Login success");
+         response.put("message", "Login sukses");
          response.put("data", login);
-         return ResponseEntity.ok(BaseResponse.success(login, "login success"));
+         return ResponseEntity.ok(BaseResponse.success(login, "Login sukses"));
     }
 
     @PostMapping(value = {"/relogin", "/relogin/"})
