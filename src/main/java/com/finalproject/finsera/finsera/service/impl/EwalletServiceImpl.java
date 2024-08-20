@@ -8,9 +8,7 @@ import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.EwalletService;
-import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
-import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,7 +66,7 @@ public class EwalletServiceImpl implements EwalletService {
 
         int nominal = ewalletRequest.getNominal() + 2500;
         if (bankAccounts.getAmount() - nominal < 0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
         if (!(passwordEncoder.matches(ewalletRequest.getPin(), bankAccounts.getMpinAccount()))) {
             int newFailAttempts = bankAccounts.getFailedAttempt() + 1;

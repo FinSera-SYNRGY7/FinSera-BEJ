@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.controller;
 
+import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CheckVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CreateVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
@@ -32,30 +33,30 @@ public class VirtualAccountController {
 
     @PostMapping("/create-virtual-account")
     @Operation(summary = "Create Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<VirtualAccounts> create(@RequestBody CreateVirtualAccountRequestDto createVirtualAccountRequestDto){
+    public ResponseEntity<?> create(@RequestBody CreateVirtualAccountRequestDto createVirtualAccountRequestDto){
         VirtualAccounts virtualAccounts = virtualAccountService.createVirtualAccount(createVirtualAccountRequestDto);
-        return ResponseEntity.ok(virtualAccounts);
+        return ResponseEntity.ok(BaseResponse.success(virtualAccounts, "Transfer Virtual Accoount berhasil"));
     }
 
     @GetMapping("/va-last-transaction")
     @Operation(summary = "Last Transactions Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Map<String, Object>> getAccount(){
-        return virtualAccountService.getLastTransactionAccountVA();
+    public ResponseEntity<?> getAccount(){
+        return ResponseEntity.ok(BaseResponse.success(virtualAccountService.getLastTransactionAccountVA(), "Berhasil mendapatkan data"));
     }
 
     @PostMapping("/check-virtual-account")
     @Operation(summary = "Check Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Map<String, Object>> checkVirtualAccount(@RequestBody CheckVirtualAccountRequestDto checkVirtualAccountRequestDto){
-        return virtualAccountService.checkVirtualAccount(checkVirtualAccountRequestDto);
+    public ResponseEntity<?> checkVirtualAccount(@RequestBody CheckVirtualAccountRequestDto checkVirtualAccountRequestDto){
+        return ResponseEntity.ok(BaseResponse.success(virtualAccountService.checkVirtualAccount(checkVirtualAccountRequestDto), "Nomor Virtual Account ditemukan"));
     }
 
     @PostMapping("/transfer-va")
     @Operation(summary = "Transfer Virtual Accounts (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransferVirtualAccountResponseDto.class), mediaType = "application/json") })
-    public ResponseEntity<Map<String, Object>> virtualAccount(@RequestHeader("Authorization") String token, @RequestBody TransferVirtualAccountRequestDto transferVirtualAccountRequestDto){
+    public ResponseEntity<?> virtualAccount(@RequestHeader("Authorization") String token, @RequestBody TransferVirtualAccountRequestDto transferVirtualAccountRequestDto){
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
 
-        return virtualAccountService.transferVA(userId, transferVirtualAccountRequestDto);
+        return ResponseEntity.ok(BaseResponse.success(virtualAccountService.transferVA(userId, transferVirtualAccountRequestDto), "Transfer Virtual Account Berhaisl"));
     }
 }

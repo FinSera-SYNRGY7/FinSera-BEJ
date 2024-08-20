@@ -46,10 +46,6 @@ public class CustomerController {
     public ResponseEntity<?> userDetail(@RequestHeader(name = "Authorization") String token) {
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "success");
-
-        Map<String, Object> data = new HashMap<>();
         Optional<Customers> customer = customerRepository.findByUsername(username);
         DetailCustomerResponse detailCustomerResponse = new DetailCustomerResponse();
         detailCustomerResponse.setAddress(customer.get().getAddress());
@@ -61,13 +57,9 @@ public class CustomerController {
         detailCustomerResponse.setUsername(customer.get().getUsername());
 
         if (customer != null) {
-            data.put("userDetails", detailCustomerResponse);
-            response.put("data", data);
-            return ResponseEntity.ok(BaseResponse.success(response, "success"));
+            return ResponseEntity.ok(BaseResponse.success(detailCustomerResponse, "Berhasil mendapatkan detail user"));
         } else {
-            response.put("status", "error");
-            response.put("message", "User not found");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan");
         }
     }
 

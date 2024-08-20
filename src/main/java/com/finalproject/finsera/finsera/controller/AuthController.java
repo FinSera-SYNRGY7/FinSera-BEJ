@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.controller;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.customer.ForgotMpinRequestDto;
 import com.finalproject.finsera.finsera.dto.login.*;
@@ -74,10 +75,10 @@ public class AuthController {
     @PostMapping(value = {"/relogin", "/relogin/"})
     @Operation(summary = "Relogin user (done)", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = ReloginExampleSwagger.class), mediaType = "application/json") })
-    public ResponseEntity<Map<String, Object>> reloginGetId(@RequestHeader("Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
+    public ResponseEntity<?> reloginGetId(@RequestHeader("Authorization") String token, @RequestBody ReloginRequestDto reloginRequestDto){
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
-        return customerService.relogin(userId, reloginRequestDto);
+        return ResponseEntity.ok(BaseResponse.success(customerService.relogin(userId, reloginRequestDto), "Relogin sukses"));
     }
 
     @PostMapping(value = {"/user/refresh-token", "/user/refresh-token/"})
@@ -85,15 +86,15 @@ public class AuthController {
     @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = RefreshTokenResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<Object> relogin(@RequestBody RefreshTokenRequestDto refreshTokenRequestDto){
         RefreshTokenResponseDto response = customerService.refreshToken(refreshTokenRequestDto);
-        return ResponseEntity.ok(BaseResponse.success(response, "accessToken"));
+        return ResponseEntity.ok(BaseResponse.success(response, "Berhasil mendapatkan accessToken"));
     }
 
     @PostMapping(value = {"/user/forgot-mpin", "/user/forgot-mpin/"})
     @Operation(summary = "Forgot Mpin", security = @SecurityRequirement(name = "bearerAuth"))
     @ApiResponse(responseCode = "200")
-    public ResponseEntity<Map<String, Object>> forgotMpin(@RequestHeader("Authorization") String token, @RequestBody ForgotMpinRequestDto forgotMpinRequestDto){
+    public ResponseEntity<?> forgotMpin(@RequestHeader("Authorization") String token, @RequestBody ForgotMpinRequestDto forgotMpinRequestDto){
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
-        return customerService.forgotMpin(userId, forgotMpinRequestDto);
+        return ResponseEntity.ok(BaseResponse.success(customerService.forgotMpin(userId, forgotMpinRequestDto), "Update berhasil"));
     }
 }

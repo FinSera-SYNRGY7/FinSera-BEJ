@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.service.TransactionService;
-import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -62,7 +61,7 @@ public class TransactionServiceImpl implements TransactionService{
 
 
         if (bankAccountsSender.getAmount()-transactionRequestDto.getNominal() <0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
         if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getMpinAccount()))) {
             int newFailAttempts = bankAccountsSender.getFailedAttempt() + 1;
@@ -175,7 +174,7 @@ public class TransactionServiceImpl implements TransactionService{
         BankAccountsOtherBanks bankAccountsReceiver = optionalBankAccountsReceiver.get(0);
         int nominal = transactionOtherBankRequest.getNominal()+2500;
         if (bankAccountsSender.getAmount()-nominal <0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
 
         if (!(passwordEncoder.matches(transactionOtherBankRequest.getPin(), bankAccountsSender.getMpinAccount()))) {
