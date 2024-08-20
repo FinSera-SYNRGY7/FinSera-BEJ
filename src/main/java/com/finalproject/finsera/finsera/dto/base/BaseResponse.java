@@ -1,5 +1,6 @@
 package com.finalproject.finsera.finsera.dto.base;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class BaseResponse<T> {
     private T data;
 
     public static <T> BaseResponse<T> success(T data, String message) {
+
         return new BaseResponse<>(200, message, true, data);
     }
 

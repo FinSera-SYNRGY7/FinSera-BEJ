@@ -2,6 +2,9 @@ package com.finalproject.finsera.finsera.controller;
 
 import java.util.HashMap;
 
+import com.finalproject.finsera.finsera.dto.BaseResponse;
+import com.finalproject.finsera.finsera.util.ApiResponseAnnotations;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -26,23 +29,13 @@ public class BankController {
     @Autowired BankServiceImpl bankServiceImpl;
 
     @GetMapping("/get-all")
-    @Operation(summary = "List All Bank Data", security = @SecurityRequirement(name = "bearerAuth"))
-    // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
-    public ResponseEntity<Map<String, Object>> historyTransactionInterBank(@RequestHeader("Authorization") String token) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            List<?> dataList =  bankServiceImpl.getListBanks();
-            // Map<String, Object> data = new HashMap<>();
-            // data.put("data", transactionResponseDto);
-            response.put("message", "Data Bank tersedia");
-            response.put("status", 200);
-            response.put("data", dataList);
-
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("status", 402);
-            response.put("message", e.getMessage());
-            return ResponseEntity.status(402).body(response);
-        }
+    @ApiResponseAnnotations.BankApiResponses
+    @Operation(summary = "List All Bank Data (done)", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<?> historyTransactionInterBank(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
+            @RequestHeader("Authorization") String token
+    ) {
+        List<?> dataList =  bankServiceImpl.getListBanks();
+        return ResponseEntity.ok(BaseResponse.success(dataList, "Berhasil mendapatkan data"));
     }    
 }

@@ -15,7 +15,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.service.TransactionService;
-import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -48,7 +47,7 @@ public class TransactionServiceImpl implements TransactionService{
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionRequestDto.getAccountnum_recipient());
         if (!optionalBankAccountsReceiver.isPresent()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening Tidak Ditemukan");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor rekening tidak ditemukan");
         }
         if(transactionRequestDto.getAccountnum_recipient().equals(optionalBankAccountsSender.get(0).getAccountNumber())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Nomor rekening tujuan tidak boleh sama dengan nomor rekening pengirim");
@@ -62,7 +61,7 @@ public class TransactionServiceImpl implements TransactionService{
 
 
         if (bankAccountsSender.getAmount()-transactionRequestDto.getNominal() <0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
         if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getMpinAccount()))) {
             int newFailAttempts = bankAccountsSender.getFailedAttempt() + 1;
@@ -175,7 +174,7 @@ public class TransactionServiceImpl implements TransactionService{
         BankAccountsOtherBanks bankAccountsReceiver = optionalBankAccountsReceiver.get(0);
         int nominal = transactionOtherBankRequest.getNominal()+2500;
         if (bankAccountsSender.getAmount()-nominal <0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
 
         if (!(passwordEncoder.matches(transactionOtherBankRequest.getPin(), bankAccountsSender.getMpinAccount()))) {
@@ -271,7 +270,7 @@ public class TransactionServiceImpl implements TransactionService{
         for (Transactions transaction : optionalHistory) {
             Map<String, Object> data = new HashMap<>();
             data.put("name_recipient", transaction.getBankAccounts().getCustomer().getName());
-            data.put("bank_name", "Bank BCA");
+            data.put("bank_name", "Bank Central Asia (BCA)");
             data.put("account_number_recipient", transaction.getBankAccounts().getAccountNumber());
             historyList.add(data);
         }
@@ -283,15 +282,16 @@ public class TransactionServiceImpl implements TransactionService{
     @Transactional
     public List<?> historyTransactionInterBank(long idCustomers){
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
-        log.info("bank account: " + optionalBankAccountsSender.get(0).getAccountNumber());
         Optional<List<Transactions>> sender = transactionRepository.getAllHistoryByToAccountNumber(optionalBankAccountsSender.get(0).getAccountNumber(), TransactionsType.ANTAR_BANK);
-        if (sender.isEmpty()) {
+        if (sender.get().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
         }
         List<Map<String, Object>> historyList = new ArrayList<>();
         
         for (Transactions transaction : sender.get()) {
+            log.info("transaction: " + transaction.getToAccountNumber());
             Optional<BankAccountsOtherBanks> bankAccountsOtherBanks = bankAccountsOtherBanksRepository.findByAccountNumber(transaction.getToAccountNumber());
+            log.info("bank account: " + bankAccountsOtherBanks.get().getAccountNumber());
             Map<String, Object> data = new HashMap<>();
             data.put("name_recipient", bankAccountsOtherBanks.get().getName());
             data.put("bank_name", bankAccountsOtherBanks.get().getBanks().getBankName());

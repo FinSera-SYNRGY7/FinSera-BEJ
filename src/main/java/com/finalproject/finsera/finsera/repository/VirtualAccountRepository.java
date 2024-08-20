@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface VirtualAccountRepository extends JpaRepository<VirtualAccounts, Long> {
-    VirtualAccounts findByVirtualAccountNumber(String virtualAccountNumber);
+    Optional<VirtualAccounts> findByVirtualAccountNumber(String virtualAccountNumber);
 }

@@ -3,7 +3,6 @@ package com.finalproject.finsera.finsera.service.impl;
 import com.finalproject.finsera.finsera.dto.qris.QrisMerchantRequestDto;
 import com.finalproject.finsera.finsera.dto.qris.QrisMerchantResponseDto;
 import com.finalproject.finsera.finsera.dto.qris.QrisResponseDto;
-import com.finalproject.finsera.finsera.dto.transaction.TransactionResponseDto;
 import com.finalproject.finsera.finsera.mapper.QrisMapper;
 import com.finalproject.finsera.finsera.model.entity.BankAccounts;
 import com.finalproject.finsera.finsera.model.entity.Customers;
@@ -17,7 +16,6 @@ import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.repository.TransactionNumberRepository;
 import com.finalproject.finsera.finsera.repository.TransactionRepository;
 import com.finalproject.finsera.finsera.service.QrisService;
-import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +25,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -72,8 +69,11 @@ public class QrisServiceImpl implements QrisService {
         Customers customers = customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
         BankAccounts bankAccountsSender = bankAccountsRepository.findByCustomerId(customerId);
+        if(customers.getStatusUser() == StatusUser.INACTIVE) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Akun anda terblokir");
+        }
         if (bankAccountsSender.getAmount() - qrisMerchantRequestDto.getNominal() < 0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
         if (!(passwordEncoder.matches(qrisMerchantRequestDto.getPin(), bankAccountsSender.getMpinAccount()))) {
             int newFailAttempts = bankAccountsSender.getFailedAttempt() + 1;

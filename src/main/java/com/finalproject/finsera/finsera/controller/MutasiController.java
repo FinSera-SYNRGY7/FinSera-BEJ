@@ -2,16 +2,12 @@ package com.finalproject.finsera.finsera.controller;
 
 
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
-import com.finalproject.finsera.finsera.dto.mutasi.MutasiRequestDto;
 import com.finalproject.finsera.finsera.dto.mutasi.MutasiResponseDto;
-import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
-import com.finalproject.finsera.finsera.dto.schemes.MutasiReponseExampleSwagger;
 import com.finalproject.finsera.finsera.service.MutasiService;
+import com.finalproject.finsera.finsera.util.ApiResponseAnnotations;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -28,8 +24,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -44,10 +38,11 @@ public class MutasiController {
     MutasiService mutasiService;
 
     @GetMapping(value = {"/", ""})
+    @ApiResponseAnnotations.MutasiApiResponses
     @Operation(summary = "Mutasi (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = MutasiReponseExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<?> getInfoMutasi(
             @Valid
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
             @RequestHeader(name = "Authorization") String token,
             @RequestParam(value = "startDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(value = "endDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
@@ -81,9 +76,10 @@ public class MutasiController {
 
 
     @GetMapping(value = {"/download/", "/download"})
+    @ApiResponseAnnotations.MutasiDownloadResponses
     @Operation(summary = "Download Mutasi (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = InfoSaldoExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<?> getDownloadInfoMutasi(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
             @Valid
             @RequestHeader(name = "Authorization") String token,
             @RequestParam(value = "startDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,

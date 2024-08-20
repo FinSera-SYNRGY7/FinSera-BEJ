@@ -89,8 +89,11 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan");
         }
         Customers customer = optionalCustomers.get();
+        if(!newMpin.matches("\\d{6}")){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock harus 6 digit angka");
+        }
         if (passwordEncoder.matches(newMpin, customer.getMpinAuth())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock sudah digunakan.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock sudah digunakan sebelumnya");
         }
         customer.setMpinAuth(passwordEncoder.encode(newMpin));
 
@@ -151,22 +154,12 @@ public class CustomerServiceImpl implements CustomerService {
     public ResponseEntity<Map<String, Object>> relogin(Long id, ReloginRequestDto reloginRequestDto) {
         Customers customers = customerRepository.findById(id).get();
         if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", null);
-            response.put("message", "Akun anda tidak aktif");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,  "Akun anda tidak aktif");
         }
-
         if (!passwordEncoder.matches(reloginRequestDto.getMpinAuth(), customers.getMpinAuth())) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", null);
-            response.put("message", "Pin yang anda masukkan salah!");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Pin yang anda masukkan salah");
         } else {
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", "Pin valid");
-            response.put("message", "Relogin Sukses!");
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return null;
         }
     }
 
@@ -175,24 +168,14 @@ public class CustomerServiceImpl implements CustomerService {
         Customers customers = customerRepository.findById(id).get();
 
         if (!passwordEncoder.matches(forgotMpinRequestDto.getPassword(), customers.getPassword())){
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", null);
-            response.put("message", "Password yang anda masukkan salah!");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Password yang anda masukkan salah");
         } else if (!forgotMpinRequestDto.getNewMpin().equalsIgnoreCase(forgotMpinRequestDto.getConfirmNewMpin())) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", null);
-            response.put("message", "MPin yang anda masukkan salah!");
-            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "MPin yang anda masukkan salah");
         } else {
             customers.setPassword(passwordEncoder.encode(forgotMpinRequestDto.getPassword()));
             customers.setMpinAuth(passwordEncoder.encode(forgotMpinRequestDto.getNewMpin()));
             customerRepository.save(customers);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("data", "Pin anda berhasil diubah");
-            response.put("message", "sukses");
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return null;
         }
     }
 

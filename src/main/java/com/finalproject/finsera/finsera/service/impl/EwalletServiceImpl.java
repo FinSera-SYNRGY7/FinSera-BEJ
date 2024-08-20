@@ -8,9 +8,7 @@ import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.EwalletService;
-import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
-import io.swagger.v3.oas.annotations.servers.Server;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -56,11 +54,14 @@ public class EwalletServiceImpl implements EwalletService {
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(idCustomers)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
         Optional<Ewallet> ewallet = Optional.ofNullable(ewalletRepository.findById(ewalletRequest.getEwalletId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "E-Wallet tidak ditemukkan")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "E-Wallet tidak ditemukan")));
         Optional<EwalletAccounts> ewalletAccounts = Optional.ofNullable(ewalletAccountsRepository.findByEwalletAndEwalletAccountNumber(ewallet.get(), ewalletRequest.getEwalletAccount())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor E-Wallet tidak ditemukan")));
 
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
+        if(customers.get().getStatusUser() == StatusUser.INACTIVE) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Akun anda terblokir");
+        }
         if(bankAccounts == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor rekening tidak ditemukan");
         }
@@ -68,7 +69,7 @@ public class EwalletServiceImpl implements EwalletService {
 
         int nominal = ewalletRequest.getNominal() + 2500;
         if (bankAccounts.getAmount() - nominal < 0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
         if (!(passwordEncoder.matches(ewalletRequest.getPin(), bankAccounts.getMpinAccount()))) {
             int newFailAttempts = bankAccounts.getFailedAttempt() + 1;

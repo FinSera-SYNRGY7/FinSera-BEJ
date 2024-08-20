@@ -51,7 +51,8 @@ public class MutasiMapper {
             toNameAccountNumber = bankAccounts.get().getCustomer().getName();
             toBankName = "BCA";
         } else if (transaction.getType().equals(TransactionsType.VIRTUAL_ACCOUNT)) {
-            VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(transaction.getToAccountNumber());
+            VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(transaction.getToAccountNumber())
+                    .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Virtual Account tidak ditemukan"));;
             toNameAccountNumber = virtualAccounts.getAccountName();
             toBankName = "BCA";
         } else if (transaction.getType().equals(TransactionsType.TOP_UP_EWALLET)) {
