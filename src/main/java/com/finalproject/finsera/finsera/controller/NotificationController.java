@@ -4,8 +4,10 @@ package com.finalproject.finsera.finsera.controller;
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.service.CustomerService;
 import com.finalproject.finsera.finsera.service.NotificationService;
+import com.finalproject.finsera.finsera.util.ApiResponseAnnotations;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +32,17 @@ public class NotificationController {
 
 
     @GetMapping({"", "/"})
+    @ApiResponseAnnotations.NotificationResponses
     @Operation(summary = "Notification (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<?> getNotif(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<?> getNotif(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
+            @RequestHeader(name = "Authorization") String token
+    ) {
 
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
 
-        return ResponseEntity.ok(BaseResponse.success(notificationService.getNotif(userId), "Get Notif Success"));
+        return ResponseEntity.ok(BaseResponse.success(notificationService.getNotif(userId), "Data notifkasi ditemukan"));
     }
 
 }

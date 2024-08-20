@@ -14,7 +14,7 @@ public class InfoSaldoMapper {
         amount.setCurrency("IDR");
         return InfoSaldoResponse.builder()
                 .accountNumber(bankAccounts.getAccountNumber())
-                .username(bankAccounts.getCustomer().getName())
+                .name(bankAccounts.getCustomer().getName())
                 .customerId(bankAccounts.getCustomer().getIdCustomers())
                 .amount(amount)
                 .build();

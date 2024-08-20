@@ -10,8 +10,10 @@ import com.finalproject.finsera.finsera.dto.schemes.ProfileExampleSwagger;
 import com.finalproject.finsera.finsera.model.entity.Customers;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.CustomerService;
+import com.finalproject.finsera.finsera.util.ApiResponseAnnotations;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,9 +43,11 @@ public class CustomerController {
     JwtUtil jwtUtil;
 
     @GetMapping(value = {"/", ""})
+    @ApiResponseAnnotations.ProfileResponses
     @Operation(summary = "Detail user (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = ProfileExampleSwagger.class), mediaType = "application/json") })
-    public ResponseEntity<?> userDetail(@RequestHeader(name = "Authorization") String token) {
+    public ResponseEntity<?> userDetail(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
+            @RequestHeader(name = "Authorization") String token) {
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
         Optional<Customers> customer = customerRepository.findByUsername(username);
@@ -64,19 +68,18 @@ public class CustomerController {
     }
 
     @PatchMapping("/update-mpin")
+    @ApiResponseAnnotations.UpdateMpinResponses
     @Operation(summary = "Update PIN AppLock (done) ", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = InfoSaldoExampleSwagger.class), mediaType = "application/json") })
-    public ResponseEntity<BaseResponse<Void>> updateMpin(@RequestHeader(name = "Authorization") String token, @RequestBody UpdateMpinRequest mpin) {
+    public ResponseEntity<BaseResponse<Void>> updateMpin(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
+            @RequestHeader(name = "Authorization") String token,
+            @RequestBody UpdateMpinRequest mpin) {
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
-        try{
-            Customers updatedCustomer =  customerService.updateMpin(username, mpin.getMpinAuth());
-            return ResponseEntity.ok(BaseResponse.success(null, ResponseConstant.UPDATE_SUCCESS));
-        }catch(ResponseStatusException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(BaseResponse.failure(400, e.getMessage()));
-        }catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(BaseResponse.failure(500, e.getMessage()));
-        }
+
+        Customers updatedCustomer =  customerService.updateMpin(username, mpin.getMpinAuth());
+        return ResponseEntity.ok(BaseResponse.success(null, ResponseConstant.UPDATE_SUCCESS));
+
     }
 
 

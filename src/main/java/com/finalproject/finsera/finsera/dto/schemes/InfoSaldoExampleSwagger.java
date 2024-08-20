@@ -16,7 +16,7 @@ public class InfoSaldoExampleSwagger {
 
     @Schema(name = "code", example = "200")
     private Integer code;
-    @Schema(name = "message", example = "Sukess")
+    @Schema(name = "message", example = "Nomor Rekening ditemukan")
     private String message;
     @Schema(name = "status", example = "true")
     private Boolean status;

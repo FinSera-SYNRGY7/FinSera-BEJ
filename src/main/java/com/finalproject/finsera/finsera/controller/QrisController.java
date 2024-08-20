@@ -40,7 +40,9 @@ public class QrisController {
     @Autowired
     JwtUtil jwtUtil;
 
+
     @GetMapping({"/", ""})
+    @ApiResponseAnnotations.QrisApiResponses
     @Operation(summary = "Qris (done) ", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<BaseResponse<QrisResponseDto>> generateQris(
             @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
@@ -58,8 +60,9 @@ public class QrisController {
         }
     }
 
-    @ApiResponseAnnotations.QrisMerchantApiResponses
+
     @PostMapping({"/merchant", "merchant"})
+    @ApiResponseAnnotations.QrisMerchantApiResponses
     @Operation(summary = "Qris (done) ", security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<?> merchantQris(
             @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")

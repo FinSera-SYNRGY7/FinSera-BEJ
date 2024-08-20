@@ -59,16 +59,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private void handleExpiredJwtException(ExpiredJwtException e, HttpServletRequest request,
                                            HttpServletResponse response) throws IOException{
-//        ExpiredTokenResponse expiredTokenResponse = new ExpiredTokenResponse();
-//        expiredTokenResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//        expiredTokenResponse.setMessage("JWT Token has expired");
-//        expiredTokenResponse.setExpiredAt(e.getClaims().getExpiration().toString());
-//        expiredTokenResponse.setCurrentTime(Date.from(Instant.now()).toString());
-//        expiredTokenResponse.setPath(request.getRequestURI());
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        mapper.writeValue(response.getWriter(), BaseResponse.failure(401, "JWT Token has expired"));
+        mapper.writeValue(response.getWriter(), BaseResponse.failure(401, "JWT Token sudah kedaluwarsa"));
     }
 
     private String parseJwt(HttpServletRequest request){

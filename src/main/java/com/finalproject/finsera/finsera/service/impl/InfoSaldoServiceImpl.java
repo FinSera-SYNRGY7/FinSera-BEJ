@@ -1,6 +1,6 @@
 package com.finalproject.finsera.finsera.service.impl;
 
-import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoRequest;
+
 import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoResponse;
 import com.finalproject.finsera.finsera.mapper.InfoSaldoMapper;
 import com.finalproject.finsera.finsera.model.entity.BankAccounts;
@@ -35,10 +35,10 @@ public class InfoSaldoServiceImpl implements InfoSaldoService {
         validationService.validate(username);
 
         Customers customers = customersRepository.findByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User Tidak Ditemukan"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
 
         Optional<BankAccounts> bankAccounts = Optional.ofNullable(infoSaldoRepository.findByCustomer(customers)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening Tidak Ditemukan")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor rekening tidak ditemukan")));
         return infoSaldoMapper.toInfoSaldoResponse(bankAccounts.get());
     }
 }

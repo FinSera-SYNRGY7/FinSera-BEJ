@@ -54,11 +54,14 @@ public class EwalletServiceImpl implements EwalletService {
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(idCustomers)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
         Optional<Ewallet> ewallet = Optional.ofNullable(ewalletRepository.findById(ewalletRequest.getEwalletId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "E-Wallet tidak ditemukkan")));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "E-Wallet tidak ditemukan")));
         Optional<EwalletAccounts> ewalletAccounts = Optional.ofNullable(ewalletAccountsRepository.findByEwalletAndEwalletAccountNumber(ewallet.get(), ewalletRequest.getEwalletAccount())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor E-Wallet tidak ditemukan")));
 
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
+        if(customers.get().getStatusUser() == StatusUser.INACTIVE) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Akun anda terblokir");
+        }
         if(bankAccounts == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor rekening tidak ditemukan");
         }

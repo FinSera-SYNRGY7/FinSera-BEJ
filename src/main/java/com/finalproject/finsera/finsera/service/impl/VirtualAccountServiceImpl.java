@@ -17,7 +17,6 @@ import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
 import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 public class VirtualAccountServiceImpl implements VirtualAccountService {
@@ -69,7 +69,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> getLastTransactionAccountVA() {
+    public Stream<Object> getLastTransactionAccountVA() {
         List<Transactions> transactionsList = transactionRepository.getLastAccountTransactionVA();
 
         if (transactionsList.isEmpty()){
@@ -78,21 +78,21 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             Set<String> seenVirtualAccountNumbers = new HashSet<>();
             Map<String, Object> response = new HashMap<>();
             response.put("message", "sukses");
-            response.put("data", transactionsList.stream()
+            Stream<Object> accountLastTransactionResponseDtos = transactionsList.stream()
                     .filter(transactions -> seenVirtualAccountNumbers.add(transactions.getToAccountNumber()))
                     .map(transactions -> new AccountLastTransactionResponseDto(
                       virtualAccountRepository.findByVirtualAccountNumber(transactions.getToAccountNumber()).get().getAccountName(),
                             transactions.getToAccountNumber()
-                    )));
-            return new ResponseEntity<>(response, HttpStatus.OK);
+                    ));
+            return accountLastTransactionResponseDtos;
         }
 
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> checkVirtualAccount(CheckVirtualAccountRequestDto checkVirtualAccountRequestDto) {
+    public CheckVirtualAccountResponseDto checkVirtualAccount(CheckVirtualAccountRequestDto checkVirtualAccountRequestDto) {
         VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(checkVirtualAccountRequestDto.getVirtualAccountNumber())
-                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Virtual Account tidak ditemukan"));
+                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Virtual Account tidak ditemukan"));
 
 
         CheckVirtualAccountResponseDto responseVirtualAccount = new CheckVirtualAccountResponseDto();
@@ -100,16 +100,13 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
         responseVirtualAccount.setAccountName(virtualAccounts.getAccountName());
         responseVirtualAccount.setNominal(virtualAccounts.getNominal());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "sukses");
-        response.put("data", responseVirtualAccount);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return responseVirtualAccount;
 
     }
 
     @Transactional
     @Override
-    public ResponseEntity<Map<String, Object>> transferVA(Long id,
+    public TransferVirtualAccountResponseDto transferVA(Long id,
                                                         TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
         Customers customers = customerRepository.findById(id).get();
         if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
@@ -175,10 +172,7 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
             transferVAResponse.setType(TransactionsType.VIRTUAL_ACCOUNT);
             transferVAResponse.setNominal(transferVirtualAccount.getAmountTransfer().toString());
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "sukses");
-            response.put("data", transferVAResponse);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return transferVAResponse;
         }
     }
 }

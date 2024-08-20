@@ -1,6 +1,6 @@
 package com.finalproject.finsera.finsera.service;
 
-import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoRequest;
+
 import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoResponse;
 
 public interface InfoSaldoService {

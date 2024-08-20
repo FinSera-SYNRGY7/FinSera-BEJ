@@ -89,8 +89,11 @@ public class CustomerServiceImpl implements CustomerService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan");
         }
         Customers customer = optionalCustomers.get();
+        if(!newMpin.matches("\\d{6}")){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock harus 6 digit angka");
+        }
         if (passwordEncoder.matches(newMpin, customer.getMpinAuth())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock sudah digunakan.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pin App Lock sudah digunakan sebelumnya");
         }
         customer.setMpinAuth(passwordEncoder.encode(newMpin));
 

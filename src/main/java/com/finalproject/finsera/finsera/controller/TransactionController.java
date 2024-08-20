@@ -11,8 +11,10 @@ import com.finalproject.finsera.finsera.dto.transaction.*;
 import com.finalproject.finsera.finsera.repository.VirtualAccountRepository;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
+import com.finalproject.finsera.finsera.util.ApiResponseAnnotations;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -50,9 +52,12 @@ public class TransactionController {
     PasswordEncoder passwordEncoder;
 
     @PostMapping("/transaction-intra/create")
+    @ApiResponseAnnotations.TransferIntraCreateApiResponses
     @Operation(summary = "Transaction intra-bank (done)" , security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionResponseDto.class), mediaType = "application/json") })
-    public ResponseEntity<?> createTransaction(@RequestHeader("Authorization") String token, @RequestBody TransactionRequestDto transactionRequestDto) {
+    public ResponseEntity<?> createTransaction(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
+            @RequestHeader("Authorization") String token,
+            @RequestBody TransactionRequestDto transactionRequestDto) {
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
         TransactionResponseDto transactionResponseDto =  transactionServiceImpl.placeTransactionsIntraBank(transactionRequestDto, userId);
@@ -61,8 +66,8 @@ public class TransactionController {
     }
 
     @PostMapping("/transaction-intra/check")
+    @ApiResponseAnnotations.TransferIntraCheckApiResponses
     @Operation(summary = "Transaction check intra-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
     public ResponseEntity<?> checkTransaction(@RequestBody TransactionCheckAccountRequestDto transactionCheckAccountRequestDto) {
         System.out.println(transactionCheckAccountRequestDto.getAccountnum_recipient());
         Map<String, Object> response = new HashMap<>();
@@ -72,9 +77,12 @@ public class TransactionController {
     }
 
     @GetMapping("/transaction-intra/history")
+    @ApiResponseAnnotations.LastTransactionIntraApiResponses
     @Operation(summary = "Transaction history intra-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
-    public ResponseEntity<?> historyTransaction(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> historyTransaction(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
+            @RequestHeader("Authorization") String token
+    ) {
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
         List<?> dataList =  transactionServiceImpl.historyTransaction(userId);
@@ -83,26 +91,32 @@ public class TransactionController {
     }
 
     @PostMapping(value ={"/transaction-inter/create"})
+    @ApiResponseAnnotations.TransferInterCreateApiResponses
     @Operation(summary = "Transaction inter-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionOtherBankResponse.class), mediaType = "application/json") })
-    public ResponseEntity<?> createTransactionInter(@RequestHeader("Authorization") String token, @RequestBody TransactionOtherBankRequest transactionOtherBankRequest) {
+    public ResponseEntity<?> createTransactionInter(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
+            @RequestHeader("Authorization") String token,
+            @RequestBody TransactionOtherBankRequest transactionOtherBankRequest) {
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
         TransactionOtherBankResponse transactionResponseDto =  transactionServiceImpl.placeTransactionsInterBank(transactionOtherBankRequest, userId);
         return ResponseEntity.ok(BaseResponse.success(transactionResponseDto, "Transfer berhasil"));
     }
     @PostMapping(value ={"/transaction-inter/check"})
+    @ApiResponseAnnotations.TransferInterCheckApiResponses
     @Operation(summary = "Transaction check inter-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckOtherBankResponse.class), mediaType = "application/json") })
     public ResponseEntity<?> checkTransactionInter(@RequestBody TransactionCheckOtherBankAccountRequest transactionCheckOtherBankAccountRequest) {
         TransactionCheckOtherBankResponse transactionCheckAccountResponseDto =  transactionServiceImpl.checkAccountOtherBank(transactionCheckOtherBankAccountRequest);
         return ResponseEntity.ok(BaseResponse.success(transactionCheckAccountResponseDto, "Data Rekening tersedia"));
     }
 
     @GetMapping("/transaction-inter/history")
+    @ApiResponseAnnotations.LastTransactionInterApiResponses
     @Operation(summary = "Transaction history inter-bank (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    // @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = TransactionCheckAccountResponseDto.class), mediaType = "application/json") })
-    public ResponseEntity<?> historyTransactionInterBank(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<?> historyTransactionInterBank(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
+            @RequestHeader("Authorization") String token
+    ) {
         String jwt = token.substring("Bearer ".length());
         Long userId = jwtUtil.getId(jwt);
         List<?> dataList =  transactionServiceImpl.historyTransactionInterBank(userId);

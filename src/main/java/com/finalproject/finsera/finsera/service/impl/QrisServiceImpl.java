@@ -69,6 +69,9 @@ public class QrisServiceImpl implements QrisService {
         Customers customers = customerRepository.findById(customerId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan"));
         BankAccounts bankAccountsSender = bankAccountsRepository.findByCustomerId(customerId);
+        if(customers.getStatusUser() == StatusUser.INACTIVE) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Akun anda terblokir");
+        }
         if (bankAccountsSender.getAmount() - qrisMerchantRequestDto.getNominal() < 0) {
             throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
