@@ -6,7 +6,6 @@ import com.finalproject.finsera.finsera.dto.virtualAccount.CreateVirtualAccountR
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
 import com.finalproject.finsera.finsera.model.entity.VirtualAccounts;
-import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
 import com.finalproject.finsera.finsera.util.ApiResponseAnnotations;
 import com.finalproject.finsera.finsera.util.JwtUtil;
