@@ -89,3 +89,5 @@ ksrc/main/java/com/finalproject/finsera/finsera/dto/virtualAccount/VirtualAccoun
 src/main/java/com/finalproject/finsera/finsera/dto/virtualAccount/transferVirtualAccount/TransferVirtualAccountResponseDto.java,7\4\742d8bf76f08c71fb51409a0353623b399f6b907
 …
 Usrc/main/java/com/finalproject/finsera/finsera/util/InsufficientBalanceException.java,b\4\b4a611da030a168995c226d2f089c916febef84c
+
+Osrc/main/java/com/finalproject/finsera/finsera/util/ApiResponseAnnotations.java,7\a\7a8be661cd85f99b2b26269d4a686afb891dcc3b
