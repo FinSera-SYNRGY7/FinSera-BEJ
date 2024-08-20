@@ -539,7 +539,7 @@ public class ApiResponseAnnotations {
                                             value = "{\"code\": 401, \"message\": \"Username atau password yang anda masukkan salah!\", \"status\": false , \"data\": null}"
                                     ),
                                     @ExampleObject(
-                                            name = "Akun terblokir",
+                                            name = "Akun tidak aktif",
                                             value = "{\"code\": 401, \"message\": \"Akun anda tidak aktif!\", \"status\": false , \"data\": null}"
                                     ),
                             }
@@ -581,7 +581,7 @@ public class ApiResponseAnnotations {
                                             value = "{\"code\": 401, \"message\": \"Pin yang anda masukkan salah\", \"status\": false , \"data\": null}"
                                     ),
                                     @ExampleObject(
-                                            name = "Akun terblokir",
+                                            name = "Akun tidak aktif",
                                             value = "{\"code\": 401, \"message\": \"Akun anda tidak aktif\", \"status\": false , \"data\": null}"
                                     ),
                                     @ExampleObject(
