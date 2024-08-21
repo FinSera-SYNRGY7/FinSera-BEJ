@@ -95,11 +95,8 @@ public class MutasiServiceImpl implements MutasiService {
         assert filteredTransactions != null;
         if(filteredTransactions.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
-        } else if (filteredTransactions.stream().toList().size() > 10) {
-            return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList().subList(0, 10));
-        } else {
-            return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList());
         }
+        return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList());
     }
 
     @Override
