@@ -8,6 +8,7 @@ import com.finalproject.finsera.finsera.dto.schemes.qris.QrisMerchantExampleSwag
 import com.finalproject.finsera.finsera.dto.schemes.qris.QrisResponseExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.transactions.TransactionsCheckExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.transactions.TransactionsCreateExampleSwagger;
+import com.finalproject.finsera.finsera.dto.schemes.transactions.TransactionsInterCheckExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.transactions.TransactionsInterCreateExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.va.VaCheckExampleSwagger;
 import com.finalproject.finsera.finsera.dto.schemes.va.VaTransferExampleSwagger;
@@ -1006,7 +1007,7 @@ public class ApiResponseAnnotations {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Ok (Cek nomor rekening berhasil)",
                     content = {@Content(mediaType = "application/json",
-                            schema = @Schema(implementation = TransactionsInterCreateExampleSwagger.class))}),
+                            schema = @Schema(implementation = TransactionsInterCheckExampleSwagger.class))}),
             @ApiResponse(responseCode = "401", description = "Unauthorized (JWT kedaluwarsa)",
                     content = @Content(
                             mediaType = "application/json",

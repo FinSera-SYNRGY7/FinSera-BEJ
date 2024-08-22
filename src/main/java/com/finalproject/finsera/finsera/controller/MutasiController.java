@@ -85,14 +85,16 @@ public class MutasiController {
             @RequestParam(value = "startDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @RequestParam(value = "endDate", required = false, defaultValue = "") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate
     ) {
+        Timestamp startDateTimeStamp = null;
+        Timestamp endDateTimeStamp = null;
         String jwt = token.substring("Bearer ".length());
         String username = jwtUtil.getUsername(jwt);
         byte[] reportContent;
         if ((startDate != null) && (endDate != null)) {
             LocalDateTime startDateLocalDateTime = startDate.atStartOfDay();
-            Timestamp startDateTimeStamp = Timestamp.valueOf(startDateLocalDateTime);
+            startDateTimeStamp = Timestamp.valueOf(startDateLocalDateTime);
             LocalDateTime endDateLocalDateTime = endDate.atTime(23, 59, 59);
-            Timestamp endDateTimeStamp = Timestamp.valueOf(endDateLocalDateTime);
+            endDateTimeStamp = Timestamp.valueOf(endDateLocalDateTime);
             reportContent = mutasiService.transactionsReport(username, startDateTimeStamp, endDateTimeStamp);
         } else if((startDate != null) && (endDate == null)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End Date is required, if you want to use Start Date");
@@ -110,7 +112,7 @@ public class MutasiController {
                 .contentLength(resource.contentLength())
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.attachment()
-                                .filename("Transactions-Report (" + formattedNow +").pdf")
+                                .filename("Transactions-Report (" + startDateTimeStamp + " - " + endDateTimeStamp + ").pdf")
                                 .build().toString())
                 .body(resource);
     }

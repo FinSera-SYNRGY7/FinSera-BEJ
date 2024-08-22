@@ -11,6 +11,6 @@ public class TransactionCheckOtherBankResponse {
     private String bank_name;
     @Schema(name = "accountnum_recipient", example = "789012345")
     private String accountnum_recipient;
-    @Schema(name = "name_recipient", example = "Fuad")
+    @Schema(name = "name_recipient", example = "Ahmad")
     private String name_recipient;
 }

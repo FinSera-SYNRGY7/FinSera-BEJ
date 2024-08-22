@@ -95,11 +95,8 @@ public class MutasiServiceImpl implements MutasiService {
         assert filteredTransactions != null;
         if(filteredTransactions.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
-        } else if (filteredTransactions.stream().toList().size() > 10) {
-            return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList().subList(0, 10));
-        } else {
-            return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList());
         }
+        return mutasiMapper.toMutasiResponse(filteredTransactions.stream().toList());
     }
 
     @Override
@@ -107,25 +104,27 @@ public class MutasiServiceImpl implements MutasiService {
         List<TransactionsReportJasperDto> itemsTransactions = new ArrayList<>();
         Optional<Customers> customers = Optional.ofNullable(customerRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
-        List<Transactions> transactions;
+        Optional<List<Transactions>> transactions;
         BankAccounts bankAccounts = bankAccountsRepository.findByCustomerId(customers.get().getIdCustomers());
+        if(bankAccounts == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening tidak ditemukan");
+        }
         if(startDate != null && endDate != null) {
-            transactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan"));
-            for(var i = 0; i < transactions.size(); i++){
-                toResponseJasperDto(itemsTransactions, transactions, i);
+            transactions = transactionRepository.findAllByBankAccountsAndCreatedDate(startDate, endDate, bankAccounts.getIdBankAccounts());
+            if(transactions.get().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
+            }
+            for(var i = 0; i < transactions.get().size(); i++){
+                toResponseJasperDto(itemsTransactions, transactions.get(), i);
             }
         } else {
-            transactions = transactionRepository.findAllByBankAccountsOrderByCreatedDateDesc(bankAccounts)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan"));
-            if(transactions.size() > 10) {
-                for(var i = 0; i < 10; i++){
-                    toResponseJasperDto(itemsTransactions, transactions, i);
-                }
-            } else {
-                for(var i = 0; i < transactions.size(); i++){
-                    toResponseJasperDto(itemsTransactions, transactions, i);
-                }
+            transactions = transactionRepository.findAllByBankAccountsOrderByCreatedDateDesc(bankAccounts);
+            if(transactions.get().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
+            }
+            log.info("transactions 2: {}", transactions.get().size());
+            for(var i = 0; i < transactions.get().size(); i++){
+                toResponseJasperDto(itemsTransactions, transactions.get(), i);
             }
 
         }

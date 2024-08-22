@@ -137,10 +137,8 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public TransactionCheckAccountResponseDto checkAccountIntraBank(TransactionCheckAccountRequestDto transactionCheckAccountRequestDto){
 
-        Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionCheckAccountRequestDto.getAccountnum_recipient());
-        if (!optionalBankAccountsReceiver.isPresent()) {
-            new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening Tidak Ditemukan");
-        }
+        Optional<BankAccounts>  optionalBankAccountsReceiver = Optional.ofNullable(bankAccountsRepository.findByAccountNumber(transactionCheckAccountRequestDto.getAccountnum_recipient())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening Tidak Ditemukan")));
         BankAccounts bankAccountsReceiver = optionalBankAccountsReceiver.get();
 
         TransactionCheckAccountResponseDto transactionCheckAccountResponseDisplay = new TransactionCheckAccountResponseDto();
