@@ -7,6 +7,7 @@ import com.finalproject.finsera.finsera.model.enums.Gender;
 import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import com.finalproject.finsera.finsera.repository.CustomerRepository;
 import com.finalproject.finsera.finsera.service.CustomerService;
+import com.finalproject.finsera.finsera.service.ValidationService;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import com.finalproject.finsera.finsera.util.JwtUtilRefreshToken;
 import com.finalproject.finsera.finsera.util.UserDetailsImpl;
@@ -41,6 +42,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
     JwtUtilRefreshToken jwtUtilRefreshToken;
+
+    @Autowired
+    ValidationService validationService;
 
 
     //ignore register service
@@ -103,6 +107,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
+        validationService.validate(loginRequestDto);
         Optional<Customers> customer = Optional.ofNullable(customerRepository.findByUsername(loginRequestDto.getUsername()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")
         ));
