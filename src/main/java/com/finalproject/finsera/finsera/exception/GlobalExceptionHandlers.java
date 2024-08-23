@@ -3,18 +3,22 @@ package com.finalproject.finsera.finsera.exception;
 import com.finalproject.finsera.finsera.dto.BaseResponse;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.transaction.NotSupportedException;
+import org.hibernate.query.PathException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandlers {
-
     @ExceptionHandler(ExpiredJwtException.class)
     public ResponseEntity<BaseResponse<String>> handleExpiredJwtException(ExpiredJwtException ex) {
         String errorMessage = String.format("JWT expired at %s. Current time: %s, a difference of %d milliseconds. Allowed clock skew: %d milliseconds.",
@@ -39,7 +43,4 @@ public class GlobalExceptionHandlers {
         return ResponseEntity.status(exception.getStatusCode())
                 .body(BaseResponse.failure(exception.getStatusCode().value(), exception.getReason()));
     }
-
-
-
 }

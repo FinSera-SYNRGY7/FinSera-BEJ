@@ -115,8 +115,8 @@ public class CustomerServiceImpl implements CustomerService {
         } else {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            loginRequestDto.getUsername(),
-                            loginRequestDto.getPassword()
+                            loginRequestDto.getUsername().toString(),
+                            loginRequestDto.getPassword().toString()
                     ));
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtUtil.generateToken(authentication);
