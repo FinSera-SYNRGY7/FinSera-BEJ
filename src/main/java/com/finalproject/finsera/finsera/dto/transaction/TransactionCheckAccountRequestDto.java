@@ -7,4 +7,5 @@ import lombok.Data;
 public class TransactionCheckAccountRequestDto {
     @Schema(name = "accountnum_recipient", example = "987654321")
     private String accountnum_recipient;
+
 }
