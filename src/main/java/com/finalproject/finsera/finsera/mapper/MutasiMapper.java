@@ -49,12 +49,12 @@ public class MutasiMapper {
         Optional<BankAccounts> bankAccounts = bankAccountsRepository.findByAccountNumber(transaction.getToAccountNumber());
         if (transaction.getType().equals(TransactionsType.SESAMA_BANK)) {
             toNameAccountNumber = bankAccounts.get().getCustomer().getName();
-            toBankName = "BCA";
+            toBankName = "Bank Central Asia (BCA)";
         } else if (transaction.getType().equals(TransactionsType.VIRTUAL_ACCOUNT)) {
             VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(transaction.getToAccountNumber())
                     .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Virtual Account tidak ditemukan"));;
             toNameAccountNumber = virtualAccounts.getAccountName();
-            toBankName = "BCA";
+            toBankName = "Bank Central Asia (BCA)";
         } else if (transaction.getType().equals(TransactionsType.TOP_UP_EWALLET)) {
             Optional<EwalletAccounts> ewalletAccounts = Optional.ofNullable(ewalletAccountsRepository.findByEwalletAccountNumber(transaction.getToAccountNumber())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ewallet account not found")));
