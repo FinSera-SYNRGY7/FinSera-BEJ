@@ -1,27 +1,28 @@
 package com.finalproject.finsera.finsera.service.impl;
 
 import com.finalproject.finsera.finsera.dto.transaction.*;
-import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
-import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
 import com.finalproject.finsera.finsera.model.entity.*;
+import com.finalproject.finsera.finsera.model.enums.StatusUser;
 import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
 import com.finalproject.finsera.finsera.repository.*;
-import com.finalproject.finsera.finsera.service.VirtualAccountService;
-import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
+import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.finalproject.finsera.finsera.model.enums.TransactionsType;
 import com.finalproject.finsera.finsera.service.TransactionService;
-import com.finalproject.finsera.finsera.util.InsufficientBalanceException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.*;
 import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
+
 @Service
+@Slf4j
 public class TransactionServiceImpl implements TransactionService{
     @Autowired TransactionRepository transactionRepository;
     @Autowired
@@ -33,17 +34,23 @@ public class TransactionServiceImpl implements TransactionService{
     @Autowired BankRepository bankRepository;
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired
-    VirtualAccountService virtualAccountService;
+    DateFormatterIndonesia dateFormatterIndonesia;
+
     @Autowired
-    VirtualAccountRepository virtualAccountRepository;
+    CustomerRepository customerRepository;
 
     @Transactional
     @Override
     public TransactionResponseDto placeTransactionsIntraBank(TransactionRequestDto transactionRequestDto, long idCustomers ){
+        Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(idCustomers)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
         Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionRequestDto.getAccountnum_recipient());
         if (!optionalBankAccountsReceiver.isPresent()) {
-            throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor rekening tidak ditemukan");
+        }
+        if(transactionRequestDto.getAccountnum_recipient().equals(optionalBankAccountsSender.get(0).getAccountNumber())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Nomor rekening tujuan tidak boleh sama dengan nomor rekening pengirim");
         }
 
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
@@ -52,14 +59,25 @@ public class TransactionServiceImpl implements TransactionService{
         System.out.println(transactionRequestDto.getPin());
         System.out.println(bankAccountsSender.getMpinAccount());
 
-        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getCustomer().getMpinAuth())))
-        {
-            throw new IllegalArgumentException("Pin Anda Salah");
-        } 
-        if (bankAccountsSender.getAmount()-transactionRequestDto.getNominal() <0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
-        }
 
+        if (bankAccountsSender.getAmount()-transactionRequestDto.getNominal() <0) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
+        }
+        if (!(passwordEncoder.matches(transactionRequestDto.getPin(), bankAccountsSender.getMpinAccount()))) {
+            int newFailAttempts = bankAccountsSender.getFailedAttempt() + 1;
+            bankAccountsSender.setFailedAttempt(newFailAttempts);
+            bankAccountsRepository.save(bankAccountsSender);
+            if (bankAccountsSender.getFailedAttempt() > 3) {
+                customers.get().setStatusUser(StatusUser.INACTIVE);
+                customers.get().setBannedTime(Date.from(Instant.now()));
+                customerRepository.save(customers.get());
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda terblokir");
+            }
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Pin yang anda masukkan salah");
+        } else {
+            bankAccountsSender.setFailedAttempt(0);
+            bankAccountsRepository.save(bankAccountsSender);
+        }
         // transactionNumber
         Random random = new Random();
         long randomLong = Math.abs(random.nextLong());
@@ -98,8 +116,7 @@ public class TransactionServiceImpl implements TransactionService{
 
         TransactionResponseDto transactionResponseDto = new TransactionResponseDto();
         // Convert Date to String
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm 'WIB'");
-        String dateString = dateFormat.format(transactionsaved.getCreatedDate());
+        String dateString = DateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
         transactionResponseDto.setTransaction_num(String.valueOf(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());
@@ -120,17 +137,13 @@ public class TransactionServiceImpl implements TransactionService{
     @Override
     public TransactionCheckAccountResponseDto checkAccountIntraBank(TransactionCheckAccountRequestDto transactionCheckAccountRequestDto){
 
-        Optional<BankAccounts>  optionalBankAccountsReceiver = bankAccountsRepository.findByAccountNumber( transactionCheckAccountRequestDto.getAccountnum_recipient());
-        if (!optionalBankAccountsReceiver.isPresent()) {
-            throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
-        }
+        Optional<BankAccounts>  optionalBankAccountsReceiver = Optional.ofNullable(bankAccountsRepository.findByAccountNumber(transactionCheckAccountRequestDto.getAccountnum_recipient())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening Tidak Ditemukan")));
         BankAccounts bankAccountsReceiver = optionalBankAccountsReceiver.get();
 
         TransactionCheckAccountResponseDto transactionCheckAccountResponseDisplay = new TransactionCheckAccountResponseDto();
         transactionCheckAccountResponseDisplay.setAccountnum_recipient(transactionCheckAccountRequestDto.getAccountnum_recipient());
         transactionCheckAccountResponseDisplay.setName_recipient(bankAccountsReceiver.getCustomer().getName());
-        // transactionCheckAccountResponseDisplay.setNominal(transactionCheckAccountRequestDto.getNominal());
-        // transactionCheckAccountResponseDisplay.setNote(transactionCheckAccountRequestDto.getNote());
 
         return transactionCheckAccountResponseDisplay;
     }
@@ -139,32 +152,44 @@ public class TransactionServiceImpl implements TransactionService{
     @Transactional
     @Override
     public TransactionOtherBankResponse placeTransactionsInterBank(TransactionOtherBankRequest transactionOtherBankRequest, long customerId){
+        Optional<Customers> customers = Optional.ofNullable(customerRepository.findById(customerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User tidak ditemukan")));
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(customerId);
         List<BankAccountsOtherBanks>  optionalBankAccountsReceiver = bankAccountsOtherBanksRepository.findBankAccountsByAccountNumberAndBankId( transactionOtherBankRequest.getAccountnum_recipient(), transactionOtherBankRequest.getBank_id());
         if (optionalBankAccountsReceiver.isEmpty()) {
-            throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening Tidak Ditemukan");
         }
         Optional<Banks> optionalBanks = bankRepository.findById(Long.valueOf(transactionOtherBankRequest.getBank_id()));
-        // Optional<Banks> optionalBanks = bankRepository.findByBankName("BCA");
         if (!optionalBanks.isPresent()){
-            throw new IllegalArgumentException("Bank Tidak Ditemukan");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Bank Tidak Ditemukan");
+        }
+
+        if(transactionOtherBankRequest.getAccountnum_recipient().equals(optionalBankAccountsSender.get(0).getAccountNumber())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Nomor rekening tujuan tidak boleh sama dengan nomor rekening pengirim");
         }
         Banks banks = optionalBanks.get();
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
         BankAccountsOtherBanks bankAccountsReceiver = optionalBankAccountsReceiver.get(0);
-        // if (!(bankAccountsSender.getCustomer().getMpin().equals(transactionRequestDto.getPin()))){
-        //
-        // }
-
-        if (!(passwordEncoder.matches(transactionOtherBankRequest.getPin(), bankAccountsSender.getMpinAccount())))
-        {
-            throw new IllegalArgumentException("Pin Anda Salah");
-        }
         int nominal = transactionOtherBankRequest.getNominal()+2500;
         if (bankAccountsSender.getAmount()-nominal <0) {
-            throw new InsufficientBalanceException("Saldo Anda Tidak Cukup");
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
         }
 
+        if (!(passwordEncoder.matches(transactionOtherBankRequest.getPin(), bankAccountsSender.getMpinAccount()))) {
+            int newFailAttempts = bankAccountsSender.getFailedAttempt() + 1;
+            bankAccountsSender.setFailedAttempt(newFailAttempts);
+            bankAccountsRepository.save(bankAccountsSender);
+            if (bankAccountsSender.getFailedAttempt() > 3) {
+                customers.get().setStatusUser(StatusUser.INACTIVE);
+                customers.get().setBannedTime(Date.from(Instant.now()));
+                customerRepository.save(customers.get());
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda terblokir");
+            }
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Pin yang anda masukkan salah");
+        } else {
+            bankAccountsSender.setFailedAttempt(0);
+            bankAccountsRepository.save(bankAccountsSender);
+        }
         // transactionNumber
         Random random = new Random();
         long randomLong = Math.abs(random.nextLong());
@@ -173,38 +198,25 @@ public class TransactionServiceImpl implements TransactionService{
         TransactionsNumber transactionsNumberSaved =  transactionNumberRepository.save(transactionsNumber);
 
         // logging money out
-        TransactionOtherBanks transaction_out = new TransactionOtherBanks();
+        Transactions transaction_out = new Transactions();
         transaction_out.setBankAccounts(bankAccountsSender);
-        transaction_out.setBankAccountsOtherBanks(bankAccountsReceiver);
         transaction_out.setTransactionsNumber(transactionsNumberSaved);
         transaction_out.setFromAccountNumber(bankAccountsSender.getAccountNumber());
         transaction_out.setToAccountNumber(bankAccountsReceiver.getAccountNumber());
         transaction_out.setAmountTransfer((double) nominal);
         transaction_out.setNotes(transactionOtherBankRequest.getNote());
+        transaction_out.setType(TransactionsType.ANTAR_BANK);
         transaction_out.setTransactionInformation(TransactionInformation.UANG_KELUAR);
-
-        // logging money in
-        TransactionOtherBanks transaction_in = new TransactionOtherBanks();
-        transaction_in.setBankAccounts(bankAccountsSender);
-        transaction_in.setBankAccountsOtherBanks(bankAccountsReceiver);
-        transaction_in.setTransactionsNumber(transactionsNumberSaved);
-        transaction_in.setFromAccountNumber(bankAccountsReceiver.getAccountNumber());
-        transaction_in.setToAccountNumber(bankAccountsSender.getAccountNumber());
-        transaction_in.setAmountTransfer((double) nominal);
-        transaction_in.setNotes(transactionOtherBankRequest.getNote());
-        transaction_in.setTransactionInformation(TransactionInformation.UANG_MASUK);
 
         bankAccountsSender.setAmount(bankAccountsSender.getAmount()-(double) nominal);
         bankAccountsReceiver.setAmount(bankAccountsReceiver.getAmount()+(double) transactionOtherBankRequest.getNominal());
         bankAccountsOtherBanksRepository.save(bankAccountsReceiver);
         bankAccountsRepository.save(bankAccountsSender);
-        TransactionOtherBanks transactionsaved = transactionOtherBankRepository.save(transaction_out);
-        transactionOtherBankRepository.save(transaction_in);
+        Transactions transactionsaved = transactionRepository.save(transaction_out);
+
 
         TransactionOtherBankResponse transactionResponseDto = new TransactionOtherBankResponse();
-        // Convert Date to String
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy HH:mm 'WIB'");
-        String dateString = dateFormat.format(transactionsaved.getCreatedDate());
+        String dateString = DateFormatterIndonesia.dateFormatterIND(transactionsaved.getCreatedDate());
         transactionResponseDto.setTransaction_num(String.valueOf(randomLong));
         transactionResponseDto.setTransaction_date(dateString);
         transactionResponseDto.setName_sender(bankAccountsSender.getCustomer().getName());
@@ -224,12 +236,11 @@ public class TransactionServiceImpl implements TransactionService{
     public TransactionCheckOtherBankResponse checkAccountOtherBank(TransactionCheckOtherBankAccountRequest transactionCheckAccountRequestDto){
         List<BankAccountsOtherBanks>  optionalBankAccountsReceiver = bankAccountsOtherBanksRepository.findBankAccountsByAccountNumberAndBankId( transactionCheckAccountRequestDto.getAccountnum_recipient(), transactionCheckAccountRequestDto.getBank_id());
         if (optionalBankAccountsReceiver.isEmpty()) {
-            throw new IllegalArgumentException("Nomor Rekening Tidak Ditemukan");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Rekening Tidak Ditemukan");
         }
         Optional<Banks> optionalBanks = bankRepository.findById(Long.valueOf(transactionCheckAccountRequestDto.getBank_id()));
-        // Optional<Banks> optionalBanks = bankRepository.findByBankName("BCA");
         if (!optionalBanks.isPresent()){
-            throw new IllegalArgumentException("Bank Tidak Ditemukan");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Bank Tidak Ditemukan");
         }
         Banks banks = optionalBanks.get();
         BankAccountsOtherBanks bankAccountsReceiver = optionalBankAccountsReceiver.get(0);
@@ -237,12 +248,8 @@ public class TransactionServiceImpl implements TransactionService{
         TransactionCheckOtherBankResponse transactionCheckAccountResponseDisplay = new TransactionCheckOtherBankResponse();
         transactionCheckAccountResponseDisplay.setAccountnum_recipient(transactionCheckAccountRequestDto.getAccountnum_recipient());
         transactionCheckAccountResponseDisplay.setName_recipient(bankAccountsReceiver.getName());
-        // transactionCheckAccountResponseDisplay.setNominal(transactionCheckAccountRequestDto.getNominal());
-        // transactionCheckAccountResponseDisplay.setAdmin_fee(formatCurrency(2500));
         transactionCheckAccountResponseDisplay.setBank_id(transactionCheckAccountRequestDto.getBank_id());
         transactionCheckAccountResponseDisplay.setBank_name(banks.getBankName());
-        // transactionCheckAccountResponseDisplay.setNote(transactionCheckAccountRequestDto.getNote());
-
         return transactionCheckAccountResponseDisplay;
     }
 
@@ -252,16 +259,16 @@ public class TransactionServiceImpl implements TransactionService{
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
         BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
 
-        List<Transactions> optionalHistory =  transactionRepository.findDistinctByToAccountNumber(bankAccountsSender.getAccountNumber());
+        List<Transactions> optionalHistory =  transactionRepository.findDistinctByToAccountNumber(bankAccountsSender.getAccountNumber(), TransactionsType.SESAMA_BANK);
         if (optionalHistory.isEmpty()) {
-            throw new IllegalArgumentException("Transaksi belum ada");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
         }
         List<Map<String, Object>> historyList = new ArrayList<>();
         
         for (Transactions transaction : optionalHistory) {
             Map<String, Object> data = new HashMap<>();
             data.put("name_recipient", transaction.getBankAccounts().getCustomer().getName());
-            data.put("bank_name", "Bank BCA");
+            data.put("bank_name", "Bank Central Asia (BCA)");
             data.put("account_number_recipient", transaction.getBankAccounts().getAccountNumber());
             historyList.add(data);
         }
@@ -273,85 +280,24 @@ public class TransactionServiceImpl implements TransactionService{
     @Transactional
     public List<?> historyTransactionInterBank(long idCustomers){
         List<BankAccounts>  optionalBankAccountsSender = bankAccountsRepository.findBankAccountsByCustomerId(idCustomers);
-        BankAccounts bankAccountsSender = optionalBankAccountsSender.get(0);
-
-        List<TransactionOtherBanks> optionalHistory =  transactionOtherBankRepository.findDistinctByToAccountNumber(bankAccountsSender.getAccountNumber());
-        if (optionalHistory.isEmpty()) {
-            throw new IllegalArgumentException("Transaksi belum ada");
+        Optional<List<Transactions>> sender = transactionRepository.getAllHistoryByToAccountNumber(optionalBankAccountsSender.get(0).getAccountNumber(), TransactionsType.ANTAR_BANK);
+        if (sender.get().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaksi tidak ditemukan");
         }
         List<Map<String, Object>> historyList = new ArrayList<>();
         
-        for (TransactionOtherBanks transaction : optionalHistory) {
+        for (Transactions transaction : sender.get()) {
+            log.info("transaction: " + transaction.getToAccountNumber());
+            Optional<BankAccountsOtherBanks> bankAccountsOtherBanks = bankAccountsOtherBanksRepository.findByAccountNumber(transaction.getToAccountNumber());
+            log.info("bank account: " + bankAccountsOtherBanks.get().getAccountNumber());
             Map<String, Object> data = new HashMap<>();
-            data.put("name_recipient", transaction.getBankAccountsOtherBanks().getName());
-            data.put("bank_name", transaction.getBankAccountsOtherBanks().getBanks().getBankName());
-            data.put("account_number_recipient", transaction.getBankAccountsOtherBanks().getAccountNumber());
+            data.put("name_recipient", bankAccountsOtherBanks.get().getName());
+            data.put("bank_name", bankAccountsOtherBanks.get().getBanks().getBankName());
+            data.put("account_number_recipient", bankAccountsOtherBanks.get().getAccountNumber());
             historyList.add(data);
         }
         
         return historyList;
-    }
-
-    @Transactional
-    @Override
-    public TransferVirtualAccountResponseDto transferVA(Long id, TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
-        BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
-        VirtualAccounts recipientVirtualAccount = virtualAccountService.checkAccount(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        TransactionsNumber transactionsNumber = new TransactionsNumber();
-        transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
-        transactionNumberRepository.save(transactionsNumber);
-        Double adminFee = 2500.0;
-
-        //sender transaction
-        Transactions senderTransaction = new Transactions();
-        senderTransaction.setTransactionInformation(TransactionInformation.UANG_KELUAR);
-        senderTransaction.setBankAccounts(senderBankAccount);
-        senderTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
-        senderTransaction.setTransactionsNumber(transactionsNumber);
-        senderTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
-        senderTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        senderTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
-        senderTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
-        transactionRepository.save(senderTransaction);
-
-        //sender update amount
-        senderBankAccount.setAmount(senderBankAccount.getAmount() - transferVirtualAccountRequestDto.getNominal() - adminFee);
-        bankAccountsRepository.save(senderBankAccount);
-
-        //recipient transaction
-        Transactions recipientTransaction = new Transactions();
-        recipientTransaction.setTransactionInformation(TransactionInformation.UANG_MASUK);
-        recipientTransaction.setType(TransactionsType.VIRTUAL_ACCOUNT);
-
-        //TBD should be same with noTransaction of sender or not
-        recipientTransaction.setTransactionsNumber(transactionsNumber);
-        recipientTransaction.setBankAccounts(senderBankAccount);
-        recipientTransaction.setFromAccountNumber(senderBankAccount.getAccountNumber());
-        recipientTransaction.setToAccountNumber(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        recipientTransaction.setAmountTransfer(transferVirtualAccountRequestDto.getNominal());
-
-        recipientTransaction.setNotes(transferVirtualAccountRequestDto.getNote());
-        transactionRepository.save(recipientTransaction);
-
-        //recipient update amount and save
-        recipientVirtualAccount.setAmount(
-                recipientVirtualAccount.getAmount() + transferVirtualAccountRequestDto.getNominal()
-        );
-        recipientVirtualAccount.setSavedAccount(transferVirtualAccountRequestDto.getSaveAccount());
-        virtualAccountRepository.save(recipientVirtualAccount);
-
-        TransferVirtualAccountResponseDto response = new TransferVirtualAccountResponseDto();
-        response.setTransactionNum(transactionsNumber.getTransactionNumber());
-        response.setType(TransactionsType.VIRTUAL_ACCOUNT);
-        response.setTransactionDate(Date.from(Instant.now()).toString());
-        response.setSenderName(senderBankAccount.getCustomer().getName());
-        response.setSenderAccountNum(senderBankAccount.getAccountNumber());
-        response.setRecipientName(recipientVirtualAccount.getAccountName());
-        response.setRecipientAccountNum(transferVirtualAccountRequestDto.getRecipientAccountNum());
-        response.setNominal(transferVirtualAccountRequestDto.getNominal().toString());
-        response.setAdminFee(String.valueOf(adminFee));
-        response.setNote(transferVirtualAccountRequestDto.getNote());
-        return response;
     }
 
 }

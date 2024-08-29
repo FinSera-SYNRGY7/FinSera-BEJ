@@ -112,6 +112,33 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.0.4</version>
 		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.10.2</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>5.12.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports</artifactId>
+			<version>6.20.0</version> <!-- or latest version -->
+		</dependency>
+		<dependency>
+			<groupId>net.sf.jasperreports</groupId>
+			<artifactId>jasperreports-fonts</artifactId>
+			<version>6.20.0</version> <!-- or latest version -->
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.github.susom</groupId>-->
+<!--			<artifactId>jasperreports-spring-boot-starter</artifactId>-->
+<!--			<version>1.0.0</version> &lt;!&ndash; or latest version &ndash;&gt;-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>

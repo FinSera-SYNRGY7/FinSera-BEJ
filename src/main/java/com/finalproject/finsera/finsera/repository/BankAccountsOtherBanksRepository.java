@@ -18,4 +18,5 @@ public interface BankAccountsOtherBanksRepository extends JpaRepository<BankAcco
     List<BankAccountsOtherBanks> findBankAccountsByAccountNumberAndBankId(@Param("accountNumber") String accountNumber, @Param("bankId") int bankId);
     
     Optional<BankAccountsOtherBanks> findByAccountNumber(String account_number);
+
 }

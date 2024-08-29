@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -18,7 +19,7 @@ public class Customers extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "customer_id")
-    private long idCustomers;
+    private Long idCustomers;
 
     private String address;
 
@@ -57,4 +58,6 @@ public class Customers extends BaseModel{
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
     private List<Notifications> notifications;
 
+    @Column(name = "banned_time")
+    private Date bannedTime;
 }

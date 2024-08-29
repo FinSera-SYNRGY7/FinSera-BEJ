@@ -6,8 +6,9 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "account_dummy_data", schema = "public")
+@Table(name = "virtual_account", schema = "public")
 public class VirtualAccounts extends BaseModel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "account_id")
@@ -17,17 +18,11 @@ public class VirtualAccounts extends BaseModel {
     private String accountName;
 
     @Column(name = "account_number")
-    private String accountNumber;
+    private String virtualAccountNumber;
 
-    @Column(name = "amount")
-    private Double amount;
-
-    @Column(name = "mpin_account")
-    private String mpinAccount;
+    @Column(name = "nominal")
+    private Double nominal;
 
     @Column(name = "account_type")
     private AccountType accountType;
-
-    @Column(name = "saved_account")
-    private Boolean savedAccount;
 }

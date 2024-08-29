@@ -14,7 +14,7 @@ public class BankAccountsOtherBanks extends BaseModel{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_bank_accounts_ob")
-    private long idBankAccounts;
+    private Long idBankAccounts;
 
     @Column(name = "name")
     private String name;

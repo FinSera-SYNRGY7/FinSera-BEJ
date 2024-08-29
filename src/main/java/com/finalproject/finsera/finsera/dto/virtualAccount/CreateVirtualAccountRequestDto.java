@@ -7,7 +7,6 @@ import lombok.Data;
 public class CreateVirtualAccountRequestDto {
     private String accountName;
     private String accountNumber;
-    private Double amount;
-    private String mpinAccount;
+    private Double nominal;
     private AccountType accountType;
 }

@@ -1,25 +1,36 @@
 package com.finalproject.finsera.finsera.service.impl;
 
-import com.finalproject.finsera.finsera.dto.BaseResponse;
 import com.finalproject.finsera.finsera.dto.virtualAccount.AccountLastTransactionResponseDto;
+import com.finalproject.finsera.finsera.dto.virtualAccount.CheckVirtualAccountRequestDto;
+import com.finalproject.finsera.finsera.dto.virtualAccount.CheckVirtualAccountResponseDto;
 import com.finalproject.finsera.finsera.dto.virtualAccount.CreateVirtualAccountRequestDto;
-import com.finalproject.finsera.finsera.model.entity.VirtualAccounts;
-import com.finalproject.finsera.finsera.model.entity.BankAccounts;
-import com.finalproject.finsera.finsera.model.entity.Transactions;
+import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountRequestDto;
+import com.finalproject.finsera.finsera.dto.virtualAccount.transferVirtualAccount.TransferVirtualAccountResponseDto;
+import com.finalproject.finsera.finsera.model.entity.*;
 import com.finalproject.finsera.finsera.model.enums.AccountType;
-import com.finalproject.finsera.finsera.repository.VirtualAccountRepository;
-import com.finalproject.finsera.finsera.repository.BankAccountsRepository;
-import com.finalproject.finsera.finsera.repository.TransactionRepository;
+import com.finalproject.finsera.finsera.model.enums.StatusUser;
+import com.finalproject.finsera.finsera.model.enums.TransactionInformation;
+import com.finalproject.finsera.finsera.model.enums.TransactionsType;
+import com.finalproject.finsera.finsera.repository.*;
 import com.finalproject.finsera.finsera.service.VirtualAccountService;
+import com.finalproject.finsera.finsera.util.DateFormatterIndonesia;
+import com.finalproject.finsera.finsera.util.TransactionNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 
 @Service
 public class VirtualAccountServiceImpl implements VirtualAccountService {
+    @Autowired
+    CustomerRepository customerRepository;
+
     @Autowired
     VirtualAccountRepository virtualAccountRepository;
 
@@ -30,24 +41,20 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
     TransactionRepository transactionRepository;
 
     @Autowired
+    TransactionNumberRepository transactionNumberRepository;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
 
     @Override
     public VirtualAccounts createVirtualAccount(CreateVirtualAccountRequestDto createVirtualAccountRequestDto) {
         VirtualAccounts account = new VirtualAccounts();
         account.setAccountName(createVirtualAccountRequestDto.getAccountName());
-        account.setAccountNumber(createVirtualAccountRequestDto.getAccountNumber());
+        account.setVirtualAccountNumber(createVirtualAccountRequestDto.getAccountNumber());
         account.setAccountType(AccountType.VIRTUAL_ACCOUNT);
-        account.setAmount(createVirtualAccountRequestDto.getAmount());
-        account.setMpinAccount(passwordEncoder.encode(createVirtualAccountRequestDto.getMpinAccount()));
-        account.setSavedAccount(false);
+        account.setNominal(createVirtualAccountRequestDto.getNominal());
         virtualAccountRepository.save(account);
         return account;
-    }
-
-    @Override
-    public VirtualAccounts checkAccount(String accountNum) {
-        return virtualAccountRepository.findByAccountNumber(accountNum);
     }
 
     @Override
@@ -62,37 +69,110 @@ public class VirtualAccountServiceImpl implements VirtualAccountService {
     }
 
     @Override
-    public ResponseEntity<Map<String, Object>> getAccount() {
-        List<Transactions> transactionsList = transactionRepository.getLastAccountTransaction();
-        List<Transactions> savedAccountList = transactionsList.stream()
-                .filter(transactions -> virtualAccountRepository
-                        .findByAccountNumber(transactions.getToAccountNumber()).getSavedAccount())
-                .toList();
+    public Stream<Object> getLastTransactionAccountVA() {
+        List<Transactions> transactionsList = transactionRepository.getLastAccountTransactionVA();
 
         if (transactionsList.isEmpty()){
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "transaction not found");
-            response.put("data", null);
-            return ResponseEntity.badRequest().body(response);
-        } else if (savedAccountList.isEmpty()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("message", "transaction not found");
-            response.put("data", null);
-            return ResponseEntity.badRequest().body(response);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Transaksi tidak ditemukan");
         } else {
-            Set<String> seenAccountNumbers = new HashSet<>();
+            Set<String> seenVirtualAccountNumbers = new HashSet<>();
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "success");
-            response.put("data", transactionsList.stream()
-//                    .filter(transactions -> !savedAccountList.isEmpty())
-                    .filter(transactions -> seenAccountNumbers.add(transactions.getToAccountNumber()))
+            response.put("message", "sukses");
+            Stream<Object> accountLastTransactionResponseDtos = transactionsList.stream()
+                    .filter(transactions -> seenVirtualAccountNumbers.add(transactions.getToAccountNumber()))
                     .map(transactions -> new AccountLastTransactionResponseDto(
-                            virtualAccountRepository.findByAccountNumber(transactions.getToAccountNumber())
-                                    .getAccountName(),
+                      virtualAccountRepository.findByVirtualAccountNumber(transactions.getToAccountNumber()).get().getAccountName(),
                             transactions.getToAccountNumber()
-                    )).toList());
-            return ResponseEntity.ok(response);
+                    ));
+            return accountLastTransactionResponseDtos;
         }
 
+    }
+
+    @Override
+    public CheckVirtualAccountResponseDto checkVirtualAccount(CheckVirtualAccountRequestDto checkVirtualAccountRequestDto) {
+        VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(checkVirtualAccountRequestDto.getVirtualAccountNumber())
+                .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Virtual Account tidak ditemukan"));
+
+
+        CheckVirtualAccountResponseDto responseVirtualAccount = new CheckVirtualAccountResponseDto();
+        responseVirtualAccount.setAccountNum(virtualAccounts.getVirtualAccountNumber());
+        responseVirtualAccount.setAccountName(virtualAccounts.getAccountName());
+        responseVirtualAccount.setNominal(virtualAccounts.getNominal());
+
+        return responseVirtualAccount;
+
+    }
+
+    @Transactional
+    @Override
+    public TransferVirtualAccountResponseDto transferVA(Long id,
+                                                        TransferVirtualAccountRequestDto transferVirtualAccountRequestDto) {
+        Customers customers = customerRepository.findById(id).get();
+        if (customers.getStatusUser().equals(StatusUser.INACTIVE)){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda tidak aktif");
+        }
+
+        BankAccounts senderBankAccount = bankAccountsRepository.findByCustomerId(id);
+        VirtualAccounts virtualAccounts = virtualAccountRepository.findByVirtualAccountNumber(
+                transferVirtualAccountRequestDto.getVirtualAccountNumber()
+        ).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Virtual Account tidak ditemukan"));
+
+        if(virtualAccounts.getVirtualAccountNumber() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nomor Virtual Account tidak ditemukan");
+        }
+        if (!passwordEncoder.matches(
+                transferVirtualAccountRequestDto.getMpinAccount(),
+                senderBankAccount.getMpinAccount()
+        )) {
+            int newFailAttempts = senderBankAccount.getFailedAttempt() + 1;
+            senderBankAccount.setFailedAttempt(newFailAttempts);
+            bankAccountsRepository.save(senderBankAccount);
+            if (senderBankAccount.getFailedAttempt() > 3){
+                customers.setStatusUser(StatusUser.INACTIVE);
+                customers.setBannedTime(Date.from(Instant.now()));
+                customerRepository.save(customers);
+
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Akun anda terblokir");
+            }
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Pin yang anda masukkan salah");
+        } else if (virtualAccounts.getNominal() > senderBankAccount.getAmount()) {
+            throw new ResponseStatusException(HttpStatus.PAYMENT_REQUIRED, "Saldo Anda Tidak Cukup");
+        } else {
+            senderBankAccount.setFailedAttempt(0);
+            bankAccountsRepository.save(senderBankAccount);
+
+            customers.setBannedTime(null);
+            customerRepository.save(customers);
+
+            TransactionsNumber transactionsNumber = new TransactionsNumber();
+            transactionsNumber.setTransactionNumber(TransactionNumberGenerator.generateTransactionNumber());
+            transactionNumberRepository.save(transactionsNumber);
+
+            //sender transaction
+            Transactions transferVirtualAccount = new Transactions();
+            transferVirtualAccount.setTransactionInformation(TransactionInformation.UANG_KELUAR);
+            transferVirtualAccount.setBankAccounts(senderBankAccount);
+            transferVirtualAccount.setType(TransactionsType.VIRTUAL_ACCOUNT);
+            transferVirtualAccount.setTransactionsNumber(transactionsNumber);
+            transferVirtualAccount.setFromAccountNumber(senderBankAccount.getAccountNumber());
+            transferVirtualAccount.setToAccountNumber(virtualAccounts.getVirtualAccountNumber());
+            transferVirtualAccount.setAmountTransfer(virtualAccounts.getNominal());
+            transactionRepository.save(transferVirtualAccount);
+
+            //update sender amount
+            senderBankAccount.setAmount(senderBankAccount.getAmount() - virtualAccounts.getNominal());
+            bankAccountsRepository.save(senderBankAccount);
+
+            TransferVirtualAccountResponseDto transferVAResponse = new TransferVirtualAccountResponseDto();
+            transferVAResponse.setTransactionDate(DateFormatterIndonesia.dateFormatterIND(Date.from(Instant.now())));
+            transferVAResponse.setTransactionNum(transactionsNumber.getTransactionNumber());
+            transferVAResponse.setRecipientName(virtualAccounts.getAccountName());
+            transferVAResponse.setRecipientVirtualAccountNum(virtualAccounts.getVirtualAccountNumber());
+            transferVAResponse.setType(TransactionsType.VIRTUAL_ACCOUNT);
+            transferVAResponse.setNominal(transferVirtualAccount.getAmountTransfer().toString());
+
+            return transferVAResponse;
+        }
     }
 }

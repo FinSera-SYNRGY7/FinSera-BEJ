@@ -22,11 +22,15 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Finsera API Documentation")
                         .version("1.0.0")
-                        .description("Documentation for Finsera API using Springdoc OpenAPI and Swagger UI, Key Features :" +
-                                "1. Authentication" +
-                                "2. Informasi Saldo" +
-                                "3. Profiling" +
-                                "4. Transfer Sesama Bank"))
+                        .description("Documentation for Finsera API using Springdoc OpenAPI and Swagger UI, Key Features :\n" +
+                                "1. Authentication\n" +
+                                "2. Informasi Saldo\n" +
+                                "3. Profiling\n" +
+                                "3. Top Up Ewallet\n" +
+                                "3. Virtual Account\n" +
+                                "3. Qris\n" +
+                                "3. Mutation\n" +
+                                "4. Transfer Intra-Inter Bank\n"))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("bearerAuth", new SecurityScheme()
                                 .type(SecurityScheme.Type.HTTP)
@@ -34,7 +38,7 @@ public class OpenApiConfig {
                                 .bearerFormat("JWT")))
                 .servers(List.of(
                         new Server().url("http://localhost:8080").description("HTTP Server"),
-                        new Server().url("https://individual-gerry-finsera-dd701fe5.koyeb.app").description("HTTPS Server")
+                        new Server().url("https://finsera-api.site").description("HTTPS Server")
                 ));
 
 

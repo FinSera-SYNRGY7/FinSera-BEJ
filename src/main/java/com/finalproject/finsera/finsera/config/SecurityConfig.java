@@ -1,6 +1,7 @@
 package com.finalproject.finsera.finsera.config;
 
 import com.finalproject.finsera.finsera.util.JwtAuthFilter;
+import jakarta.servlet.DispatcherType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,9 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -38,13 +42,20 @@ public class SecurityConfig implements WebMvcConfigurer {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // Enable CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth ->{
-//                            auth.requestMatchers("api/v1/auth/user/**", "/v3/**","/swagger-ui/**", "/v3/api-docs/**").permitAll();
-                    auth.requestMatchers("/api/v1/amount").authenticated()
-                            .anyRequest().permitAll();
+                            auth.requestMatchers(
+                                    "/api/v1/auth/user/**",
+                                    "/api/v1/test/",
+                                    "/api/v1/test",
+                                    "/v3/**",
+                                    "/swagger-ui/**",
+                                    "/v3/api-docs/**")
+                                    .permitAll();
+                            auth.anyRequest().authenticated();
                         }
                 )
+
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -55,13 +66,9 @@ public class SecurityConfig implements WebMvcConfigurer {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.addAllowedOrigin("http://localhost:5173");
-        configuration.addAllowedMethod(HttpMethod.GET);
-        configuration.addAllowedMethod(HttpMethod.POST);
-        configuration.addAllowedMethod(HttpMethod.PUT);
-        configuration.addAllowedMethod(HttpMethod.DELETE);
-        configuration.addAllowedMethod(HttpMethod.OPTIONS);
-        configuration.addAllowedHeader("*");
+        configuration.addAllowedOriginPattern("*"); // Mengizinkan semua origin
+        configuration.addAllowedMethod(CorsConfiguration.ALL); // Mengizinkan semua method
+        configuration.addAllowedHeader(CorsConfiguration.ALL); // Mengizinkan semua headers
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  finsera:
+    image: fahrizalvianaz/finsera:latest
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://roundhouse.proxy.rlwy.net:51749/railway
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: FkcLlyNpTVXInmWuVzxcHAAalhFeRZXq

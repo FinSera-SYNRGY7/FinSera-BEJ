@@ -10,9 +10,13 @@ public interface MutasiService {
 
     List<MutasiResponseDto> getMutasi(
             String username,
-            MutasiRequestDto mutasiRequestDto,
             Timestamp startDate,
             Timestamp endDate,
             int page,
             int size);
+
+    byte[]  transactionsReport(String username, Timestamp startDate,
+                            Timestamp endDate);
+
+
 }

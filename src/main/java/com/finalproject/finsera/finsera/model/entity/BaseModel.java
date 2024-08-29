@@ -17,18 +17,14 @@ import java.util.Date;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseModel implements Serializable {
 
-
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_date", nullable = true, updatable = false)
     @CreatedDate
     private Date createdDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_date", nullable = true)
     @LastModifiedDate
     private Date updatedDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "deleted_date")
     private Date deletedDate;
 }

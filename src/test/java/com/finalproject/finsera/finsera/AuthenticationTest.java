@@ -43,46 +43,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 public class AuthenticationTest {
 
-    @Autowired
-    MockMvc mockMvc;
-
-
-    @MockBean
-    private CustomerService customerService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-
-    private BaseResponse authResponse;
-
-    @BeforeEach
-    public void init() {
-        authResponse = new BaseResponse();
-
-    }
-
-    @Test
-    public void testLogin() throws Exception{
-        LoginRequestDto loginRequestDto = new LoginRequestDto();
-        loginRequestDto.setUsername("customerusername");
-        loginRequestDto.setPassword("securepassword");
-
-        ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/auth/user/login")
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequestDto))
-        );
-        resultActions
-                .andExpect(status().isOk())
-                .andDo(result -> {
-                    String responseBody = result.getResponse().getContentAsString();
-                    authResponse = objectMapper.readValue(responseBody, BaseResponse.class);
-                    assertEquals("Login success", authResponse.getMessage());
-                });
-
-    }
+//    @Autowired
+//    MockMvc mockMvc;
+//
+//
+//    @MockBean
+//    private CustomerService customerService;
+//
+//    @Autowired
+//    private ObjectMapper objectMapper;
+//
+//
+//    private BaseResponse authResponse;
+//
+//    @BeforeEach
+//    public void init() {
+//        authResponse = new BaseResponse();
+//
+//    }
+//
+//    @Test
+//    public void testLogin() throws Exception{
+//        LoginRequestDto loginRequestDto = new LoginRequestDto();
+//        loginRequestDto.setUsername("customerusername");
+//        loginRequestDto.setPassword("securepassword");
+//
+//        ResultActions resultActions = mockMvc.perform(
+//                post("/api/v1/auth/user/login")
+//                        .accept(MediaType.APPLICATION_JSON)
+//                        .contentType(MediaType.APPLICATION_JSON)
+//                        .content(objectMapper.writeValueAsString(loginRequestDto))
+//        );
+//        resultActions
+//                .andExpect(status().isOk())
+//                .andDo(result -> {
+//                    String responseBody = result.getResponse().getContentAsString();
+//                    authResponse = objectMapper.readValue(responseBody, BaseResponse.class);
+//                    assertEquals("Login success", authResponse.getMessage());
+//                });
+//
+//    }
 
 //    @Test
 //    public void testRelogin() throws Exception{

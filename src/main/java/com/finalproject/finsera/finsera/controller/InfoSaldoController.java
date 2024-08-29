@@ -1,12 +1,14 @@
 package com.finalproject.finsera.finsera.controller;
 
 
-import com.finalproject.finsera.finsera.dto.infosaldo.InfoSaldoRequest;
+
 import com.finalproject.finsera.finsera.dto.base.BaseResponse;
 import com.finalproject.finsera.finsera.dto.schemes.InfoSaldoExampleSwagger;
 import com.finalproject.finsera.finsera.service.InfoSaldoService;
+import com.finalproject.finsera.finsera.util.ApiResponseAnnotations;
 import com.finalproject.finsera.finsera.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,9 +42,10 @@ public class InfoSaldoController {
     private final JwtUtil jwtUtil;
 
     @GetMapping(value = {"/", ""})
+    @ApiResponseAnnotations.InformasiSaldoApiResponses
     @Operation(summary = "Info Saldo user (done)", security = @SecurityRequirement(name = "bearerAuth"))
-    @ApiResponse(responseCode = "200", content = { @Content(schema = @Schema(implementation = InfoSaldoExampleSwagger.class), mediaType = "application/json") })
     public ResponseEntity<?> getInfoSaldo(
+            @Parameter(description = "Example header value", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb2huZG9lIiwidXNlcklkIjoxLCJpYXQiOjE3MjQxMjA2NTZ9.1xUZqr42tkDH4x31q9gJd3TmMMRGouRhCixe9BmtI6Y")
             @Valid
             @RequestHeader(name = "Authorization") String token
     ) {
@@ -51,6 +54,8 @@ public class InfoSaldoController {
         String username = jwtUtil.getUsername(jwt);
         return ResponseEntity.ok(BaseResponse.success(infoSaldoService.getInfoSaldo(username), "Nomor Rekening ditemukan"));
     }
+
+
 
 
 }
